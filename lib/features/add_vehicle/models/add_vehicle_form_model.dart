@@ -6,10 +6,12 @@ class AddVehicleFormModel {
   final String model;
   final int year;
   final String fuelPowertrain;
+  final String bodyType;
   final int mileage;
   final DistanceUnit distanceUnit;
   final Currency currency;
   final bool hasPhoto;
+  final String? photoPath;
 
   const AddVehicleFormModel({
     required this.vin,
@@ -17,10 +19,12 @@ class AddVehicleFormModel {
     required this.model,
     required this.year,
     required this.fuelPowertrain,
+    required this.bodyType,
     required this.mileage,
     required this.distanceUnit,
     required this.currency,
     required this.hasPhoto,
+    this.photoPath,
   });
 
   VehiclePassportModel toVehiclePassportModel() {
@@ -31,11 +35,12 @@ class AddVehicleFormModel {
       year: year > 0 ? year : 2013,
       vin: vin.toUpperCase(),
       fuelPowertrain: fuelPowertrain,
-      bodyType: 'Sedan',
+      bodyType: bodyType,
       currentMileage: mileage > 0 ? mileage : 142000,
       distanceUnit: distanceUnit,
       currency: currency,
       isActive: true,
+      photoUrl: photoPath,
       licensePlate: '77 VV 707',
       serviceRecords: const [],
     );
