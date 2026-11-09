@@ -99,6 +99,24 @@ mixin _$AddVehicleController on _AddVehicleControllerBase, Store {
     });
   }
 
+  late final _$bodyTypeAtom = Atom(
+    name: '_AddVehicleControllerBase.bodyType',
+    context: context,
+  );
+
+  @override
+  String get bodyType {
+    _$bodyTypeAtom.reportRead();
+    return super.bodyType;
+  }
+
+  @override
+  set bodyType(String value) {
+    _$bodyTypeAtom.reportWrite(value, super.bodyType, () {
+      super.bodyType = value;
+    });
+  }
+
   late final _$mileageAtom = Atom(
     name: '_AddVehicleControllerBase.mileage',
     context: context,
@@ -171,6 +189,48 @@ mixin _$AddVehicleController on _AddVehicleControllerBase, Store {
     });
   }
 
+  late final _$photoPathAtom = Atom(
+    name: '_AddVehicleControllerBase.photoPath',
+    context: context,
+  );
+
+  @override
+  String? get photoPath {
+    _$photoPathAtom.reportRead();
+    return super.photoPath;
+  }
+
+  @override
+  set photoPath(String? value) {
+    _$photoPathAtom.reportWrite(value, super.photoPath, () {
+      super.photoPath = value;
+    });
+  }
+
+  late final _$pickPhotoFromGalleryAsyncAction = AsyncAction(
+    '_AddVehicleControllerBase.pickPhotoFromGallery',
+    context: context,
+  );
+
+  @override
+  Future<String?> pickPhotoFromGallery() {
+    return _$pickPhotoFromGalleryAsyncAction.run(
+      () => super.pickPhotoFromGallery(),
+    );
+  }
+
+  late final _$capturePhotoFromCameraAsyncAction = AsyncAction(
+    '_AddVehicleControllerBase.capturePhotoFromCamera',
+    context: context,
+  );
+
+  @override
+  Future<String?> capturePhotoFromCamera() {
+    return _$capturePhotoFromCameraAsyncAction.run(
+      () => super.capturePhotoFromCamera(),
+    );
+  }
+
   late final _$_AddVehicleControllerBaseActionController = ActionController(
     name: '_AddVehicleControllerBase',
     context: context,
@@ -232,6 +292,17 @@ mixin _$AddVehicleController on _AddVehicleControllerBase, Store {
   }
 
   @override
+  void setBodyType(String val) {
+    final _$actionInfo = _$_AddVehicleControllerBaseActionController
+        .startAction(name: '_AddVehicleControllerBase.setBodyType');
+    try {
+      return super.setBodyType(val);
+    } finally {
+      _$_AddVehicleControllerBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   void setMileage(int val) {
     final _$actionInfo = _$_AddVehicleControllerBaseActionController
         .startAction(name: '_AddVehicleControllerBase.setMileage');
@@ -276,6 +347,17 @@ mixin _$AddVehicleController on _AddVehicleControllerBase, Store {
   }
 
   @override
+  void removePhoto() {
+    final _$actionInfo = _$_AddVehicleControllerBaseActionController
+        .startAction(name: '_AddVehicleControllerBase.removePhoto');
+    try {
+      return super.removePhoto();
+    } finally {
+      _$_AddVehicleControllerBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   VehiclePassportModel submitVehicle() {
     final _$actionInfo = _$_AddVehicleControllerBaseActionController
         .startAction(name: '_AddVehicleControllerBase.submitVehicle');
@@ -294,10 +376,12 @@ make: ${make},
 model: ${model},
 year: ${year},
 fuelPowertrain: ${fuelPowertrain},
+bodyType: ${bodyType},
 mileage: ${mileage},
 distanceUnit: ${distanceUnit},
 currency: ${currency},
-photoAdded: ${photoAdded}
+photoAdded: ${photoAdded},
+photoPath: ${photoPath}
     ''';
   }
 }

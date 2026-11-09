@@ -58,34 +58,6 @@ class GarageManagerView extends StatelessWidget {
             ],
           ),
         ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16),
-            child: Center(
-              child: ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 8,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                ),
-                icon: const Icon(Icons.add_rounded, size: 16),
-                label: const Text(
-                  'Add Car',
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
-                ),
-                onPressed: () {
-                  context.router.push(AddNewVehicleRoute());
-                },
-              ),
-            ),
-          ),
-        ],
       ),
       body: Observer(
         builder: (_) {

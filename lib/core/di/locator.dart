@@ -1,9 +1,12 @@
 import 'package:get_it/get_it.dart';
+
+import '../controllers/image_picker_controller.dart';
 import '../repository/service_record_repository.dart';
 import '../repository/settings_repository.dart';
 import '../repository/vehicle_repository.dart';
 import '../services/hive_local_database_service.dart';
 import '../services/local_database_service.dart';
+import '../services/media_service.dart';
 import '../theme/theme_controller.dart';
 import '../../features/add_vehicle/controllers/add_vehicle_controller.dart';
 import '../../features/dossier/controllers/dossier_controller.dart';
@@ -28,7 +31,17 @@ class Locator {
   /// Registers all repositories and feature controllers into GetIt.
   static void setup() {
     if (!getIt.isRegistered<LocalDatabaseService>()) {
-      getIt.registerLazySingleton<LocalDatabaseService>(() => HiveLocalDatabaseService());
+      getIt.registerLazySingleton<LocalDatabaseService>(
+        () => HiveLocalDatabaseService(),
+      );
+    }
+    if (!getIt.isRegistered<MediaService>()) {
+      getIt.registerLazySingleton<MediaService>(() => MediaService());
+    }
+    if (!getIt.isRegistered<ImagePickerController>()) {
+      getIt.registerFactory<ImagePickerController>(
+        () => ImagePickerController(mediaService: getIt<MediaService>()),
+      );
     }
     if (!getIt.isRegistered<VehicleRepository>()) {
       getIt.registerLazySingleton<VehicleRepository>(
@@ -45,7 +58,8 @@ class Locator {
     }
     if (!getIt.isRegistered<SettingsRepository>()) {
       getIt.registerLazySingleton<SettingsRepository>(
-        () => SettingsRepository(databaseService: getIt<LocalDatabaseService>()),
+        () =>
+            SettingsRepository(databaseService: getIt<LocalDatabaseService>()),
       );
     }
     if (!getIt.isRegistered<ThemeController>()) {
@@ -61,8 +75,12 @@ class Locator {
       );
     }
     if (!getIt.isRegistered<AddVehicleController>()) {
-      getIt.registerLazySingleton<AddVehicleController>(
-        () => AddVehicleController(repository: getIt<VehicleRepository>()),
+      getIt.registerFactory<AddVehicleController>(
+        () => AddVehicleController(
+          repository: getIt<VehicleRepository>(),
+          mediaService: getIt<MediaService>(),
+          imagePickerController: getIt<ImagePickerController>(),
+        ),
       );
     }
     if (!getIt.isRegistered<TimelineController>()) {
@@ -115,21 +133,32 @@ class Locator {
   }
 
   // GetIt-backed static accessors for backward-compatible and type-safe dependency resolution
-  static LocalDatabaseService get databaseService => _get<LocalDatabaseService>();
+  static LocalDatabaseService get databaseService =>
+      _get<LocalDatabaseService>();
+  static MediaService get mediaService => _get<MediaService>();
+  static ImagePickerController get imagePickerController =>
+      _get<ImagePickerController>();
   static VehicleRepository get vehicleRepository => _get<VehicleRepository>();
-  static ServiceRecordRepository get serviceRecordRepository => _get<ServiceRecordRepository>();
-  static SettingsRepository get settingsRepository => _get<SettingsRepository>();
+  static ServiceRecordRepository get serviceRecordRepository =>
+      _get<ServiceRecordRepository>();
+  static SettingsRepository get settingsRepository =>
+      _get<SettingsRepository>();
   static ThemeController get themeController => _get<ThemeController>();
 
   static ShellController get shellController => _get<ShellController>();
   static GarageController get garageController => _get<GarageController>();
-  static AddVehicleController get addVehicleController => _get<AddVehicleController>();
-  static TimelineController get timelineController => _get<TimelineController>();
-  static RecordDetailController get recordDetailController => _get<RecordDetailController>();
+  static AddVehicleController get addVehicleController =>
+      _get<AddVehicleController>();
+  static TimelineController get timelineController =>
+      _get<TimelineController>();
+  static RecordDetailController get recordDetailController =>
+      _get<RecordDetailController>();
   static IntakeController get intakeController => _get<IntakeController>();
-  static ManualEntryController get manualEntryController => _get<ManualEntryController>();
+  static ManualEntryController get manualEntryController =>
+      _get<ManualEntryController>();
   static DossierController get dossierController => _get<DossierController>();
-  static SettingsController get settingsController => _get<SettingsController>();
+  static SettingsController get settingsController =>
+      _get<SettingsController>();
 
   /// Initializes asynchronous dependencies like local database loading.
   static Future<void> init() async {
