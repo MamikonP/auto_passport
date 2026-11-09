@@ -1,7 +1,7 @@
+import 'package:auto_passport/core/models/vehicle_passport_model.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 
-import '../../features/add_vehicle/controllers/add_vehicle_controller.dart';
 import '../../features/add_vehicle/views/add_new_vehicle_view.dart';
 import '../../features/dossier/controllers/dossier_controller.dart';
 import '../../features/dossier/views/dossier_hub_view.dart';

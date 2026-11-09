@@ -94,6 +94,9 @@ abstract class _AddVehicleControllerBase with Store {
   void setCurrency(Currency val) => currency = val;
 
   @action
+  void setPhoto(String val) => photoPath = val;
+
+  @action
   void togglePhoto() {
     photoAdded = !photoAdded;
     if (!photoAdded) {
@@ -132,6 +135,7 @@ abstract class _AddVehicleControllerBase with Store {
   @action
   VehiclePassportModel submitVehicle() {
     final form = AddVehicleFormModel(
+      id: 'veh-${DateTime.now().millisecondsSinceEpoch}',
       vin: vin,
       make: make,
       model: model,
@@ -148,5 +152,26 @@ abstract class _AddVehicleControllerBase with Store {
     final vehicle = form.toVehiclePassportModel();
     _repository.addVehicle(vehicle);
     return vehicle;
+  }
+
+  @action
+  void updateVehicle(String id) {
+    final form = AddVehicleFormModel(
+      id: id,
+      vin: vin,
+      make: make,
+      model: model,
+      year: year,
+      fuelPowertrain: fuelPowertrain,
+      bodyType: bodyType,
+      mileage: mileage,
+      distanceUnit: distanceUnit,
+      currency: currency,
+      hasPhoto: photoAdded,
+      photoPath: photoPath,
+    );
+
+    final vehicle = form.toVehiclePassportModel();
+    _repository.updateVehicle(vehicle);
   }
 }

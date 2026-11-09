@@ -12,11 +12,10 @@ mixin _$ImagePickerController on _ImagePickerControllerBase, Store {
   Computed<bool>? _$hasImageComputed;
 
   @override
-  bool get hasImage =>
-      (_$hasImageComputed ??= Computed<bool>(
-        () => super.hasImage,
-        name: '_ImagePickerControllerBase.hasImage',
-      )).value;
+  bool get hasImage => (_$hasImageComputed ??= Computed<bool>(
+    () => super.hasImage,
+    name: '_ImagePickerControllerBase.hasImage',
+  )).value;
 
   late final _$imagePathAtom = Atom(
     name: '_ImagePickerControllerBase.imagePath',
@@ -109,4 +108,3 @@ hasImage: ${hasImage}
     ''';
   }
 }
-
