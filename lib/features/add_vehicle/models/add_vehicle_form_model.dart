@@ -1,6 +1,7 @@
 import '../../../core/models/vehicle_model.dart';
 
 class AddVehicleFormModel {
+  final String id;
   final String vin;
   final String make;
   final String model;
@@ -14,6 +15,7 @@ class AddVehicleFormModel {
   final String? photoPath;
 
   const AddVehicleFormModel({
+    required this.id,
     required this.vin,
     required this.make,
     required this.model,
@@ -29,7 +31,7 @@ class AddVehicleFormModel {
 
   VehiclePassportModel toVehiclePassportModel() {
     return VehiclePassportModel(
-      id: 'veh-${DateTime.now().millisecondsSinceEpoch}',
+      id: id,
       make: make.isNotEmpty ? make : 'BMW',
       model: model.isNotEmpty ? model : '528i',
       year: year > 0 ? year : 2013,

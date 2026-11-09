@@ -13,9 +13,9 @@ import '../controllers/add_vehicle_controller.dart';
 
 @RoutePage()
 class AddNewVehicleView extends StatefulWidget {
-  final AddVehicleController? controller;
+  final VehiclePassportModel? vehicle;
 
-  const AddNewVehicleView({super.key, this.controller});
+  const AddNewVehicleView({super.key, this.vehicle});
 
   @override
   State<AddNewVehicleView> createState() => _AddNewVehicleViewState();
@@ -34,7 +34,10 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
   @override
   void initState() {
     super.initState();
-    _controller = widget.controller ?? Locator.addVehicleController;
+    _controller = Locator.addVehicleController;
+    if (widget.vehicle != null) {
+      _onInitializeVehicle(widget.vehicle!, _controller);
+    }
 
     _vinTextController = TextEditingController(text: _controller.vin);
     _makeTextController = TextEditingController(text: _controller.make);
@@ -57,6 +60,22 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
     super.dispose();
   }
 
+  void _onInitializeVehicle(
+    VehiclePassportModel vehicle,
+    AddVehicleController controller,
+  ) {
+    controller.setVin(vehicle.vin);
+    controller.setMake(vehicle.make);
+    controller.setModel(vehicle.model);
+    controller.setYear(vehicle.year);
+    controller.setMileage(vehicle.mileageKm);
+    controller.setBodyType(vehicle.bodyType);
+    controller.setFuel(vehicle.fuelPowertrain);
+    controller.setDistanceUnit(vehicle.distanceUnit);
+    controller.setCurrency(vehicle.currency);
+    controller.setPhoto(vehicle.photoUrl ?? '');
+  }
+
   void _submit() {
     if (_formKey.currentState?.validate() ?? false) {
       _controller.setVin(_vinTextController.text.trim());
@@ -70,14 +89,24 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
             142000,
       );
 
-      final newVehicle = _controller.submitVehicle();
+      if (widget.vehicle == null) {
+        final newVehicle = _controller.submitVehicle();
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('✓ ${newVehicle.fullName} added to your Garage'),
-          backgroundColor: AppColors.verified,
-        ),
-      );
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('✓ ${newVehicle.fullName} added to your Garage'),
+            backgroundColor: AppColors.verified,
+          ),
+        );
+      } else {
+        _controller.updateVehicle(widget.vehicle!.id);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('✓ ${_controller.make} updated in your Garage'),
+            backgroundColor: AppColors.pending,
+          ),
+        );
+      }
 
       context.router.maybePop();
     }
@@ -217,9 +246,9 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
         ),
         leadingWidth: 90,
         centerTitle: true,
-        title: const Text(
-          'New Vehicle Setup',
-          style: TextStyle(
+        title: Text(
+          widget.vehicle != null ? 'Edit Vehicle' : 'New Vehicle Setup',
+          style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w700,
             color: Colors.white,
@@ -668,7 +697,7 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
                                 height: 150,
                                 width: double.infinity,
                                 fit: BoxFit.cover,
-                                errorBuilder: (_, __, ___) => const Icon(
+                                errorBuilder: (_, _, _) => const Icon(
                                   Icons.check_circle_rounded,
                                   size: 36,
                                   color: AppColors.verified,

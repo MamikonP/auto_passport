@@ -336,6 +336,17 @@ mixin _$AddVehicleController on _AddVehicleControllerBase, Store {
   }
 
   @override
+  void setPhoto(String val) {
+    final _$actionInfo = _$_AddVehicleControllerBaseActionController
+        .startAction(name: '_AddVehicleControllerBase.setPhoto');
+    try {
+      return super.setPhoto(val);
+    } finally {
+      _$_AddVehicleControllerBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   void togglePhoto() {
     final _$actionInfo = _$_AddVehicleControllerBaseActionController
         .startAction(name: '_AddVehicleControllerBase.togglePhoto');
@@ -363,6 +374,17 @@ mixin _$AddVehicleController on _AddVehicleControllerBase, Store {
         .startAction(name: '_AddVehicleControllerBase.submitVehicle');
     try {
       return super.submitVehicle();
+    } finally {
+      _$_AddVehicleControllerBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void updateVehicle(String id) {
+    final _$actionInfo = _$_AddVehicleControllerBaseActionController
+        .startAction(name: '_AddVehicleControllerBase.updateVehicle');
+    try {
+      return super.updateVehicle(id);
     } finally {
       _$_AddVehicleControllerBaseActionController.endAction(_$actionInfo);
     }
