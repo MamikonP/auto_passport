@@ -7,7 +7,6 @@ import '../../../core/di/locator.dart';
 import '../../../core/routes/app_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_confirmation_dialog.dart';
-import '../../intake/views/intake_modal.dart';
 import '../controllers/timeline_controller.dart';
 import '../widgets/timeline_empty_garage_view.dart';
 import '../widgets/timeline_entry_card.dart';
@@ -337,7 +336,8 @@ class TimelineFeedView extends StatelessWidget {
                         fontSize: 14,
                       ),
                     ),
-                    onPressed: () => IntakeModal.show(context),
+                    onPressed: () =>
+                        context.router.push(ManualEntryFormRoute()),
                   ),
                 )
               : null,

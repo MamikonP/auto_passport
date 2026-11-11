@@ -10,6 +10,7 @@ import '../../../core/di/locator.dart';
 import '../../../core/models/vehicle_model.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/custom_text_field.dart';
+import '../../../core/widgets/info_description_box.dart';
 import '../controllers/add_vehicle_controller.dart';
 
 @RoutePage()
@@ -31,6 +32,8 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
   late final TextEditingController _modelTextController;
   late final TextEditingController _yearTextController;
   late final TextEditingController _mileageTextController;
+
+  bool _isVinScannedFromCamera = false;
 
   @override
   void initState() {
@@ -259,6 +262,9 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
       final detected = result.detectedVin!;
       _vinTextController.text = detected;
       _controller.setVin(detected);
+      setState(() {
+        _isVinScannedFromCamera = true;
+      });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('✓ VIN detected: $detected'),
@@ -328,6 +334,9 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
                       Navigator.of(sheetContext).pop();
                       _vinTextController.text = candidate;
                       _controller.setVin(candidate);
+                      setState(() {
+                        _isVinScannedFromCamera = true;
+                      });
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text('✓ VIN applied: $candidate'),
@@ -571,6 +580,13 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
                   ),
                 ),
               ),
+              if (_isVinScannedFromCamera) ...[
+                const SizedBox(height: 8),
+                const InfoDescriptionBox.warning(
+                  text:
+                      'Please double-check the scanned VIN characters carefully. Camera OCR may occasionally misread similar symbols (such as 0/O, 1/I, 5/S, or 8/B).',
+                ),
+              ],
               const SizedBox(height: 16),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,

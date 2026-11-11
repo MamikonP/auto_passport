@@ -2,10 +2,10 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import '../../../core/di/locator.dart';
+import '../../../core/routes/app_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../dossier/views/dossier_hub_view.dart';
 import '../../garage/views/garage_manager_view.dart';
-import '../../intake/views/intake_modal.dart';
 import '../../settings/views/settings_view.dart';
 import '../../timeline/views/timeline_feed_view.dart';
 import '../controllers/shell_controller.dart';
@@ -65,7 +65,7 @@ class MainShellView extends StatelessWidget {
                     isSelected: activeController.currentIndex == item.index,
                     onTap: () {
                       if (item.isScanButton) {
-                        IntakeModal.show(context);
+                        context.router.push(ManualEntryFormRoute());
                       } else {
                         activeController.setIndex(item.index);
                       }
