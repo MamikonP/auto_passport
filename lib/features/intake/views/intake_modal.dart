@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+
 import '../../../core/di/locator.dart';
 import '../../../core/routes/app_router.dart';
 import '../../../core/theme/app_colors.dart';
@@ -10,10 +11,7 @@ import '../widgets/intake_option_card.dart';
 class IntakeModal extends StatelessWidget {
   final IntakeController? controller;
 
-  const IntakeModal({
-    super.key,
-    this.controller,
-  });
+  const IntakeModal({super.key, this.controller});
 
   static Future<void> show(BuildContext context) {
     return showModalBottomSheet(
@@ -62,29 +60,35 @@ class IntakeModal extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Log Service Proof',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Log Service Proof',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
                       ),
-                    ),
-                    SizedBox(height: 4),
-                    Text(
-                      'Choose how you want to document this repair:',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: AppColors.textSecondary,
+                      SizedBox(height: 4),
+                      Text(
+                        'Choose how you want to document this repair:',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: AppColors.textSecondary,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.close_rounded, color: AppColors.textSecondary, size: 20),
+                  icon: const Icon(
+                    Icons.close_rounded,
+                    color: AppColors.textSecondary,
+                    size: 20,
+                  ),
                   onPressed: () => Navigator.of(context).pop(),
                 ),
               ],
@@ -97,7 +101,9 @@ class IntakeModal extends StatelessWidget {
                   method: method,
                   onTap: () {
                     Navigator.of(context).pop();
-                    context.router.push(ManualEntryFormRoute(initialProofType: method.id));
+                    context.router.push(
+                      ManualEntryFormRoute(initialProofType: method.id),
+                    );
                   },
                 ),
               );

@@ -6,6 +6,7 @@ import '../../../core/di/locator.dart';
 import '../../../core/models/vehicle_model.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/custom_text_field.dart';
+import '../../../core/widgets/info_description_box.dart';
 import '../controllers/manual_entry_controller.dart';
 import '../widgets/manual_entry_add_photo_button.dart';
 import '../widgets/manual_entry_attachment_thumbnail.dart';
@@ -97,7 +98,7 @@ class _ManualEntryFormViewState extends State<ManualEntryFormView> {
             color: AppColors.primaryLight,
           ),
           label: const Text(
-            'Intake',
+            'Back',
             style: TextStyle(
               color: AppColors.primaryLight,
               fontSize: 14,
@@ -467,9 +468,13 @@ class _ManualEntryFormViewState extends State<ManualEntryFormView> {
                   color: AppColors.textSecondary,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 6),
+              const InfoDescriptionBox(
+                text: 'Upload photos of new part boxes or labels, the car on a service lift, paper store receipts, oil change door stickers, or payment transfer screenshots (Idram, Telcell, bank app).',
+              ),
+              const SizedBox(height: 10),
               Observer(
-                builder: (_) => Row(
+                builder: (_) => Wrap(
                   children: [
                     ..._controller.proofBadges.map((badge) {
                       return ManualEntryAttachmentThumbnail(
