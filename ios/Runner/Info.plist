@@ -4,6 +4,10 @@
 <dict>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>AutoPassport needs camera access to scan vehicle VIN numbers and capture vehicle photos.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>AutoPassport needs photo library access to attach vehicle photos and scan VIN numbers from images.</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>

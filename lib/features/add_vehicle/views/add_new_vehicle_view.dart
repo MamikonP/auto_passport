@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:auto_passport/core/models/ocr_scan_result.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -112,6 +113,238 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
     }
   }
 
+  Future<bool> _ensureCameraAccess() async {
+    final status = await _controller.ensureCameraPermission();
+    if (status.isGranted) return true;
+    if (!mounted) return false;
+
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: AppColors.darkSurface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(14),
+          side: const BorderSide(color: AppColors.darkBorder),
+        ),
+        title: const Text(
+          'Camera Permission Required',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        content: const Text(
+          'Camera access is needed to scan 17-character VIN plates and capture vehicle photos. Please enable Camera permission in Settings.',
+          style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text(
+              'Cancel',
+              style: TextStyle(color: AppColors.textSecondary),
+            ),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+            ),
+            onPressed: () {
+              Navigator.of(dialogContext).pop();
+              _controller.openAppSettings();
+            },
+            child: const Text('Open Settings'),
+          ),
+        ],
+      ),
+    );
+    return false;
+  }
+
+  Future<void> _showVinScannerSheet() async {
+    await showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: AppColors.darkSurface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
+      ),
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 12),
+                  decoration: BoxDecoration(
+                    color: AppColors.darkBorder,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                const Text(
+                  'Scan Vehicle VIN (OCR)',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                const Text(
+                  'Point camera at windshield VIN plate, door jamb sticker, or registration card',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 12, color: AppColors.textMuted),
+                ),
+                const SizedBox(height: 12),
+                ListTile(
+                  leading: const Icon(
+                    Icons.document_scanner_rounded,
+                    color: AppColors.primaryLight,
+                  ),
+                  title: const Text(
+                    'Scan VIN with Camera',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  onTap: () async {
+                    Navigator.of(sheetContext).pop();
+                    final allowed = await _ensureCameraAccess();
+                    if (!allowed) return;
+                    final result = await _controller.scanVinFromCamera();
+                    _handleOcrResult(result);
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(
+                    Icons.photo_library_rounded,
+                    color: AppColors.primaryLight,
+                  ),
+                  title: const Text(
+                    'Scan VIN from Photo Library',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  onTap: () async {
+                    Navigator.of(sheetContext).pop();
+                    final result = await _controller.scanVinFromGallery();
+                    _handleOcrResult(result);
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _handleOcrResult(OcrScanResult? result) {
+    if (!mounted || result == null) return;
+
+    if (result.candidates.length > 1) {
+      _showVinCandidateSelectionSheet(result.candidates);
+      return;
+    }
+
+    if (result.hasVin) {
+      final detected = result.detectedVin!;
+      _vinTextController.text = detected;
+      _controller.setVin(detected);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('✓ VIN detected: $detected'),
+          backgroundColor: AppColors.verified,
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'No 17-character VIN detected. Try closer lighting or a clearer angle.',
+          ),
+          backgroundColor: AppColors.pending,
+        ),
+      );
+    }
+  }
+
+  Future<void> _showVinCandidateSelectionSheet(List<String> candidates) async {
+    await showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: AppColors.darkSurface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
+      ),
+      showDragHandle: true,
+      builder: (sheetContext) {
+        return SafeArea(
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  'Select Detected VIN / Chassis Number',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                ...candidates.take(5).map((candidate) {
+                  return ListTile(
+                    leading: const Icon(
+                      Icons.verified_rounded,
+                      color: AppColors.verified,
+                    ),
+                    title: Text(
+                      candidate,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontFamily: 'monospace',
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 1.1,
+                      ),
+                    ),
+                    subtitle: Text(
+                      candidate.length == 17
+                          ? '17-Character ISO VIN'
+                          : 'Chassis / Frame Code (${candidate.length} chars)',
+                      style: const TextStyle(
+                        color: AppColors.textMuted,
+                        fontSize: 12,
+                      ),
+                    ),
+                    onTap: () {
+                      Navigator.of(sheetContext).pop();
+                      _vinTextController.text = candidate;
+                      _controller.setVin(candidate);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('✓ VIN applied: $candidate'),
+                          backgroundColor: AppColors.verified,
+                        ),
+                      );
+                    },
+                  );
+                }),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   Future<void> _showPhotoPickerSheet() async {
     await showModalBottomSheet<void>(
       context: context,
@@ -158,6 +391,8 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
                   ),
                   onTap: () async {
                     Navigator.of(sheetContext).pop();
+                    final allowed = await _ensureCameraAccess();
+                    if (!allowed) return;
                     final path = await _controller.capturePhotoFromCamera();
                     if (path != null && mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -304,16 +539,35 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
                   }
                   return null;
                 },
-                suffixIcon: Container(
-                  margin: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: const Icon(
-                    Icons.qr_code_scanner_rounded,
-                    color: Colors.white,
-                    size: 20,
+                suffixIcon: Observer(
+                  builder: (_) => GestureDetector(
+                    onTap: _controller.isScanningVin
+                        ? null
+                        : _showVinScannerSheet,
+                    child: Container(
+                      margin: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: _controller.isScanningVin
+                          ? const Padding(
+                              padding: EdgeInsets.all(10),
+                              child: SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            )
+                          : const Icon(
+                              Icons.qr_code_scanner_rounded,
+                              color: Colors.white,
+                              size: 20,
+                            ),
+                    ),
                   ),
                 ),
               ),
