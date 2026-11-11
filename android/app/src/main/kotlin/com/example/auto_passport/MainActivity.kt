@@ -1,6 +1,7 @@
 package com.example.auto_passport
 
 import android.Manifest
+import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -19,7 +20,10 @@ import java.io.File
 class MainActivity : FlutterActivity() {
     private val channelName = "com.auto_passport/ocr"
     private val cameraPermissionRequestCode = 1001
+    private val vinScannerRequestCode = 1002
+
     private var pendingPermissionResult: MethodChannel.Result? = null
+    private var pendingScannerResult: MethodChannel.Result? = null
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
@@ -81,8 +85,13 @@ class MainActivity : FlutterActivity() {
             }
 
             "scanVinWithCamera" -> {
-                // On Android, Flutter captures via camera and runs ML Kit recognizeText
-                result.error("USE_CAMERA_CAPTURE", "Use camera capture with recognizeText on Android", null)
+                if (!packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)) {
+                    result.error("NO_CAMERA", "Camera hardware is not available on this device", null)
+                    return
+                }
+                pendingScannerResult = result
+                val intent = Intent(this, NativeVinScannerActivity::class.java)
+                startActivityForResult(intent, vinScannerRequestCode)
             }
 
             else -> result.notImplemented()
@@ -120,6 +129,30 @@ class MainActivity : FlutterActivity() {
                 }
         } catch (e: Exception) {
             result.error("OCR_EXCEPTION", e.localizedMessage ?: "Unexpected OCR error", null)
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == vinScannerRequestCode) {
+            val callback = pendingScannerResult
+            pendingScannerResult = null
+            if (callback != null) {
+                if (resultCode == Activity.RESULT_OK && data != null) {
+                    val vin = data.getStringExtra(NativeVinScannerActivity.EXTRA_VIN)
+                    val lines = data.getStringArrayListExtra(NativeVinScannerActivity.EXTRA_LINES) ?: arrayListOf()
+                    val fullText = data.getStringExtra(NativeVinScannerActivity.EXTRA_FULL_TEXT) ?: ""
+                    callback.success(
+                        mapOf(
+                            "vin" to vin,
+                            "fullText" to fullText,
+                            "lines" to lines
+                        )
+                    )
+                } else {
+                    callback.success(null)
+                }
+            }
         }
     }
 

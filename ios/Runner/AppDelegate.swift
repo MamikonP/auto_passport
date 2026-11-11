@@ -269,7 +269,16 @@ final class NativeVinScannerViewController: UIViewController, AVCaptureVideoData
 
     if device.isFocusModeSupported(.continuousAutoFocus) {
       try? device.lockForConfiguration()
+      if device.isFocusPointOfInterestSupported {
+        device.focusPointOfInterest = CGPoint(x: 0.5, y: 0.5)
+      }
       device.focusMode = .continuousAutoFocus
+      if device.isExposurePointOfInterestSupported {
+        device.exposurePointOfInterest = CGPoint(x: 0.5, y: 0.5)
+      }
+      if device.isExposureModeSupported(.continuousAutoExposure) {
+        device.exposureMode = .continuousAutoExposure
+      }
       device.unlockForConfiguration()
     }
 
@@ -302,7 +311,8 @@ final class NativeVinScannerViewController: UIViewController, AVCaptureVideoData
     cancelButton.translatesAutoresizingMaskIntoConstraints = false
     cancelButton.setTitle("✕ Cancel", for: .normal)
     cancelButton.setTitleColor(.white, for: .normal)
-    cancelButton.titleLabel?.font = .systemFont(ofSize: 15, weight: .semibold)
+    cancelButton.titleLabel?.font = .systemFont(ofSize: 14, weight: .semibold)
+    cancelButton.setContentCompressionResistancePriority(.required, for: .horizontal)
     cancelButton.addTarget(self, action: #selector(didTapCancel), for: .touchUpInside)
     topBar.addSubview(cancelButton)
 
@@ -310,7 +320,10 @@ final class NativeVinScannerViewController: UIViewController, AVCaptureVideoData
     titleLabel.translatesAutoresizingMaskIntoConstraints = false
     titleLabel.text = "Scan 17-Digit VIN"
     titleLabel.textColor = .white
-    titleLabel.font = .systemFont(ofSize: 16, weight: .bold)
+    titleLabel.textAlignment = .center
+    titleLabel.font = .systemFont(ofSize: 15, weight: .bold)
+    titleLabel.adjustsFontSizeToFitWidth = true
+    titleLabel.minimumScaleFactor = 0.8
     topBar.addSubview(titleLabel)
 
     let torchButton = UIButton(type: .system)
@@ -318,6 +331,7 @@ final class NativeVinScannerViewController: UIViewController, AVCaptureVideoData
     torchButton.setTitle("⚡ Light", for: .normal)
     torchButton.setTitleColor(UIColor(red: 0.22, green: 0.74, blue: 0.97, alpha: 1.0), for: .normal)
     torchButton.titleLabel?.font = .systemFont(ofSize: 14, weight: .bold)
+    torchButton.setContentCompressionResistancePriority(.required, for: .horizontal)
     torchButton.addTarget(self, action: #selector(didTapTorch), for: .touchUpInside)
     topBar.addSubview(torchButton)
 
@@ -357,12 +371,14 @@ final class NativeVinScannerViewController: UIViewController, AVCaptureVideoData
 
       titleLabel.centerXAnchor.constraint(equalTo: topBar.centerXAnchor),
       titleLabel.centerYAnchor.constraint(equalTo: cancelButton.centerYAnchor),
+      titleLabel.leadingAnchor.constraint(greaterThanOrEqualTo: cancelButton.trailingAnchor, constant: 8),
+      titleLabel.trailingAnchor.constraint(lessThanOrEqualTo: torchButton.leadingAnchor, constant: -8),
 
       torchButton.trailingAnchor.constraint(equalTo: topBar.trailingAnchor, constant: -16),
       torchButton.centerYAnchor.constraint(equalTo: cancelButton.centerYAnchor),
 
       reticleView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-      reticleView.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -30),
+      reticleView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
       reticleView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
       reticleView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24),
       reticleView.heightAnchor.constraint(equalToConstant: 96),
@@ -419,7 +435,9 @@ final class NativeVinScannerViewController: UIViewController, AVCaptureVideoData
       guard let self = self else { return }
       defer { self.isProcessingFrame = false }
 
-      let observations = req.results as? [VNRecognizedTextObservation] ?? []
+      let observations = (req.results as? [VNRecognizedTextObservation] ?? []).sorted {
+        abs($0.boundingBox.midY - 0.5) < abs($1.boundingBox.midY - 0.5)
+      }
       var lines: [String] = []
       for obs in observations {
         for candidate in obs.topCandidates(2) {
@@ -450,6 +468,7 @@ final class NativeVinScannerViewController: UIViewController, AVCaptureVideoData
     request.recognitionLevel = .accurate
     request.usesLanguageCorrection = false
     request.minimumTextHeight = 0.02
+    request.regionOfInterest = CGRect(x: 0.04, y: 0.30, width: 0.92, height: 0.40)
 
     let handler = VNImageRequestHandler(cvPixelBuffer: pixelBuffer, orientation: .right, options: [:])
     try? handler.perform([request])
@@ -464,19 +483,35 @@ final class NativeVinScannerViewController: UIViewController, AVCaptureVideoData
 
       let tokens = cleaned.split(separator: " ").map(String.init)
       for token in tokens where token.count == 17 {
-        let normalized = token
-          .replacingOccurrences(of: "O", with: "0")
-          .replacingOccurrences(of: "I", with: "1")
-          .replacingOccurrences(of: "Q", with: "0")
+        if let valid = validate17CharVin(token) {
+          return valid
+        }
+      }
 
-        let hasLetter = normalized.range(of: "[A-HJ-NPR-Z]", options: .regularExpression) != nil
-        let hasDigit = normalized.range(of: "[0-9]", options: .regularExpression) != nil
-        let validPattern = normalized.range(of: "^[A-HJ-NPR-Z0-9]{17}$", options: .regularExpression) != nil
-        if validPattern && hasLetter && hasDigit {
-          return normalized
+      let joined = tokens.joined()
+      if joined.count >= 17 {
+        let chars = Array(joined)
+        for i in 0...(chars.count - 17) {
+          let sub = String(chars[i..<(i + 17)])
+          if let valid = validate17CharVin(sub) {
+            return valid
+          }
         }
       }
     }
     return nil
+  }
+
+  private static func validate17CharVin(_ raw: String) -> String? {
+    guard raw.count == 17 else { return nil }
+    let normalized = raw
+      .replacingOccurrences(of: "O", with: "0")
+      .replacingOccurrences(of: "I", with: "1")
+      .replacingOccurrences(of: "Q", with: "0")
+
+    let hasLetter = normalized.range(of: "[A-HJ-NPR-Z]", options: .regularExpression) != nil
+    let hasDigit = normalized.range(of: "[0-9]", options: .regularExpression) != nil
+    let validPattern = normalized.range(of: "^[A-HJ-NPR-Z0-9]{17}$", options: .regularExpression) != nil
+    return (validPattern && hasLetter && hasDigit) ? normalized : nil
   }
 }
