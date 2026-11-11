@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
-import '../models/vehicle_passport_model.dart';
+import '../../models/vehicle_passport_model.dart';
 
 /// Concrete Hive implementation of [LocalDatabaseService] with in-memory fallback for testing.
 class HiveLocalDatabaseService implements LocalDatabaseService {

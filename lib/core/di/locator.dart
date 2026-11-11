@@ -1,12 +1,14 @@
+import 'package:auto_passport/core/services/ocr/ocr_service_imp.dart';
 import 'package:get_it/get_it.dart';
 
 import '../controllers/image_picker_controller.dart';
 import '../repository/service_record_repository.dart';
 import '../repository/settings_repository.dart';
 import '../repository/vehicle_repository.dart';
-import '../services/hive_local_database_service.dart';
+import '../services/hive_database/hive_local_database_service.dart';
 import '../services/local_database_service.dart';
 import '../services/media_service.dart';
+import '../services/ocr/ocr_service.dart';
 import '../theme/theme_controller.dart';
 import '../../features/add_vehicle/controllers/add_vehicle_controller.dart';
 import '../../features/dossier/controllers/dossier_controller.dart';
@@ -37,6 +39,9 @@ class Locator {
     }
     if (!getIt.isRegistered<MediaService>()) {
       getIt.registerLazySingleton<MediaService>(() => MediaService());
+    }
+    if (!getIt.isRegistered<OcrService>()) {
+      getIt.registerLazySingleton<OcrService>(() => OcrServiceImp());
     }
     if (!getIt.isRegistered<ImagePickerController>()) {
       getIt.registerFactory<ImagePickerController>(
@@ -79,6 +84,7 @@ class Locator {
         () => AddVehicleController(
           repository: getIt<VehicleRepository>(),
           mediaService: getIt<MediaService>(),
+          ocrService: getIt<OcrService>(),
           imagePickerController: getIt<ImagePickerController>(),
         ),
       );
@@ -136,6 +142,7 @@ class Locator {
   static LocalDatabaseService get databaseService =>
       _get<LocalDatabaseService>();
   static MediaService get mediaService => _get<MediaService>();
+  static OcrService get ocrService => _get<OcrService>();
   static ImagePickerController get imagePickerController =>
       _get<ImagePickerController>();
   static VehicleRepository get vehicleRepository => _get<VehicleRepository>();

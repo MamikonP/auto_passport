@@ -207,6 +207,46 @@ mixin _$AddVehicleController on _AddVehicleControllerBase, Store {
     });
   }
 
+  late final _$isScanningVinAtom = Atom(
+    name: '_AddVehicleControllerBase.isScanningVin',
+    context: context,
+  );
+
+  @override
+  bool get isScanningVin {
+    _$isScanningVinAtom.reportRead();
+    return super.isScanningVin;
+  }
+
+  @override
+  set isScanningVin(bool value) {
+    _$isScanningVinAtom.reportWrite(value, super.isScanningVin, () {
+      super.isScanningVin = value;
+    });
+  }
+
+  late final _$scanVinFromCameraAsyncAction = AsyncAction(
+    '_AddVehicleControllerBase.scanVinFromCamera',
+    context: context,
+  );
+
+  @override
+  Future<OcrScanResult?> scanVinFromCamera() {
+    return _$scanVinFromCameraAsyncAction.run(() => super.scanVinFromCamera());
+  }
+
+  late final _$scanVinFromGalleryAsyncAction = AsyncAction(
+    '_AddVehicleControllerBase.scanVinFromGallery',
+    context: context,
+  );
+
+  @override
+  Future<OcrScanResult?> scanVinFromGallery() {
+    return _$scanVinFromGalleryAsyncAction.run(
+      () => super.scanVinFromGallery(),
+    );
+  }
+
   late final _$pickPhotoFromGalleryAsyncAction = AsyncAction(
     '_AddVehicleControllerBase.pickPhotoFromGallery',
     context: context,
@@ -403,7 +443,8 @@ mileage: ${mileage},
 distanceUnit: ${distanceUnit},
 currency: ${currency},
 photoAdded: ${photoAdded},
-photoPath: ${photoPath}
+photoPath: ${photoPath},
+isScanningVin: ${isScanningVin}
     ''';
   }
 }
