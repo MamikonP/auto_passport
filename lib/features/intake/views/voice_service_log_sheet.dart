@@ -257,7 +257,8 @@ class _VoiceServiceLogSheetState extends State<VoiceServiceLogSheet> {
     final created = manualController.saveRecord(
       title: _parsedLog.title,
       mechanicName: _parsedLog.mechanicName,
-      cost: _parsedLog.totalCost,
+      partsCost: _parsedLog.totalCost,
+      laborCost: 0,
       odometer: _parsedLog.odometerKm,
     );
 

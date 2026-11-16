@@ -108,7 +108,8 @@ abstract class _ManualEntryControllerBase with Store {
   ServiceRecordModel saveRecord({
     required String title,
     required String mechanicName,
-    required double cost,
+    required double partsCost,
+    required double laborCost,
     required int odometer,
     String partsOemNumber = '',
   }) {
@@ -118,7 +119,8 @@ abstract class _ManualEntryControllerBase with Store {
       category: selectedCategory,
       date: serviceDate,
       odometerKm: odometer,
-      totalCost: cost,
+      partsCost: partsCost,
+      laborCost: laborCost,
       currency: selectedCurrency,
       mechanicName: mechanicName,
       partsOemNumber: partsOemNumber,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimensions.dart';
 import '../models/record_detail_model.dart';
@@ -6,10 +7,7 @@ import '../models/record_detail_model.dart';
 class RecordInvestmentCard extends StatelessWidget {
   final RecordBreakdownModel breakdown;
 
-  const RecordInvestmentCard({
-    super.key,
-    required this.breakdown,
-  });
+  const RecordInvestmentCard({super.key, required this.breakdown});
 
   @override
   Widget build(BuildContext context) {
