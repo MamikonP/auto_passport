@@ -6,7 +6,8 @@ class ManualEntryFormModel {
   final ServiceCategory category;
   final DateTime date;
   final int odometerKm;
-  final double totalCost;
+  final double partsCost;
+  final double laborCost;
   final Currency currency;
   final String mechanicName;
   final String partsOemNumber;
@@ -18,12 +19,15 @@ class ManualEntryFormModel {
     required this.category,
     required this.date,
     required this.odometerKm,
-    required this.totalCost,
+    required this.partsCost,
+    required this.laborCost,
     required this.currency,
     required this.mechanicName,
     this.partsOemNumber = '',
     required this.proofBadges,
   });
+
+  double get totalCost => partsCost + laborCost;
 
   ServiceRecordModel toServiceRecord() {
     final isFormal =
@@ -43,8 +47,8 @@ class ManualEntryFormModel {
       date: date,
       mileageKm: odometerKm,
       totalCost: totalCost,
-      partsCost: totalCost * 0.7,
-      laborCost: totalCost * 0.3,
+      partsCost: partsCost,
+      laborCost: laborCost,
       partsOemNumber: trimmedOem,
       facilityName: effectiveFacility,
       facilityType: isFormal ? 'Official Dealership / Store' : 'Private Garage',

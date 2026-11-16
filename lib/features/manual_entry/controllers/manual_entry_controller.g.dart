@@ -187,7 +187,8 @@ mixin _$ManualEntryController on _ManualEntryControllerBase, Store {
   ServiceRecordModel saveRecord({
     required String title,
     required String mechanicName,
-    required double cost,
+    required double partsCost,
+    required double laborCost,
     required int odometer,
     String partsOemNumber = '',
   }) {
@@ -197,7 +198,8 @@ mixin _$ManualEntryController on _ManualEntryControllerBase, Store {
       return super.saveRecord(
         title: title,
         mechanicName: mechanicName,
-        cost: cost,
+        partsCost: partsCost,
+        laborCost: laborCost,
         odometer: odometer,
         partsOemNumber: partsOemNumber,
       );

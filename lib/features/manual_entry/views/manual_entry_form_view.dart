@@ -32,9 +32,32 @@ class _ManualEntryFormViewState extends State<ManualEntryFormView> {
 
   late final TextEditingController _titleController;
   late final TextEditingController _odometerController;
-  late final TextEditingController _costController;
+  late final TextEditingController _partsCostController;
+  late final TextEditingController _laborCostController;
   late final TextEditingController _mechanicController;
   late final TextEditingController _oemNumberController;
+
+  double get _partsCostValue =>
+      double.tryParse(_partsCostController.text.replaceAll(',', '').trim()) ??
+      0.0;
+
+  double get _laborCostValue =>
+      double.tryParse(_laborCostController.text.replaceAll(',', '').trim()) ??
+      0.0;
+
+  double get _totalCostValue => _partsCostValue + _laborCostValue;
+
+  String _formatAmount(double amount) {
+    final intVal = amount.toInt();
+    return intVal.toString().replaceAllMapped(
+      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+      (m) => '${m[1]},',
+    );
+  }
+
+  void _onCostChanged() {
+    setState(() {});
+  }
 
   @override
   void initState() {
@@ -43,30 +66,35 @@ class _ManualEntryFormViewState extends State<ManualEntryFormView> {
     _controller.initializeWithProofType(widget.initialProofType);
     final voiceLog = _controller.consumePendingVoiceLog();
 
-    _titleController = TextEditingController(
-      text: voiceLog?.title ?? 'Front CV Joint & Control Arms',
-    );
+    _titleController = TextEditingController(text: voiceLog?.title ?? '');
     _odometerController = TextEditingController(
       text: voiceLog != null ? voiceLog.odometerKm.toString() : '',
     );
-    _costController = TextEditingController(
+    _partsCostController = TextEditingController(
       text: voiceLog != null && voiceLog.totalCost > 0
           ? voiceLog.totalCost.toInt().toString()
           : '',
     );
+    _laborCostController = TextEditingController(text: '');
     _mechanicController = TextEditingController(
       text: voiceLog != null && voiceLog.mechanicName != 'Private Workshop'
           ? voiceLog.mechanicName
           : '',
     );
     _oemNumberController = TextEditingController(text: '');
+
+    _partsCostController.addListener(_onCostChanged);
+    _laborCostController.addListener(_onCostChanged);
   }
 
   @override
   void dispose() {
+    _partsCostController.removeListener(_onCostChanged);
+    _laborCostController.removeListener(_onCostChanged);
     _titleController.dispose();
     _odometerController.dispose();
-    _costController.dispose();
+    _partsCostController.dispose();
+    _laborCostController.dispose();
     _mechanicController.dispose();
     _oemNumberController.dispose();
     super.dispose();
@@ -74,15 +102,14 @@ class _ManualEntryFormViewState extends State<ManualEntryFormView> {
 
   void _saveRecord() {
     if (_formKey.currentState?.validate() ?? false) {
-      final cost =
-          double.tryParse(_costController.text.replaceAll(',', '')) ?? 0.0;
       final odometer =
           int.tryParse(_odometerController.text.replaceAll(',', '')) ?? 184250;
 
       _controller.saveRecord(
         title: _titleController.text.trim(),
         mechanicName: _mechanicController.text.trim(),
-        cost: cost,
+        partsCost: _partsCostValue,
+        laborCost: _laborCostValue,
         odometer: odometer,
         partsOemNumber: _oemNumberController.text.trim(),
       );
@@ -478,35 +505,16 @@ class _ManualEntryFormViewState extends State<ManualEntryFormView> {
                 ],
               ),
               const SizedBox(height: 16),
-              const Text.rich(
-                TextSpan(
-                  text: 'Total Cost & Currency',
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textSecondary,
-                  ),
-                  children: [
-                    TextSpan(
-                      text: ' *',
-                      style: TextStyle(
-                        color: AppColors.error,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 6),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
-                    flex: 3,
                     child: CustomTextField(
-                      controller: _costController,
+                      label: 'Parts Cost',
+                      isRequired: true,
+                      controller: _partsCostController,
                       keyboardType: TextInputType.number,
-                      hintText: '65,000',
+                      hintText: '45,000',
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 15,
@@ -515,60 +523,130 @@ class _ManualEntryFormViewState extends State<ManualEntryFormView> {
                       validator: (value) {
                         final trimmed = value?.replaceAll(',', '').trim() ?? '';
                         if (trimmed.isEmpty) {
-                          return 'Total cost is required';
+                          return 'Parts cost is required';
                         }
                         final cost = double.tryParse(trimmed);
-                        if (cost == null || cost <= 0) {
+                        if (cost == null || cost < 0) {
+                          return 'Enter valid cost';
+                        }
+                        if (_totalCostValue <= 0) {
+                          return 'Total must be > 0';
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: CustomTextField(
+                      label: 'Labor Cost',
+                      isRequired: true,
+                      controller: _laborCostController,
+                      keyboardType: TextInputType.number,
+                      hintText: '20,000',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                      ),
+                      validator: (value) {
+                        final trimmed = value?.replaceAll(',', '').trim() ?? '';
+                        if (trimmed.isEmpty) {
+                          return 'Labor cost is required';
+                        }
+                        final cost = double.tryParse(trimmed);
+                        if (cost == null || cost < 0) {
                           return 'Enter valid cost';
                         }
                         return null;
                       },
                     ),
                   ),
-                  const SizedBox(width: 8),
-                  Observer(
-                    builder: (_) => Row(
-                      children: [Currency.amd, Currency.usd, Currency.rub].map((
-                        curr,
-                      ) {
-                        final isSelected = _controller.selectedCurrency == curr;
-                        return Padding(
-                          padding: const EdgeInsets.only(left: 4),
-                          child: GestureDetector(
-                            onTap: () => _controller.setCurrency(curr),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 12,
-                              ),
-                              decoration: BoxDecoration(
-                                color: isSelected
-                                    ? AppColors.primary
-                                    : AppColors.darkSurfaceVariant,
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(
-                                  color: isSelected
-                                      ? AppColors.primaryLight
-                                      : AppColors.darkBorder,
-                                ),
-                              ),
-                              child: Text(
-                                '${curr.code} ${curr.symbol}',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w700,
-                                  color: isSelected
-                                      ? Colors.white
-                                      : AppColors.textSecondary,
-                                ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Observer(
+                builder: (_) => Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 12,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.darkSurface,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: AppColors.darkBorder),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Auto-Calculated Total Cost',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.textSecondary,
                               ),
                             ),
-                          ),
-                        );
-                      }).toList(),
-                    ),
+                            const SizedBox(height: 2),
+                            Text(
+                              '${_controller.selectedCurrency.symbol} ${_formatAmount(_totalCostValue)}',
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w800,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Row(
+                        children: [Currency.amd, Currency.usd, Currency.rub]
+                            .map((curr) {
+                              final isSelected =
+                                  _controller.selectedCurrency == curr;
+                              return Padding(
+                                padding: const EdgeInsets.only(left: 4),
+                                child: GestureDetector(
+                                  onTap: () => _controller.setCurrency(curr),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                      vertical: 10,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: isSelected
+                                          ? AppColors.primary
+                                          : AppColors.darkSurfaceVariant,
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(
+                                        color: isSelected
+                                            ? AppColors.primaryLight
+                                            : AppColors.darkBorder,
+                                      ),
+                                    ),
+                                    child: Text(
+                                      '${curr.code} ${curr.symbol}',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w700,
+                                        color: isSelected
+                                            ? Colors.white
+                                            : AppColors.textSecondary,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            })
+                            .toList(),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
               const SizedBox(height: 16),
               Observer(
