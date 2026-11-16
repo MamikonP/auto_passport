@@ -53,7 +53,7 @@ class RecordInvestmentCard extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  'Parts: Lemförder Arm (${breakdown.partsOemNumber})',
+                  'Parts: ${breakdown.title} (${breakdown.partsOemNumber})',
                   style: const TextStyle(
                     fontSize: 13,
                     color: AppColors.textSecondary,
@@ -75,10 +75,10 @@ class RecordInvestmentCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Expanded(
+              Expanded(
                 child: Text(
-                  'Labor: Master Gago (Suspension Box #4)',
-                  style: TextStyle(
+                  'Labor: ${breakdown.facilityName} (${breakdown.facilityType})',
+                  style: const TextStyle(
                     fontSize: 13,
                     color: AppColors.textSecondary,
                   ),

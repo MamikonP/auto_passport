@@ -7,6 +7,7 @@ import '../../../core/di/locator.dart';
 import '../../../core/routes/app_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_confirmation_dialog.dart';
+import '../../intake/views/intake_modal.dart';
 import '../controllers/timeline_controller.dart';
 import '../widgets/timeline_empty_garage_view.dart';
 import '../widgets/timeline_entry_card.dart';
@@ -322,23 +323,16 @@ class TimelineFeedView extends StatelessWidget {
                   ),
           ),
           floatingActionButton: hasVehicle
-              ? Padding(
-                  padding: const EdgeInsets.only(bottom: 50),
-                  child: FloatingActionButton.extended(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: Colors.white,
-                    elevation: 6,
-                    icon: const Icon(Icons.add_rounded, size: 20),
-                    label: const Text(
-                      'Log Service',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 14,
-                      ),
-                    ),
-                    onPressed: () =>
-                        context.router.push(ManualEntryFormRoute()),
+              ? FloatingActionButton.extended(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                  elevation: 6,
+                  icon: const Icon(Icons.add_rounded, size: 20),
+                  label: const Text(
+                    'Log Service',
+                    style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
                   ),
+                  onPressed: () => IntakeModal.show(context),
                 )
               : null,
         );

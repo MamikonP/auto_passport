@@ -7,6 +7,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimensions.dart';
 import '../controllers/intake_controller.dart';
 import '../widgets/intake_option_card.dart';
+import 'voice_service_log_sheet.dart';
 
 class IntakeModal extends StatelessWidget {
   final IntakeController? controller;
@@ -101,30 +102,15 @@ class IntakeModal extends StatelessWidget {
                   method: method,
                   onTap: () {
                     Navigator.of(context).pop();
-                    context.router.push(
-                      ManualEntryFormRoute(initialProofType: method.id),
-                    );
+                    if (method.id == 'voice_log') {
+                      VoiceServiceLogSheet.show(context);
+                    } else {
+                      context.router.push(ManualEntryFormRoute());
+                    }
                   },
                 ),
               );
             }),
-            const SizedBox(height: 12),
-            Center(
-              child: TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  context.router.push(ManualEntryFormRoute());
-                },
-                child: const Text(
-                  'Skip auto-extract and enter manually →',
-                  style: TextStyle(
-                    color: AppColors.primaryLight,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ),
           ],
         ),
       ),

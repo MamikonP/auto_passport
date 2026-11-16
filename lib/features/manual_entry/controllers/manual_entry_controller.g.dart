@@ -189,6 +189,7 @@ mixin _$ManualEntryController on _ManualEntryControllerBase, Store {
     required String mechanicName,
     required double cost,
     required int odometer,
+    String partsOemNumber = '',
   }) {
     final _$actionInfo = _$_ManualEntryControllerBaseActionController
         .startAction(name: '_ManualEntryControllerBase.saveRecord');
@@ -198,6 +199,7 @@ mixin _$ManualEntryController on _ManualEntryControllerBase, Store {
         mechanicName: mechanicName,
         cost: cost,
         odometer: odometer,
+        partsOemNumber: partsOemNumber,
       );
     } finally {
       _$_ManualEntryControllerBaseActionController.endAction(_$actionInfo);
