@@ -34,19 +34,32 @@ class _ManualEntryFormViewState extends State<ManualEntryFormView> {
   late final TextEditingController _odometerController;
   late final TextEditingController _costController;
   late final TextEditingController _mechanicController;
+  late final TextEditingController _oemNumberController;
 
   @override
   void initState() {
     super.initState();
     _controller = widget.controller ?? Locator.manualEntryController;
     _controller.initializeWithProofType(widget.initialProofType);
+    final voiceLog = _controller.consumePendingVoiceLog();
 
     _titleController = TextEditingController(
-      text: 'Front CV Joint & Control Arms',
+      text: voiceLog?.title ?? 'Front CV Joint & Control Arms',
     );
-    _odometerController = TextEditingController(text: '');
-    _costController = TextEditingController(text: '');
-    _mechanicController = TextEditingController(text: '');
+    _odometerController = TextEditingController(
+      text: voiceLog != null ? voiceLog.odometerKm.toString() : '',
+    );
+    _costController = TextEditingController(
+      text: voiceLog != null && voiceLog.totalCost > 0
+          ? voiceLog.totalCost.toInt().toString()
+          : '',
+    );
+    _mechanicController = TextEditingController(
+      text: voiceLog != null && voiceLog.mechanicName != 'Private Workshop'
+          ? voiceLog.mechanicName
+          : '',
+    );
+    _oemNumberController = TextEditingController(text: '');
   }
 
   @override
@@ -55,6 +68,7 @@ class _ManualEntryFormViewState extends State<ManualEntryFormView> {
     _odometerController.dispose();
     _costController.dispose();
     _mechanicController.dispose();
+    _oemNumberController.dispose();
     super.dispose();
   }
 
@@ -70,6 +84,7 @@ class _ManualEntryFormViewState extends State<ManualEntryFormView> {
         mechanicName: _mechanicController.text.trim(),
         cost: cost,
         odometer: odometer,
+        partsOemNumber: _oemNumberController.text.trim(),
       );
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -260,20 +275,75 @@ class _ManualEntryFormViewState extends State<ManualEntryFormView> {
                   ),
                 ),
               ),
+              const SizedBox(height: 8),
+              Observer(
+                builder: (_) => InfoDescriptionBox(
+                  icon:
+                      _controller.proofClassification ==
+                          ProofClassification.informalMaster
+                      ? Icons.lock_outline_rounded
+                      : Icons.receipt_long_rounded,
+                  iconColor:
+                      _controller.proofClassification ==
+                          ProofClassification.informalMaster
+                      ? AppColors.warning
+                      : AppColors.primaryLight,
+                  text:
+                      _controller.proofClassification ==
+                          ProofClassification.informalMaster
+                      ? 'Private Mechanic / Master Repair: Verified through part box photos, car on a lift, or mobile transfer screenshots.'
+                      : 'Official Service / Store Receipt: Verified through printed store invoices, OEM part numbers, or official service stamps.',
+                ),
+              ),
               const SizedBox(height: 18),
               CustomTextField(
                 label: 'Service Item / Description',
+                isRequired: true,
                 controller: _titleController,
                 style: const TextStyle(color: Colors.white, fontSize: 15),
                 hintText: 'e.g. Front CV Joint & Control Arms',
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return 'Service description is required';
+                  }
+                  return null;
+                },
+              ),
+              Observer(
+                builder: (_) {
+                  if (_controller.proofClassification !=
+                      ProofClassification.formalStoreReceipt) {
+                    return const SizedBox.shrink();
+                  }
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 16),
+                    child: CustomTextField(
+                      label: 'OEM Part # / Store Invoice No. (Optional)',
+                      isRequired: false,
+                      controller: _oemNumberController,
+                      hintText: 'e.g. OEM 31126794203 or INV-2048',
+                    ),
+                  );
+                },
               ),
               const SizedBox(height: 16),
-              const Text(
-                'Repair / Maintenance Category',
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textSecondary,
+              const Text.rich(
+                TextSpan(
+                  text: 'Repair / Maintenance Category',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textSecondary,
+                  ),
+                  children: [
+                    TextSpan(
+                      text: ' *',
+                      style: TextStyle(
+                        color: AppColors.error,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(height: 6),
@@ -311,17 +381,29 @@ class _ManualEntryFormViewState extends State<ManualEntryFormView> {
               ),
               const SizedBox(height: 16),
               Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'Service Date',
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.textSecondary,
+                        const Text.rich(
+                          TextSpan(
+                            text: 'Service Date',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textSecondary,
+                            ),
+                            children: [
+                              TextSpan(
+                                text: ' *',
+                                style: TextStyle(
+                                  color: AppColors.error,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                         const SizedBox(height: 6),
@@ -376,24 +458,48 @@ class _ManualEntryFormViewState extends State<ManualEntryFormView> {
                   Expanded(
                     child: CustomTextField(
                       label: 'Odometer (km)',
+                      isRequired: true,
                       controller: _odometerController,
                       keyboardType: TextInputType.number,
                       hintText: '184,250',
+                      validator: (value) {
+                        final trimmed = value?.replaceAll(',', '').trim() ?? '';
+                        if (trimmed.isEmpty) {
+                          return 'Odometer is required';
+                        }
+                        final odo = int.tryParse(trimmed);
+                        if (odo == null || odo <= 0) {
+                          return 'Enter valid km';
+                        }
+                        return null;
+                      },
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 16),
-              const Text(
-                'Total Cost & Currency',
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textSecondary,
+              const Text.rich(
+                TextSpan(
+                  text: 'Total Cost & Currency',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textSecondary,
+                  ),
+                  children: [
+                    TextSpan(
+                      text: ' *',
+                      style: TextStyle(
+                        color: AppColors.error,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(height: 6),
               Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
                     flex: 3,
@@ -406,6 +512,17 @@ class _ManualEntryFormViewState extends State<ManualEntryFormView> {
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
                       ),
+                      validator: (value) {
+                        final trimmed = value?.replaceAll(',', '').trim() ?? '';
+                        if (trimmed.isEmpty) {
+                          return 'Total cost is required';
+                        }
+                        final cost = double.tryParse(trimmed);
+                        if (cost == null || cost <= 0) {
+                          return 'Enter valid cost';
+                        }
+                        return null;
+                      },
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -454,10 +571,30 @@ class _ManualEntryFormViewState extends State<ManualEntryFormView> {
                 ],
               ),
               const SizedBox(height: 16),
-              CustomTextField(
-                label: 'Mechanic / Workshop Name',
-                controller: _mechanicController,
-                hintText: 'e.g. Gago Varpet',
+              Observer(
+                builder: (_) {
+                  final isFormal =
+                      _controller.proofClassification ==
+                      ProofClassification.formalStoreReceipt;
+                  return CustomTextField(
+                    label: isFormal
+                        ? 'Service Center / Store Name'
+                        : 'Mechanic / Master Name',
+                    isRequired: true,
+                    controller: _mechanicController,
+                    hintText: isFormal
+                        ? 'e.g. Liqui Moly Center / Official Service'
+                        : 'e.g. Gago Varpet',
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return isFormal
+                            ? 'Service center or store name is required'
+                            : 'Mechanic / master name is required';
+                      }
+                      return null;
+                    },
+                  );
+                },
               ),
               const SizedBox(height: 18),
               const Text(
@@ -469,8 +606,17 @@ class _ManualEntryFormViewState extends State<ManualEntryFormView> {
                 ),
               ),
               const SizedBox(height: 6),
-              const InfoDescriptionBox(
-                text: 'Upload photos of new part boxes or labels, the car on a service lift, paper store receipts, oil change door stickers, or payment transfer screenshots (Idram, Telcell, bank app).',
+              Observer(
+                builder: (_) {
+                  final isFormal =
+                      _controller.proofClassification ==
+                      ProofClassification.formalStoreReceipt;
+                  return InfoDescriptionBox(
+                    text: isFormal
+                        ? 'Upload photos of official store receipts, printed tax invoices, warranty cards, or oil change door stickers.'
+                        : 'Upload photos of new part boxes or labels, the car on a service lift, or payment transfer screenshots (Idram, Telcell, bank app).',
+                  );
+                },
               ),
               const SizedBox(height: 10),
               Observer(

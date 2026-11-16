@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import '../../../core/di/locator.dart';
+import '../../../core/enums/proof_classification.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_confirmation_dialog.dart';
 import '../controllers/record_detail_controller.dart';
@@ -117,29 +118,53 @@ class RecordDetailView extends StatelessWidget {
           children: [
             Row(
               children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: AppColors.warningBg,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: AppColors.warning, width: 1),
-                  ),
-                  child: const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.verified_rounded, size: 12, color: AppColors.warning),
-                      SizedBox(width: 4),
-                      Text(
-                        'PHOTO-VERIFIED PART',
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 0.5,
-                          color: AppColors.warning,
-                        ),
+                Builder(
+                  builder: (_) {
+                    final isFormal =
+                        record.proofClassification ==
+                        ProofClassification.formalStoreReceipt;
+                    final badgeColor = isFormal
+                        ? AppColors.verified
+                        : AppColors.warning;
+                    final badgeBg = isFormal
+                        ? AppColors.verifiedBg
+                        : AppColors.warningBg;
+                    return Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
                       ),
-                    ],
-                  ),
+                      decoration: BoxDecoration(
+                        color: badgeBg,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: badgeColor, width: 1),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            isFormal
+                                ? Icons.receipt_long_rounded
+                                : Icons.verified_rounded,
+                            size: 12,
+                            color: badgeColor,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            isFormal
+                                ? 'OFFICIAL STORE RECEIPT'
+                                : 'PHOTO-VERIFIED PART',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 0.5,
+                              color: badgeColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
                 ),
                 const SizedBox(width: 8),
                 Container(

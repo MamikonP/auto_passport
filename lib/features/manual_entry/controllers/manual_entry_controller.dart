@@ -6,6 +6,7 @@ import '../../../core/enums/service_category.dart';
 import '../../../core/models/service_record_model.dart';
 import '../../../core/repository/service_record_repository.dart';
 import '../../../core/repository/vehicle_repository.dart';
+import '../../../core/services/voice/voice_log_parser.dart';
 import '../models/manual_entry_form_model.dart';
 
 part 'manual_entry_controller.g.dart';
@@ -38,21 +39,49 @@ abstract class _ManualEntryControllerBase with Store {
   @observable
   ObservableList<String> proofBadges = ObservableList<String>.of(['Part Box', 'Idram Transfer']);
 
+  VoiceParsedServiceLog? _pendingVoiceLog;
+
+  void setPendingVoiceLog(VoiceParsedServiceLog log) {
+    _pendingVoiceLog = log;
+  }
+
+  VoiceParsedServiceLog? consumePendingVoiceLog() {
+    final log = _pendingVoiceLog;
+    _pendingVoiceLog = null;
+    if (log != null) {
+      selectedCategory = log.category;
+      selectedCurrency = log.currency;
+      serviceDate = DateTime.now();
+      if (!proofBadges.contains('Voice Quick Log')) {
+        proofBadges.insert(0, 'Voice Quick Log');
+      }
+    }
+    return log;
+  }
+
   @action
   void initializeWithProofType(String? proofType) {
     if (proofType == 'paper_receipt') {
-      proofClassification = ProofClassification.formalStoreReceipt;
-      proofBadges.clear();
-      proofBadges.add('Store Invoice OCR');
+      setClassification(ProofClassification.formalStoreReceipt);
     } else {
-      proofClassification = ProofClassification.informalMaster;
-      proofBadges.clear();
-      proofBadges.addAll(['Part Box', 'Idram Transfer']);
+      setClassification(ProofClassification.informalMaster);
     }
   }
 
   @action
-  void setClassification(ProofClassification val) => proofClassification = val;
+  void setClassification(ProofClassification val) {
+    proofClassification = val;
+    final hasCustomPhoto = proofBadges.contains('Photo Proof');
+    proofBadges.clear();
+    if (val == ProofClassification.formalStoreReceipt) {
+      proofBadges.addAll(['Store Invoice', 'Warranty Stamp']);
+    } else {
+      proofBadges.addAll(['Part Box', 'Idram Transfer']);
+    }
+    if (hasCustomPhoto) {
+      proofBadges.add('Photo Proof');
+    }
+  }
 
   @action
   void setCategory(ServiceCategory val) => selectedCategory = val;
@@ -81,6 +110,7 @@ abstract class _ManualEntryControllerBase with Store {
     required String mechanicName,
     required double cost,
     required int odometer,
+    String partsOemNumber = '',
   }) {
     final form = ManualEntryFormModel(
       proofClassification: proofClassification,
@@ -91,6 +121,7 @@ abstract class _ManualEntryControllerBase with Store {
       totalCost: cost,
       currency: selectedCurrency,
       mechanicName: mechanicName,
+      partsOemNumber: partsOemNumber,
       proofBadges: proofBadges.toList(),
     );
 

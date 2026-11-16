@@ -40,6 +40,7 @@ class CustomTextField extends StatelessWidget {
   final int? minLines;
   final int? maxLength;
   final bool isFormField;
+  final bool? isRequired;
 
   const CustomTextField({
     super.key,
@@ -79,6 +80,7 @@ class CustomTextField extends StatelessWidget {
     this.minLines,
     this.maxLength,
     this.isFormField = true,
+    this.isRequired,
   });
 
   const CustomTextField.textField({
@@ -114,6 +116,7 @@ class CustomTextField extends StatelessWidget {
     this.maxLines = 1,
     this.minLines,
     this.maxLength,
+    this.isRequired,
   }) : isFormField = false,
        initialValue = null,
        validator = null,
@@ -207,18 +210,33 @@ class CustomTextField extends StatelessWidget {
       return field;
     }
 
+    final showRequiredMark = isRequired ?? (validator != null);
+    final baseLabelStyle =
+        labelStyle ??
+        const TextStyle(
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+          color: AppColors.textSecondary,
+        );
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label!,
-          style:
-              labelStyle ??
-              const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textSecondary,
-              ),
+        Text.rich(
+          TextSpan(
+            text: label!,
+            style: baseLabelStyle,
+            children: [
+              if (showRequiredMark)
+                const TextSpan(
+                  text: ' *',
+                  style: TextStyle(
+                    color: AppColors.error,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+            ],
+          ),
         ),
         const SizedBox(height: 6),
         field,
