@@ -118,6 +118,17 @@ mixin _$ManualEntryController on _ManualEntryControllerBase, Store {
   }
 
   @override
+  void initializeForEdit(ServiceRecordModel record, {String? vehicleId}) {
+    final _$actionInfo = _$_ManualEntryControllerBaseActionController
+        .startAction(name: '_ManualEntryControllerBase.initializeForEdit');
+    try {
+      return super.initializeForEdit(record, vehicleId: vehicleId);
+    } finally {
+      _$_ManualEntryControllerBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   void setClassification(ProofClassification val) {
     final _$actionInfo = _$_ManualEntryControllerBaseActionController
         .startAction(name: '_ManualEntryControllerBase.setClassification');
@@ -196,6 +207,35 @@ mixin _$ManualEntryController on _ManualEntryControllerBase, Store {
         .startAction(name: '_ManualEntryControllerBase.saveRecord');
     try {
       return super.saveRecord(
+        title: title,
+        mechanicName: mechanicName,
+        partsCost: partsCost,
+        laborCost: laborCost,
+        odometer: odometer,
+        partsOemNumber: partsOemNumber,
+      );
+    } finally {
+      _$_ManualEntryControllerBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  ServiceRecordModel updateRecord({
+    required String recordId,
+    String? vehicleId,
+    required String title,
+    required String mechanicName,
+    required double partsCost,
+    required double laborCost,
+    required int odometer,
+    String partsOemNumber = '',
+  }) {
+    final _$actionInfo = _$_ManualEntryControllerBaseActionController
+        .startAction(name: '_ManualEntryControllerBase.updateRecord');
+    try {
+      return super.updateRecord(
+        recordId: recordId,
+        vehicleId: vehicleId,
         title: title,
         mechanicName: mechanicName,
         partsCost: partsCost,

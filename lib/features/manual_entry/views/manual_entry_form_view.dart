@@ -14,11 +14,15 @@ import '../widgets/manual_entry_attachment_thumbnail.dart';
 @RoutePage()
 class ManualEntryFormView extends StatefulWidget {
   final String? initialProofType;
+  final ServiceRecordModel? record;
+  final String? vehicleId;
   final ManualEntryController? controller;
 
   const ManualEntryFormView({
     super.key,
     this.initialProofType,
+    this.record,
+    this.vehicleId,
     this.controller,
   });
 
@@ -36,6 +40,8 @@ class _ManualEntryFormViewState extends State<ManualEntryFormView> {
   late final TextEditingController _laborCostController;
   late final TextEditingController _mechanicController;
   late final TextEditingController _oemNumberController;
+
+  bool get _isEditing => widget.record != null;
 
   double get _partsCostValue =>
       double.tryParse(_partsCostController.text.replaceAll(',', '').trim()) ??
@@ -63,25 +69,52 @@ class _ManualEntryFormViewState extends State<ManualEntryFormView> {
   void initState() {
     super.initState();
     _controller = widget.controller ?? Locator.manualEntryController;
-    _controller.initializeWithProofType(widget.initialProofType);
-    final voiceLog = _controller.consumePendingVoiceLog();
+    final existingRecord = widget.record;
 
-    _titleController = TextEditingController(text: voiceLog?.title ?? '');
-    _odometerController = TextEditingController(
-      text: voiceLog != null ? voiceLog.odometerKm.toString() : '',
-    );
-    _partsCostController = TextEditingController(
-      text: voiceLog != null && voiceLog.totalCost > 0
-          ? voiceLog.totalCost.toInt().toString()
-          : '',
-    );
-    _laborCostController = TextEditingController(text: '');
-    _mechanicController = TextEditingController(
-      text: voiceLog != null && voiceLog.mechanicName != 'Private Workshop'
-          ? voiceLog.mechanicName
-          : '',
-    );
-    _oemNumberController = TextEditingController(text: '');
+    if (existingRecord != null) {
+      _controller.initializeForEdit(existingRecord, vehicleId: widget.vehicleId);
+      final initialParts = existingRecord.partsCost > 0
+          ? existingRecord.partsCost.toInt().toString()
+          : (existingRecord.laborCost == 0 && existingRecord.totalCost > 0
+                ? existingRecord.totalCost.toInt().toString()
+                : '0');
+      final initialLabor = existingRecord.laborCost > 0
+          ? existingRecord.laborCost.toInt().toString()
+          : '0';
+
+      _titleController = TextEditingController(text: existingRecord.title);
+      _odometerController = TextEditingController(
+        text: existingRecord.mileageKm.toString(),
+      );
+      _partsCostController = TextEditingController(text: initialParts);
+      _laborCostController = TextEditingController(text: initialLabor);
+      _mechanicController = TextEditingController(
+        text: existingRecord.facilityName,
+      );
+      _oemNumberController = TextEditingController(
+        text: existingRecord.partsOemNumber,
+      );
+    } else {
+      _controller.initializeWithProofType(widget.initialProofType);
+      final voiceLog = _controller.consumePendingVoiceLog();
+
+      _titleController = TextEditingController(text: voiceLog?.title ?? '');
+      _odometerController = TextEditingController(
+        text: voiceLog != null ? voiceLog.odometerKm.toString() : '',
+      );
+      _partsCostController = TextEditingController(
+        text: voiceLog != null && voiceLog.totalCost > 0
+            ? voiceLog.totalCost.toInt().toString()
+            : '',
+      );
+      _laborCostController = TextEditingController(text: '');
+      _mechanicController = TextEditingController(
+        text: voiceLog != null && voiceLog.mechanicName != 'Private Workshop'
+            ? voiceLog.mechanicName
+            : '',
+      );
+      _oemNumberController = TextEditingController(text: '');
+    }
 
     _partsCostController.addListener(_onCostChanged);
     _laborCostController.addListener(_onCostChanged);
@@ -105,21 +138,41 @@ class _ManualEntryFormViewState extends State<ManualEntryFormView> {
       final odometer =
           int.tryParse(_odometerController.text.replaceAll(',', '')) ?? 184250;
 
-      _controller.saveRecord(
-        title: _titleController.text.trim(),
-        mechanicName: _mechanicController.text.trim(),
-        partsCost: _partsCostValue,
-        laborCost: _laborCostValue,
-        odometer: odometer,
-        partsOemNumber: _oemNumberController.text.trim(),
-      );
+      if (_isEditing) {
+        _controller.updateRecord(
+          recordId: widget.record!.id,
+          vehicleId: widget.vehicleId,
+          title: _titleController.text.trim(),
+          mechanicName: _mechanicController.text.trim(),
+          partsCost: _partsCostValue,
+          laborCost: _laborCostValue,
+          odometer: odometer,
+          partsOemNumber: _oemNumberController.text.trim(),
+        );
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('✓ Service record saved to timeline feed'),
-          backgroundColor: AppColors.verified,
-        ),
-      );
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('✓ Service record updated'),
+            backgroundColor: AppColors.verified,
+          ),
+        );
+      } else {
+        _controller.saveRecord(
+          title: _titleController.text.trim(),
+          mechanicName: _mechanicController.text.trim(),
+          partsCost: _partsCostValue,
+          laborCost: _laborCostValue,
+          odometer: odometer,
+          partsOemNumber: _oemNumberController.text.trim(),
+        );
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('✓ Service record saved to timeline feed'),
+            backgroundColor: AppColors.verified,
+          ),
+        );
+      }
 
       context.router.maybePop();
     }
@@ -150,9 +203,9 @@ class _ManualEntryFormViewState extends State<ManualEntryFormView> {
         ),
         leadingWidth: 100,
         centerTitle: true,
-        title: const Text(
-          'New Service Record',
-          style: TextStyle(
+        title: Text(
+          _isEditing ? 'Edit Service Record' : 'New Service Record',
+          style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w700,
             color: Colors.white,
@@ -746,9 +799,11 @@ class _ManualEntryFormViewState extends State<ManualEntryFormView> {
               ),
             ),
             onPressed: _saveRecord,
-            child: const Text(
-              '✓ Save to Timeline Feed',
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+            child: Text(
+              _isEditing
+                  ? '✓ Update Service Record'
+                  : '✓ Save to Timeline Feed',
+              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
             ),
           ),
         ),

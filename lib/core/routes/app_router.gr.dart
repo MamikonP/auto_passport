@@ -230,6 +230,8 @@ class ManualEntryFormRoute extends PageRouteInfo<ManualEntryFormRouteArgs> {
   ManualEntryFormRoute({
     Key? key,
     String? initialProofType,
+    ServiceRecordModel? record,
+    String? vehicleId,
     ManualEntryController? controller,
     List<PageRouteInfo>? children,
   }) : super(
@@ -237,6 +239,8 @@ class ManualEntryFormRoute extends PageRouteInfo<ManualEntryFormRouteArgs> {
          args: ManualEntryFormRouteArgs(
            key: key,
            initialProofType: initialProofType,
+           record: record,
+           vehicleId: vehicleId,
            controller: controller,
          ),
          initialChildren: children,
@@ -253,6 +257,8 @@ class ManualEntryFormRoute extends PageRouteInfo<ManualEntryFormRouteArgs> {
       return ManualEntryFormView(
         key: args.key,
         initialProofType: args.initialProofType,
+        record: args.record,
+        vehicleId: args.vehicleId,
         controller: args.controller,
       );
     },
@@ -263,6 +269,8 @@ class ManualEntryFormRouteArgs {
   const ManualEntryFormRouteArgs({
     this.key,
     this.initialProofType,
+    this.record,
+    this.vehicleId,
     this.controller,
   });
 
@@ -270,11 +278,15 @@ class ManualEntryFormRouteArgs {
 
   final String? initialProofType;
 
+  final ServiceRecordModel? record;
+
+  final String? vehicleId;
+
   final ManualEntryController? controller;
 
   @override
   String toString() {
-    return 'ManualEntryFormRouteArgs{key: $key, initialProofType: $initialProofType, controller: $controller}';
+    return 'ManualEntryFormRouteArgs{key: $key, initialProofType: $initialProofType, record: $record, vehicleId: $vehicleId, controller: $controller}';
   }
 
   @override
@@ -283,12 +295,18 @@ class ManualEntryFormRouteArgs {
     if (other is! ManualEntryFormRouteArgs) return false;
     return key == other.key &&
         initialProofType == other.initialProofType &&
+        record == other.record &&
+        vehicleId == other.vehicleId &&
         controller == other.controller;
   }
 
   @override
   int get hashCode =>
-      key.hashCode ^ initialProofType.hashCode ^ controller.hashCode;
+      key.hashCode ^
+      initialProofType.hashCode ^
+      record.hashCode ^
+      vehicleId.hashCode ^
+      controller.hashCode;
 }
 
 /// generated route for

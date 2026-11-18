@@ -1,6 +1,7 @@
 import '../../../core/models/vehicle_model.dart';
 
 class ManualEntryFormModel {
+  final String? id;
   final ProofClassification proofClassification;
   final String title;
   final ServiceCategory category;
@@ -14,6 +15,7 @@ class ManualEntryFormModel {
   final List<String> proofBadges;
 
   const ManualEntryFormModel({
+    this.id,
     required this.proofClassification,
     required this.title,
     required this.category,
@@ -41,7 +43,7 @@ class ManualEntryFormModel {
     final trimmedOem = partsOemNumber.trim();
 
     return ServiceRecordModel(
-      id: 'rec-${DateTime.now().millisecondsSinceEpoch}',
+      id: id ?? 'rec-${DateTime.now().millisecondsSinceEpoch}',
       title: title.isNotEmpty ? title : '${category.enName} Service',
       description: 'Serviced at $effectiveFacility ($odometerKm km).',
       date: date,

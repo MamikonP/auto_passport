@@ -69,6 +69,20 @@ abstract class _ManualEntryControllerBase with Store {
   }
 
   @action
+  void initializeForEdit(ServiceRecordModel record, {String? vehicleId}) {
+    final vehicle = vehicleId != null
+        ? _vehicleRepository.vehicles.where((v) => v.id == vehicleId).firstOrNull
+        : _vehicleRepository.activeVehicle;
+    proofClassification = record.proofClassification;
+    selectedCategory = record.category;
+    serviceDate = record.date;
+    if (vehicle != null) {
+      selectedCurrency = vehicle.currency;
+    }
+    proofBadges = ObservableList<String>.of(record.proofBadges);
+  }
+
+  @action
   void setClassification(ProofClassification val) {
     proofClassification = val;
     final hasCustomPhoto = proofBadges.contains('Photo Proof');
@@ -134,5 +148,44 @@ abstract class _ManualEntryControllerBase with Store {
       _serviceRecordRepository.addRecord(targetVehicleId, record);
     }
     return record;
+  }
+
+  @action
+  ServiceRecordModel updateRecord({
+    required String recordId,
+    String? vehicleId,
+    required String title,
+    required String mechanicName,
+    required double partsCost,
+    required double laborCost,
+    required int odometer,
+    String partsOemNumber = '',
+  }) {
+    final form = ManualEntryFormModel(
+      id: recordId,
+      proofClassification: proofClassification,
+      title: title,
+      category: selectedCategory,
+      date: serviceDate,
+      odometerKm: odometer,
+      partsCost: partsCost,
+      laborCost: laborCost,
+      currency: selectedCurrency,
+      mechanicName: mechanicName,
+      partsOemNumber: partsOemNumber,
+      proofBadges: proofBadges.toList(),
+    );
+
+    final updatedRecord = form.toServiceRecord();
+    final targetVehicleId =
+        vehicleId ??
+        _vehicleRepository.activeVehicleId ??
+        (_vehicleRepository.vehicles.isNotEmpty
+            ? _vehicleRepository.vehicles.first.id
+            : null);
+    if (targetVehicleId != null) {
+      _serviceRecordRepository.updateRecord(targetVehicleId, updatedRecord);
+    }
+    return updatedRecord;
   }
 }

@@ -1,3 +1,4 @@
+import 'package:auto_passport/core/models/service_record_model.dart';
 import 'package:auto_passport/core/models/vehicle_passport_model.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';

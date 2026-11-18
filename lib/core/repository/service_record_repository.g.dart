@@ -26,6 +26,17 @@ mixin _$ServiceRecordRepository on _ServiceRecordRepositoryBase, Store {
   }
 
   @override
+  void updateRecord(String vehicleId, ServiceRecordModel updatedRecord) {
+    final _$actionInfo = _$_ServiceRecordRepositoryBaseActionController
+        .startAction(name: '_ServiceRecordRepositoryBase.updateRecord');
+    try {
+      return super.updateRecord(vehicleId, updatedRecord);
+    } finally {
+      _$_ServiceRecordRepositoryBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   void deleteRecord(String vehicleId, String recordId) {
     final _$actionInfo = _$_ServiceRecordRepositoryBaseActionController
         .startAction(name: '_ServiceRecordRepositoryBase.deleteRecord');

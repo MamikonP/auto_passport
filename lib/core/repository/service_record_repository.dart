@@ -77,6 +77,39 @@ abstract class _ServiceRecordRepositoryBase with Store {
     }
   }
 
+  /// Updates an existing service record in place and recalculates stats and persistence.
+  @action
+  void updateRecord(String vehicleId, ServiceRecordModel updatedRecord) {
+    final index = vehicleRepository.vehicles.indexWhere(
+      (v) => v.id == vehicleId,
+    );
+    if (index != -1) {
+      final vehicle = vehicleRepository.vehicles[index];
+      final recordIndex = vehicle.serviceRecords.indexWhere(
+        (r) => r.id == updatedRecord.id,
+      );
+      if (recordIndex == -1) return;
+
+      final oldRecord = vehicle.serviceRecords[recordIndex];
+      final updatedList = List<ServiceRecordModel>.from(vehicle.serviceRecords);
+      updatedList[recordIndex] = updatedRecord;
+
+      final newSpent = vehicle.lifetimeTotalSpentOverride != null
+          ? (vehicle.lifetimeTotalSpentOverride! -
+                    oldRecord.totalCost +
+                    updatedRecord.totalCost)
+                .clamp(0.0, double.infinity)
+          : null;
+
+      final updated = vehicle.copyWith(
+        serviceRecords: updatedList,
+        lifetimeTotalSpentOverride: newSpent,
+      );
+      vehicleRepository.vehicles[index] = updated;
+      databaseService.saveVehicle(updated);
+    }
+  }
+
   /// Removes a service record and recalculates stats and persistence.
   @action
   void deleteRecord(String vehicleId, String recordId) {

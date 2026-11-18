@@ -291,30 +291,6 @@ class TimelineFeedView extends StatelessWidget {
                                     ),
                                   );
                                 },
-                                onDelete: () async {
-                                  final confirmed =
-                                      await AppConfirmationDialog.show(
-                                        context: context,
-                                        title: 'Delete Service Record',
-                                        message:
-                                            'Are you sure you want to delete "${item.record.title}"? This action cannot be undone.',
-                                        confirmText: 'Delete',
-                                        cancelText: 'Cancel',
-                                        isDestructive: true,
-                                      );
-                                  if (confirmed && context.mounted) {
-                                    activeController.deleteRecord(item.id);
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text(
-                                          '✓ Service record deleted successfully',
-                                        ),
-                                        backgroundColor: AppColors.error,
-                                        duration: Duration(seconds: 2),
-                                      ),
-                                    );
-                                  }
-                                },
                               );
                             }, childCount: entries.length),
                           ),
