@@ -1,19 +1,18 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+
 import '../../../core/di/locator.dart';
 import '../../../core/routes/app_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimensions.dart';
 import '../controllers/intake_controller.dart';
 import '../widgets/intake_option_card.dart';
+import 'voice_service_log_sheet.dart';
 
 class IntakeModal extends StatelessWidget {
   final IntakeController? controller;
 
-  const IntakeModal({
-    super.key,
-    this.controller,
-  });
+  const IntakeModal({super.key, this.controller});
 
   static Future<void> show(BuildContext context) {
     return showModalBottomSheet(
@@ -62,29 +61,35 @@ class IntakeModal extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Log Service Proof',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Log Service Proof',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
                       ),
-                    ),
-                    SizedBox(height: 4),
-                    Text(
-                      'Choose how you want to document this repair:',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: AppColors.textSecondary,
+                      SizedBox(height: 4),
+                      Text(
+                        'Choose how you want to document this repair:',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: AppColors.textSecondary,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.close_rounded, color: AppColors.textSecondary, size: 20),
+                  icon: const Icon(
+                    Icons.close_rounded,
+                    color: AppColors.textSecondary,
+                    size: 20,
+                  ),
                   onPressed: () => Navigator.of(context).pop(),
                 ),
               ],
@@ -97,28 +102,15 @@ class IntakeModal extends StatelessWidget {
                   method: method,
                   onTap: () {
                     Navigator.of(context).pop();
-                    context.router.push(ManualEntryFormRoute(initialProofType: method.id));
+                    if (method.id == 'voice_log') {
+                      VoiceServiceLogSheet.show(context);
+                    } else {
+                      context.router.push(ManualEntryFormRoute());
+                    }
                   },
                 ),
               );
             }),
-            const SizedBox(height: 12),
-            Center(
-              child: TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  context.router.push(ManualEntryFormRoute());
-                },
-                child: const Text(
-                  'Skip auto-extract and enter manually →',
-                  style: TextStyle(
-                    color: AppColors.primaryLight,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ),
           ],
         ),
       ),

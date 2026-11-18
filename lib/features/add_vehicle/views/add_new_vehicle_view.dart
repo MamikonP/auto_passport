@@ -1,19 +1,23 @@
+import 'dart:io';
+
+import 'package:auto_passport/core/models/ocr_scan_result.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+
 import '../../../core/di/locator.dart';
 import '../../../core/models/vehicle_model.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/custom_text_field.dart';
+import '../../../core/widgets/info_description_box.dart';
 import '../controllers/add_vehicle_controller.dart';
 
 @RoutePage()
 class AddNewVehicleView extends StatefulWidget {
-  final AddVehicleController? controller;
+  final VehiclePassportModel? vehicle;
 
-  const AddNewVehicleView({
-    super.key,
-    this.controller,
-  });
+  const AddNewVehicleView({super.key, this.vehicle});
 
   @override
   State<AddNewVehicleView> createState() => _AddNewVehicleViewState();
@@ -29,16 +33,25 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
   late final TextEditingController _yearTextController;
   late final TextEditingController _mileageTextController;
 
+  bool _isVinScannedFromCamera = false;
+
   @override
   void initState() {
     super.initState();
-    _controller = widget.controller ?? Locator.addVehicleController;
+    _controller = Locator.addVehicleController;
+    if (widget.vehicle != null) {
+      _onInitializeVehicle(widget.vehicle!, _controller);
+    }
 
     _vinTextController = TextEditingController(text: _controller.vin);
     _makeTextController = TextEditingController(text: _controller.make);
     _modelTextController = TextEditingController(text: _controller.model);
-    _yearTextController = TextEditingController(text: _controller.year.toString());
-    _mileageTextController = TextEditingController(text: _controller.mileage.toString());
+    _yearTextController = TextEditingController(
+      text: _controller.year > 0 ? _controller.year.toString() : '',
+    );
+    _mileageTextController = TextEditingController(
+      text: _controller.mileage > 0 ? _controller.mileage.toString() : '',
+    );
   }
 
   @override
@@ -51,25 +64,410 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
     super.dispose();
   }
 
+  void _onInitializeVehicle(
+    VehiclePassportModel vehicle,
+    AddVehicleController controller,
+  ) {
+    controller.setVin(vehicle.vin);
+    controller.setMake(vehicle.make);
+    controller.setModel(vehicle.model);
+    controller.setYear(vehicle.year);
+    controller.setMileage(vehicle.mileageKm);
+    controller.setBodyType(vehicle.bodyType);
+    controller.setFuel(vehicle.fuelPowertrain);
+    controller.setDistanceUnit(vehicle.distanceUnit);
+    controller.setCurrency(vehicle.currency);
+    controller.setPhoto(vehicle.photoUrl ?? '');
+  }
+
   void _submit() {
     if (_formKey.currentState?.validate() ?? false) {
       _controller.setVin(_vinTextController.text.trim());
       _controller.setMake(_makeTextController.text.trim());
       _controller.setModel(_modelTextController.text.trim());
-      _controller.setYear(int.tryParse(_yearTextController.text.trim()) ?? 2013);
-      _controller.setMileage(int.tryParse(_mileageTextController.text.replaceAll(',', '').trim()) ?? 142000);
-
-      final newVehicle = _controller.submitVehicle();
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('✓ ${newVehicle.fullName} added to your Garage'),
-          backgroundColor: AppColors.verified,
-        ),
+      _controller.setYear(
+        int.tryParse(_yearTextController.text.trim()) ?? 2013,
       );
+      _controller.setMileage(
+        int.tryParse(_mileageTextController.text.replaceAll(',', '').trim()) ??
+            142000,
+      );
+
+      if (widget.vehicle == null) {
+        final newVehicle = _controller.submitVehicle();
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('✓ ${newVehicle.fullName} added to your Garage'),
+            backgroundColor: AppColors.verified,
+          ),
+        );
+      } else {
+        _controller.updateVehicle(widget.vehicle!.id);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('✓ ${_controller.make} updated in your Garage'),
+            backgroundColor: AppColors.pending,
+          ),
+        );
+      }
 
       context.router.maybePop();
     }
+  }
+
+  Future<bool> _ensureCameraAccess() async {
+    final status = await _controller.ensureCameraPermission();
+    if (status.isGranted) return true;
+    if (!mounted) return false;
+
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: AppColors.darkSurface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(14),
+          side: const BorderSide(color: AppColors.darkBorder),
+        ),
+        title: const Text(
+          'Camera Permission Required',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        content: const Text(
+          'Camera access is needed to scan 17-character VIN plates and capture vehicle photos. Please enable Camera permission in Settings.',
+          style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text(
+              'Cancel',
+              style: TextStyle(color: AppColors.textSecondary),
+            ),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+            ),
+            onPressed: () {
+              Navigator.of(dialogContext).pop();
+              _controller.openAppSettings();
+            },
+            child: const Text('Open Settings'),
+          ),
+        ],
+      ),
+    );
+    return false;
+  }
+
+  Future<void> _showVinScannerSheet() async {
+    await showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: AppColors.darkSurface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
+      ),
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 12),
+                  decoration: BoxDecoration(
+                    color: AppColors.darkBorder,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                const Text(
+                  'Scan Vehicle VIN (OCR)',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                const Text(
+                  'Point camera at windshield VIN plate, door jamb sticker, or registration card',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 12, color: AppColors.textMuted),
+                ),
+                const SizedBox(height: 12),
+                ListTile(
+                  leading: const Icon(
+                    Icons.document_scanner_rounded,
+                    color: AppColors.primaryLight,
+                  ),
+                  title: const Text(
+                    'Scan VIN with Camera',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  onTap: () async {
+                    Navigator.of(sheetContext).pop();
+                    final allowed = await _ensureCameraAccess();
+                    if (!allowed) return;
+                    final result = await _controller.scanVinFromCamera();
+                    _handleOcrResult(result);
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(
+                    Icons.photo_library_rounded,
+                    color: AppColors.primaryLight,
+                  ),
+                  title: const Text(
+                    'Scan VIN from Photo Library',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  onTap: () async {
+                    Navigator.of(sheetContext).pop();
+                    final result = await _controller.scanVinFromGallery();
+                    _handleOcrResult(result);
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _handleOcrResult(OcrScanResult? result) {
+    if (!mounted || result == null) return;
+
+    if (result.candidates.length > 1) {
+      _showVinCandidateSelectionSheet(result.candidates);
+      return;
+    }
+
+    if (result.hasVin) {
+      final detected = result.detectedVin!;
+      _vinTextController.text = detected;
+      _controller.setVin(detected);
+      setState(() {
+        _isVinScannedFromCamera = true;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('✓ VIN detected: $detected'),
+          backgroundColor: AppColors.verified,
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'No 17-character VIN detected. Try closer lighting or a clearer angle.',
+          ),
+          backgroundColor: AppColors.pending,
+        ),
+      );
+    }
+  }
+
+  Future<void> _showVinCandidateSelectionSheet(List<String> candidates) async {
+    await showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: AppColors.darkSurface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
+      ),
+      showDragHandle: true,
+      builder: (sheetContext) {
+        return SafeArea(
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  'Select Detected VIN / Chassis Number',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                ...candidates.take(5).map((candidate) {
+                  return ListTile(
+                    leading: const Icon(
+                      Icons.verified_rounded,
+                      color: AppColors.verified,
+                    ),
+                    title: Text(
+                      candidate,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontFamily: 'monospace',
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 1.1,
+                      ),
+                    ),
+                    subtitle: Text(
+                      candidate.length == 17
+                          ? '17-Character ISO VIN'
+                          : 'Chassis / Frame Code (${candidate.length} chars)',
+                      style: const TextStyle(
+                        color: AppColors.textMuted,
+                        fontSize: 12,
+                      ),
+                    ),
+                    onTap: () {
+                      Navigator.of(sheetContext).pop();
+                      _vinTextController.text = candidate;
+                      _controller.setVin(candidate);
+                      setState(() {
+                        _isVinScannedFromCamera = true;
+                      });
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('✓ VIN applied: $candidate'),
+                          backgroundColor: AppColors.verified,
+                        ),
+                      );
+                    },
+                  );
+                }),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _showPhotoPickerSheet() async {
+    await showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: AppColors.darkSurface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
+      ),
+      builder: (sheetContext) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 12),
+                  decoration: BoxDecoration(
+                    color: AppColors.darkBorder,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                const Text(
+                  'Vehicle Photo',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                ListTile(
+                  leading: const Icon(
+                    Icons.camera_alt_rounded,
+                    color: AppColors.primaryLight,
+                  ),
+                  title: const Text(
+                    'Take Photo',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  onTap: () async {
+                    Navigator.of(sheetContext).pop();
+                    final allowed = await _ensureCameraAccess();
+                    if (!allowed) return;
+                    final path = await _controller.capturePhotoFromCamera();
+                    if (path != null && mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Front angle photo captured'),
+                          duration: Duration(seconds: 1),
+                        ),
+                      );
+                    }
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(
+                    Icons.photo_library_rounded,
+                    color: AppColors.primaryLight,
+                  ),
+                  title: const Text(
+                    'Choose from Gallery',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  onTap: () async {
+                    Navigator.of(sheetContext).pop();
+                    final path = await _controller.pickPhotoFromGallery();
+                    if (path != null && mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Front angle photo attached'),
+                          duration: Duration(seconds: 1),
+                        ),
+                      );
+                    }
+                  },
+                ),
+                if (_controller.photoAdded)
+                  ListTile(
+                    leading: const Icon(
+                      Icons.delete_outline_rounded,
+                      color: Colors.redAccent,
+                    ),
+                    title: const Text(
+                      'Remove Photo',
+                      style: TextStyle(
+                        color: Colors.redAccent,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    onTap: () {
+                      Navigator.of(sheetContext).pop();
+                      _controller.removePhoto();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Photo removed'),
+                          duration: Duration(seconds: 1),
+                        ),
+                      );
+                    },
+                  ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -92,9 +490,9 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
         ),
         leadingWidth: 90,
         centerTitle: true,
-        title: const Text(
-          'New Vehicle Setup',
-          style: TextStyle(
+        title: Text(
+          widget.vehicle != null ? 'Edit Vehicle' : 'New Vehicle Setup',
+          style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w700,
             color: Colors.white,
@@ -129,141 +527,125 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'VIN / Chassis Number',
-                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textSecondary),
-              ),
-              const SizedBox(height: 6),
-              TextFormField(
+              CustomTextField(
+                label: 'VIN / Chassis Number',
                 controller: _vinTextController,
                 textCapitalization: TextCapitalization.characters,
+                hintText: 'e.g. WBA5A7C52FD129482',
                 style: const TextStyle(
                   color: Colors.white,
                   fontFamily: 'monospace',
                   fontWeight: FontWeight.w700,
                   letterSpacing: 1.2,
                 ),
-                decoration: InputDecoration(
-                  fillColor: AppColors.darkSurface,
-                  filled: true,
-                  hintText: 'e.g. WBA5A7C52FD129482',
-                  hintStyle: const TextStyle(color: AppColors.textMuted),
-                  suffixIcon: Container(
-                    margin: const EdgeInsets.all(6),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(8),
+                validator: (value) {
+                  final trimmed = value?.trim() ?? '';
+                  if (trimmed.isEmpty) {
+                    return 'VIN / Chassis number is required';
+                  }
+                  if (trimmed.length < 6) {
+                    return 'Enter a valid VIN / chassis number';
+                  }
+                  return null;
+                },
+                suffixIcon: Observer(
+                  builder: (_) => GestureDetector(
+                    onTap: _controller.isScanningVin
+                        ? null
+                        : _showVinScannerSheet,
+                    child: Container(
+                      margin: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: _controller.isScanningVin
+                          ? const Padding(
+                              padding: EdgeInsets.all(10),
+                              child: SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            )
+                          : const Icon(
+                              Icons.qr_code_scanner_rounded,
+                              color: Colors.white,
+                              size: 20,
+                            ),
                     ),
-                    child: const Icon(Icons.qr_code_scanner_rounded, color: Colors.white, size: 20),
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(color: AppColors.darkBorder),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(color: AppColors.darkBorder),
                   ),
                 ),
               ),
+              if (_isVinScannedFromCamera) ...[
+                const SizedBox(height: 8),
+                const InfoDescriptionBox.warning(
+                  text:
+                      'Please double-check the scanned VIN characters carefully. Camera OCR may occasionally misread similar symbols (such as 0/O, 1/I, 5/S, or 8/B).',
+                ),
+              ],
               const SizedBox(height: 16),
               Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Make',
-                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textSecondary),
-                        ),
-                        const SizedBox(height: 6),
-                        TextFormField(
-                          controller: _makeTextController,
-                          style: const TextStyle(color: Colors.white, fontSize: 14),
-                          decoration: InputDecoration(
-                            fillColor: AppColors.darkSurface,
-                            filled: true,
-                            hintText: 'BMW',
-                            hintStyle: const TextStyle(color: AppColors.textMuted),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: const BorderSide(color: AppColors.darkBorder),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: const BorderSide(color: AppColors.darkBorder),
-                            ),
-                          ),
-                        ),
-                      ],
+                    child: CustomTextField(
+                      label: 'Make',
+                      controller: _makeTextController,
+                      hintText: 'BMW',
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'Make is required';
+                        }
+                        return null;
+                      },
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Model',
-                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textSecondary),
-                        ),
-                        const SizedBox(height: 6),
-                        TextFormField(
-                          controller: _modelTextController,
-                          style: const TextStyle(color: Colors.white, fontSize: 14),
-                          decoration: InputDecoration(
-                            fillColor: AppColors.darkSurface,
-                            filled: true,
-                            hintText: '528i xDrive',
-                            hintStyle: const TextStyle(color: AppColors.textMuted),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: const BorderSide(color: AppColors.darkBorder),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: const BorderSide(color: AppColors.darkBorder),
-                            ),
-                          ),
-                        ),
-                      ],
+                    child: CustomTextField(
+                      label: 'Model',
+                      controller: _modelTextController,
+                      hintText: '528i xDrive',
+                      validator: (value) {
+                        if (value == null || value.trim().isEmpty) {
+                          return 'Model is required';
+                        }
+                        return null;
+                      },
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 16),
               Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Year',
-                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textSecondary),
-                        ),
-                        const SizedBox(height: 6),
-                        TextFormField(
-                          controller: _yearTextController,
-                          keyboardType: TextInputType.number,
-                          style: const TextStyle(color: Colors.white, fontSize: 14),
-                          decoration: InputDecoration(
-                            fillColor: AppColors.darkSurface,
-                            filled: true,
-                            hintText: '2013',
-                            hintStyle: const TextStyle(color: AppColors.textMuted),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: const BorderSide(color: AppColors.darkBorder),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: const BorderSide(color: AppColors.darkBorder),
-                            ),
-                          ),
-                        ),
+                    child: CustomTextField(
+                      label: 'Year',
+                      controller: _yearTextController,
+                      keyboardType: TextInputType.number,
+                      hintText: '2013',
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                        FilteringTextInputFormatter.deny(RegExp(r'^0+')),
                       ],
+                      validator: (value) {
+                        final trimmed = value?.trim() ?? '';
+                        if (trimmed.isEmpty) {
+                          return 'Year is required';
+                        }
+                        final year = int.tryParse(trimmed);
+                        final maxYear = DateTime.now().year + 1;
+                        if (year == null || year < 1900 || year > maxYear) {
+                          return 'Enter a valid year';
+                        }
+                        return null;
+                      },
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -273,7 +655,11 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
                       children: [
                         const Text(
                           'Fuel / Powertrain',
-                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textSecondary),
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textSecondary,
+                          ),
                         ),
                         const SizedBox(height: 6),
                         Observer(
@@ -291,11 +677,14 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
                                 value: _controller.fuelPowertrain,
                                 items: _controller.fuelOptions.map((f) {
                                   return DropdownMenuItem(
-                                    value: f,
+                                    value: f.value,
                                     child: Text(
-                                      f,
+                                      f.value,
                                       overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(color: Colors.white, fontSize: 13),
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 13,
+                                      ),
                                     ),
                                   );
                                 }).toList(),
@@ -312,38 +701,74 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
                 ],
               ),
               const SizedBox(height: 16),
+              const Text(
+                'Body Type',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Observer(
+                builder: (_) => Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  decoration: BoxDecoration(
+                    color: AppColors.darkSurface,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: AppColors.darkBorder),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      isExpanded: true,
+                      dropdownColor: AppColors.darkSurface,
+                      value: _controller.bodyType,
+                      items: _controller.bodyTypeOptions.map((b) {
+                        return DropdownMenuItem(
+                          value: b.value,
+                          child: Text(
+                            b.value,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 13,
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (val) {
+                        if (val != null) _controller.setBodyType(val);
+                      },
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
               Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
                     flex: 3,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Current Mileage',
-                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textSecondary),
-                        ),
-                        const SizedBox(height: 6),
-                        TextFormField(
-                          controller: _mileageTextController,
-                          keyboardType: TextInputType.number,
-                          style: const TextStyle(color: Colors.white, fontSize: 14),
-                          decoration: InputDecoration(
-                            fillColor: AppColors.darkSurface,
-                            filled: true,
-                            hintText: '142,000',
-                            hintStyle: const TextStyle(color: AppColors.textMuted),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: const BorderSide(color: AppColors.darkBorder),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: const BorderSide(color: AppColors.darkBorder),
-                            ),
-                          ),
-                        ),
+                    child: CustomTextField(
+                      label: 'Current Mileage',
+                      controller: _mileageTextController,
+                      keyboardType: TextInputType.number,
+                      hintText: '142,000',
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                        FilteringTextInputFormatter.deny(RegExp(r'^0+')),
                       ],
+                      validator: (value) {
+                        final trimmed = value?.replaceAll(',', '').trim() ?? '';
+                        if (trimmed.isEmpty) {
+                          return 'Mileage is required';
+                        }
+                        final mileage = int.tryParse(trimmed);
+                        if (mileage == null || mileage <= 0) {
+                          return 'Enter a valid mileage';
+                        }
+                        return null;
+                      },
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -354,7 +779,11 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
                       children: [
                         const Text(
                           'Distance Unit',
-                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textSecondary),
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textSecondary,
+                          ),
                         ),
                         const SizedBox(height: 6),
                         Observer(
@@ -369,11 +798,17 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
                               children: [
                                 Expanded(
                                   child: GestureDetector(
-                                    onTap: () => _controller.setDistanceUnit(DistanceUnit.km),
+                                    onTap: () => _controller.setDistanceUnit(
+                                      DistanceUnit.km,
+                                    ),
                                     child: Container(
-                                      padding: const EdgeInsets.symmetric(vertical: 10),
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 10,
+                                      ),
                                       decoration: BoxDecoration(
-                                        color: _controller.distanceUnit == DistanceUnit.km
+                                        color:
+                                            _controller.distanceUnit ==
+                                                DistanceUnit.km
                                             ? AppColors.primary
                                             : Colors.transparent,
                                         borderRadius: BorderRadius.circular(7),
@@ -384,7 +819,9 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
                                           style: TextStyle(
                                             fontSize: 12,
                                             fontWeight: FontWeight.w700,
-                                            color: _controller.distanceUnit == DistanceUnit.km
+                                            color:
+                                                _controller.distanceUnit ==
+                                                    DistanceUnit.km
                                                 ? Colors.white
                                                 : AppColors.textSecondary,
                                           ),
@@ -395,11 +832,17 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
                                 ),
                                 Expanded(
                                   child: GestureDetector(
-                                    onTap: () => _controller.setDistanceUnit(DistanceUnit.miles),
+                                    onTap: () => _controller.setDistanceUnit(
+                                      DistanceUnit.miles,
+                                    ),
                                     child: Container(
-                                      padding: const EdgeInsets.symmetric(vertical: 10),
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 10,
+                                      ),
                                       decoration: BoxDecoration(
-                                        color: _controller.distanceUnit == DistanceUnit.miles
+                                        color:
+                                            _controller.distanceUnit ==
+                                                DistanceUnit.miles
                                             ? AppColors.primary
                                             : Colors.transparent,
                                         borderRadius: BorderRadius.circular(7),
@@ -410,7 +853,9 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
                                           style: TextStyle(
                                             fontSize: 12,
                                             fontWeight: FontWeight.w700,
-                                            color: _controller.distanceUnit == DistanceUnit.miles
+                                            color:
+                                                _controller.distanceUnit ==
+                                                    DistanceUnit.miles
                                                 ? Colors.white
                                                 : AppColors.textSecondary,
                                           ),
@@ -431,7 +876,11 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
               const SizedBox(height: 18),
               const Text(
                 'Vehicle Cost Tracking Currency',
-                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textSecondary),
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textSecondary,
+                ),
               ),
               const SizedBox(height: 8),
               Observer(
@@ -446,10 +895,14 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
                           child: Container(
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             decoration: BoxDecoration(
-                              color: isSelected ? AppColors.primary : AppColors.darkSurfaceVariant,
+                              color: isSelected
+                                  ? AppColors.primary
+                                  : AppColors.darkSurfaceVariant,
                               borderRadius: BorderRadius.circular(8),
                               border: Border.all(
-                                color: isSelected ? AppColors.primaryLight : AppColors.darkBorder,
+                                color: isSelected
+                                    ? AppColors.primaryLight
+                                    : AppColors.darkBorder,
                               ),
                             ),
                             child: Center(
@@ -458,7 +911,9 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w700,
-                                  color: isSelected ? Colors.white : AppColors.textSecondary,
+                                  color: isSelected
+                                      ? Colors.white
+                                      : AppColors.textSecondary,
                                 ),
                               ),
                             ),
@@ -472,59 +927,91 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
               const SizedBox(height: 18),
               const Text(
                 'Vehicle Photo (Optional)',
-                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textSecondary),
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textSecondary,
+                ),
               ),
               const SizedBox(height: 8),
               Observer(
-                builder: (_) => GestureDetector(
-                  onTap: () {
-                    _controller.togglePhoto();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(_controller.photoAdded ? 'Front angle photo attached' : 'Photo removed'),
-                        duration: const Duration(seconds: 1),
+                builder: (_) {
+                  final photoPath = _controller.photoPath;
+                  final hasPhoto = _controller.photoAdded;
+
+                  return GestureDetector(
+                    onTap: _showPhotoPickerSheet,
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 20,
+                        horizontal: 16,
                       ),
-                    );
-                  },
-                  child: Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
-                    decoration: BoxDecoration(
-                      color: AppColors.darkSurface,
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(
-                        color: _controller.photoAdded ? AppColors.verified : AppColors.darkBorder,
-                        width: 1.5,
+                      decoration: BoxDecoration(
+                        color: AppColors.darkSurface,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          color: hasPhoto
+                              ? AppColors.verified
+                              : AppColors.darkBorder,
+                          width: 1.5,
+                        ),
+                      ),
+                      child: Column(
+                        children: [
+                          if (photoPath != null && photoPath.isNotEmpty) ...[
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: Image.file(
+                                File(photoPath),
+                                height: 150,
+                                width: double.infinity,
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, _, _) => const Icon(
+                                  Icons.check_circle_rounded,
+                                  size: 36,
+                                  color: AppColors.verified,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                          ] else ...[
+                            Icon(
+                              hasPhoto
+                                  ? Icons.check_circle_rounded
+                                  : Icons.camera_alt_outlined,
+                              size: 36,
+                              color: hasPhoto
+                                  ? AppColors.verified
+                                  : AppColors.primaryLight,
+                            ),
+                            const SizedBox(height: 10),
+                          ],
+                          Text(
+                            hasPhoto
+                                ? 'Front Angle Photo Attached ✓ (Tap to change)'
+                                : 'Add Front / Angle Photo',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color: hasPhoto
+                                  ? AppColors.verified
+                                  : Colors.white,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          const Text(
+                            'Will be stamped on the exported buyer PDF cover',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: AppColors.textMuted,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    child: Column(
-                      children: [
-                        Icon(
-                          _controller.photoAdded ? Icons.check_circle_rounded : Icons.camera_alt_outlined,
-                          size: 36,
-                          color: _controller.photoAdded ? AppColors.verified : AppColors.primaryLight,
-                        ),
-                        const SizedBox(height: 10),
-                        Text(
-                          _controller.photoAdded ? 'Front Angle Photo Attached ✓' : 'Add Front / Angle Photo',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                            color: _controller.photoAdded ? AppColors.verified : Colors.white,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        const Text(
-                          'Will be stamped on the exported buyer PDF cover',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: AppColors.textMuted,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+                  );
+                },
               ),
             ],
           ),
@@ -534,7 +1021,9 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
         decoration: const BoxDecoration(
           color: AppColors.darkBackground,
-          border: Border(top: BorderSide(color: AppColors.darkBorder, width: 1)),
+          border: Border(
+            top: BorderSide(color: AppColors.darkBorder, width: 1),
+          ),
         ),
         child: SizedBox(
           width: double.infinity,

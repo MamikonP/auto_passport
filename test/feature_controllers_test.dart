@@ -4,7 +4,7 @@ import 'package:auto_passport/core/models/vehicle_model.dart';
 import 'package:auto_passport/core/repository/service_record_repository.dart';
 import 'package:auto_passport/core/repository/settings_repository.dart';
 import 'package:auto_passport/core/repository/vehicle_repository.dart';
-import 'package:auto_passport/core/services/hive_local_database_service.dart';
+import 'package:auto_passport/core/services/hive_database/hive_local_database_service.dart';
 import 'package:auto_passport/core/services/local_database_service.dart';
 import 'package:auto_passport/features/add_vehicle/controllers/add_vehicle_controller.dart';
 import 'package:auto_passport/features/dossier/controllers/dossier_controller.dart';

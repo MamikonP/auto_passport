@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimensions.dart';
 import '../models/record_detail_model.dart';
@@ -6,10 +7,7 @@ import '../models/record_detail_model.dart';
 class RecordInvestmentCard extends StatelessWidget {
   final RecordBreakdownModel breakdown;
 
-  const RecordInvestmentCard({
-    super.key,
-    required this.breakdown,
-  });
+  const RecordInvestmentCard({super.key, required this.breakdown});
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +51,7 @@ class RecordInvestmentCard extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  'Parts: Lemförder Arm (${breakdown.partsOemNumber})',
+                  'Parts: ${breakdown.title} (${breakdown.partsOemNumber})',
                   style: const TextStyle(
                     fontSize: 13,
                     color: AppColors.textSecondary,
@@ -75,10 +73,10 @@ class RecordInvestmentCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Expanded(
+              Expanded(
                 child: Text(
-                  'Labor: Master Gago (Suspension Box #4)',
-                  style: TextStyle(
+                  'Labor: ${breakdown.facilityName} (${breakdown.facilityType})',
+                  style: const TextStyle(
                     fontSize: 13,
                     color: AppColors.textSecondary,
                   ),

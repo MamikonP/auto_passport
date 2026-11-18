@@ -15,11 +15,11 @@ part of 'app_router.dart';
 class AddNewVehicleRoute extends PageRouteInfo<AddNewVehicleRouteArgs> {
   AddNewVehicleRoute({
     Key? key,
-    AddVehicleController? controller,
+    VehiclePassportModel? vehicle,
     List<PageRouteInfo>? children,
   }) : super(
          AddNewVehicleRoute.name,
-         args: AddNewVehicleRouteArgs(key: key, controller: controller),
+         args: AddNewVehicleRouteArgs(key: key, vehicle: vehicle),
          initialChildren: children,
        );
 
@@ -31,32 +31,32 @@ class AddNewVehicleRoute extends PageRouteInfo<AddNewVehicleRouteArgs> {
       final args = data.argsAs<AddNewVehicleRouteArgs>(
         orElse: () => const AddNewVehicleRouteArgs(),
       );
-      return AddNewVehicleView(key: args.key, controller: args.controller);
+      return AddNewVehicleView(key: args.key, vehicle: args.vehicle);
     },
   );
 }
 
 class AddNewVehicleRouteArgs {
-  const AddNewVehicleRouteArgs({this.key, this.controller});
+  const AddNewVehicleRouteArgs({this.key, this.vehicle});
 
   final Key? key;
 
-  final AddVehicleController? controller;
+  final VehiclePassportModel? vehicle;
 
   @override
   String toString() {
-    return 'AddNewVehicleRouteArgs{key: $key, controller: $controller}';
+    return 'AddNewVehicleRouteArgs{key: $key, vehicle: $vehicle}';
   }
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     if (other is! AddNewVehicleRouteArgs) return false;
-    return key == other.key && controller == other.controller;
+    return key == other.key && vehicle == other.vehicle;
   }
 
   @override
-  int get hashCode => key.hashCode ^ controller.hashCode;
+  int get hashCode => key.hashCode ^ vehicle.hashCode;
 }
 
 /// generated route for

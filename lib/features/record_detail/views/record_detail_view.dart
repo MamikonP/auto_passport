@@ -1,7 +1,9 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+
 import '../../../core/di/locator.dart';
+import '../../../core/enums/proof_classification.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_confirmation_dialog.dart';
 import '../controllers/record_detail_controller.dart';
@@ -25,14 +27,18 @@ class RecordDetailView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final activeController = controller ?? Locator.recordDetailController;
-    final breakdown = activeController.getRecordDetail(recordId, vehicleId: vehicleId);
+    final breakdown = activeController.getRecordDetail(
+      recordId,
+      vehicleId: vehicleId,
+    );
     final record = breakdown.record;
 
     Future<void> handleDelete() async {
       final confirmed = await AppConfirmationDialog.show(
         context: context,
         title: 'Delete Service Record',
-        message: 'Are you sure you want to delete "${record.title}"? This action cannot be undone and will update your vehicle lifetime totals.',
+        message:
+            'Are you sure you want to delete "${record.title}"? This action cannot be undone and will update your vehicle lifetime totals.',
         confirmText: 'Delete Record',
         cancelText: 'Cancel',
         isDestructive: true,
@@ -57,19 +63,14 @@ class RecordDetailView extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: AppColors.darkBackground,
         elevation: 0,
-        leading: TextButton.icon(
+        leading: IconButton(
           onPressed: () => context.router.maybePop(),
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 14, color: AppColors.primaryLight),
-          label: const Text(
-            'Timeline',
-            style: TextStyle(
-              color: AppColors.primaryLight,
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-            ),
+          icon: const Icon(
+            Icons.arrow_back_ios_new_rounded,
+            size: 14,
+            color: AppColors.primaryLight,
           ),
         ),
-        leadingWidth: 100,
         centerTitle: true,
         title: const Text(
           'Service Breakdown',
@@ -80,18 +81,17 @@ class RecordDetailView extends StatelessWidget {
           ),
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.delete_outline_rounded, color: Colors.redAccent, size: 20),
-            tooltip: 'Delete Record',
-            onPressed: handleDelete,
-          ),
           Observer(
             builder: (_) => TextButton(
               onPressed: () {
                 activeController.toggleEditMode();
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(activeController.isEditMode ? 'Edit mode enabled' : 'Edit mode saved'),
+                    content: Text(
+                      activeController.isEditMode
+                          ? 'Edit mode enabled'
+                          : 'Edit mode saved',
+                    ),
                     backgroundColor: AppColors.primaryDark,
                     duration: const Duration(seconds: 1),
                   ),
@@ -117,33 +117,60 @@ class RecordDetailView extends StatelessWidget {
           children: [
             Row(
               children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: AppColors.warningBg,
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: AppColors.warning, width: 1),
-                  ),
-                  child: const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.verified_rounded, size: 12, color: AppColors.warning),
-                      SizedBox(width: 4),
-                      Text(
-                        'PHOTO-VERIFIED PART',
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 0.5,
-                          color: AppColors.warning,
-                        ),
+                Builder(
+                  builder: (_) {
+                    final isFormal =
+                        record.proofClassification ==
+                        ProofClassification.formalStoreReceipt;
+                    final badgeColor = isFormal
+                        ? AppColors.verified
+                        : AppColors.warning;
+                    final badgeBg = isFormal
+                        ? AppColors.verifiedBg
+                        : AppColors.warningBg;
+                    return Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
                       ),
-                    ],
-                  ),
+                      decoration: BoxDecoration(
+                        color: badgeBg,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: badgeColor, width: 1),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            isFormal
+                                ? Icons.receipt_long_rounded
+                                : Icons.verified_rounded,
+                            size: 12,
+                            color: badgeColor,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            isFormal
+                                ? 'OFFICIAL STORE RECEIPT'
+                                : 'PHOTO-VERIFIED PART',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 0.5,
+                              color: badgeColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
                 ),
                 const SizedBox(width: 8),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.darkSurfaceVariant,
                     borderRadius: BorderRadius.circular(20),
@@ -171,7 +198,6 @@ class RecordDetailView extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 18),
-
             RecordInvestmentCard(breakdown: breakdown),
             const SizedBox(height: 16),
             RecordFacilityCard(breakdown: breakdown),
@@ -184,7 +210,9 @@ class RecordDetailView extends StatelessWidget {
               child: OutlinedButton.icon(
                 style: OutlinedButton.styleFrom(
                   foregroundColor: Colors.redAccent,
-                  side: BorderSide(color: Colors.redAccent.withValues(alpha: 0.4)),
+                  side: BorderSide(
+                    color: Colors.redAccent.withValues(alpha: 0.4),
+                  ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -204,7 +232,9 @@ class RecordDetailView extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
         decoration: const BoxDecoration(
           color: AppColors.darkBackground,
-          border: Border(top: BorderSide(color: AppColors.darkBorder, width: 1)),
+          border: Border(
+            top: BorderSide(color: AppColors.darkBorder, width: 1),
+          ),
         ),
         child: SizedBox(
           width: double.infinity,
@@ -212,28 +242,41 @@ class RecordDetailView extends StatelessWidget {
           child: Observer(
             builder: (_) => ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
-                backgroundColor: activeController.isIncludedInDossier ? AppColors.primary : AppColors.darkSurfaceVariant,
+                backgroundColor: activeController.isIncludedInDossier
+                    ? AppColors.primary
+                    : AppColors.darkSurfaceVariant,
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
               icon: Icon(
-                activeController.isIncludedInDossier ? Icons.check_circle_rounded : Icons.description_outlined,
+                activeController.isIncludedInDossier
+                    ? Icons.check_circle_rounded
+                    : Icons.description_outlined,
                 size: 18,
               ),
               label: Text(
-                activeController.isIncludedInDossier ? '✓ Included in Resale Dossier' : 'Include in Resale Dossier',
-                style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+                activeController.isIncludedInDossier
+                    ? '✓ Included in Resale Dossier'
+                    : 'Include in Resale Dossier',
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
               onPressed: () {
                 activeController.toggleIncludedInDossier();
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(activeController.isIncludedInDossier
-                        ? '✓ Verified and linked to public dossier certificate'
-                        : 'Excluded from public dossier certificate'),
-                    backgroundColor: activeController.isIncludedInDossier ? AppColors.verified : AppColors.warning,
+                    content: Text(
+                      activeController.isIncludedInDossier
+                          ? '✓ Verified and linked to public dossier certificate'
+                          : 'Excluded from public dossier certificate',
+                    ),
+                    backgroundColor: activeController.isIncludedInDossier
+                        ? AppColors.verified
+                        : AppColors.warning,
                     duration: const Duration(seconds: 2),
                   ),
                 );
