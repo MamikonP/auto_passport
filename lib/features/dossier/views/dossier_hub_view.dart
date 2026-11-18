@@ -4,6 +4,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import '../../../core/di/locator.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimensions.dart';
+import '../../../l10n/app_localizations.dart';
 import '../controllers/dossier_controller.dart';
 import '../widgets/dossier_customization_card.dart';
 import '../widgets/dossier_empty_view.dart';
@@ -22,6 +23,7 @@ class DossierHubView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final activeController = controller ?? Locator.dossierController;
+    final l10n = AppLocalizations.of(context)!;
 
     return Observer(
       builder: (context) {
@@ -34,9 +36,9 @@ class DossierHubView extends StatelessWidget {
             backgroundColor: AppColors.darkBackground,
             elevation: 0,
             centerTitle: false,
-            title: const Text(
-              'Buyer Resale Dossier',
-              style: TextStyle(
+            title: Text(
+              l10n.buyerResaleDossierTitle,
+              style: const TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w800,
                 color: Colors.white,
@@ -54,9 +56,9 @@ class DossierHubView extends StatelessWidget {
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(color: AppColors.verified, width: 1),
                       ),
-                      child: const Text(
-                        'READY',
-                        style: TextStyle(
+                      child: Text(
+                        l10n.readyBadge,
+                        style: const TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.w800,
                           letterSpacing: 0.8,
@@ -99,19 +101,19 @@ class DossierHubView extends StatelessWidget {
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
-                              children: const [
+                              children: [
                                 Text(
-                                  'Lifetime Vehicle Pass',
-                                  style: TextStyle(
+                                  l10n.lifetimeVehiclePass,
+                                  style: const TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w700,
                                     color: Colors.white,
                                   ),
                                 ),
-                                SizedBox(height: 2),
+                                const SizedBox(height: 2),
                                 Text(
-                                  'Unlimited PDF exports for this car',
-                                  style: TextStyle(
+                                  l10n.unlimitedPdfExports,
+                                  style: const TextStyle(
                                     fontSize: 12,
                                     color: AppColors.textSecondary,
                                   ),
@@ -152,14 +154,14 @@ class DossierHubView extends StatelessWidget {
                         ),
                       ),
                       icon: const Icon(Icons.download_rounded, size: 20),
-                      label: const Text(
-                        'Download Certified PDF Dossier',
-                        style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+                      label: Text(
+                        l10n.downloadCertifiedPdfDossier,
+                        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
                       ),
                       onPressed: () {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('✓ Certified PDF Dossier generated and downloaded'),
+                          SnackBar(
+                            content: Text(l10n.certifiedPdfGeneratedToast),
                             backgroundColor: AppColors.verified,
                           ),
                         );

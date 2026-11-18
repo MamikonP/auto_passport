@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimensions.dart';
+import '../../../l10n/app_localizations.dart';
 import '../models/record_detail_model.dart';
 
 class RecordInvestmentCard extends StatelessWidget {
@@ -11,6 +12,8 @@ class RecordInvestmentCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
@@ -24,9 +27,9 @@ class RecordInvestmentCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Total Investment',
-                style: TextStyle(
+              Text(
+                l10n.totalInvestment,
+                style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: AppColors.textSecondary,
@@ -51,7 +54,10 @@ class RecordInvestmentCard extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  'Parts: ${breakdown.title} (${breakdown.partsOemNumber})',
+                  l10n.partsBreakdownLine(
+                    breakdown.title,
+                    breakdown.partsOemNumber,
+                  ),
                   style: const TextStyle(
                     fontSize: 13,
                     color: AppColors.textSecondary,
@@ -75,7 +81,10 @@ class RecordInvestmentCard extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  'Labor: ${breakdown.facilityName} (${breakdown.facilityType})',
+                  l10n.laborBreakdownLine(
+                    breakdown.facilityName,
+                    breakdown.facilityType,
+                  ),
                   style: const TextStyle(
                     fontSize: 13,
                     color: AppColors.textSecondary,

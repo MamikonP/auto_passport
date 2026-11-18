@@ -450,7 +450,8 @@ void main() {
       final record = controller.saveRecord(
         title: 'New Battery Replacement',
         mechanicName: 'Varta Armenia',
-        cost: 45000,
+        partsCost: 40000,
+        laborCost: 5000,
         odometer: 184300,
       );
       expect(record, isNotNull);

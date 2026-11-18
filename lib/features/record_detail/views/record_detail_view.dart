@@ -7,6 +7,7 @@ import '../../../core/enums/proof_classification.dart';
 import '../../../core/routes/app_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_confirmation_dialog.dart';
+import '../../../l10n/app_localizations.dart';
 import '../controllers/record_detail_controller.dart';
 import '../widgets/record_facility_card.dart';
 import '../widgets/record_investment_card.dart';
@@ -28,6 +29,7 @@ class RecordDetailView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final activeController = controller ?? Locator.recordDetailController;
+    final l10n = AppLocalizations.of(context)!;
 
     return Observer(
       builder: (_) {
@@ -40,11 +42,10 @@ class RecordDetailView extends StatelessWidget {
         Future<void> handleDelete() async {
           final confirmed = await AppConfirmationDialog.show(
             context: context,
-            title: 'Delete Service Record',
-            message:
-                'Are you sure you want to delete "${record.title}"? This action cannot be undone and will update your vehicle lifetime totals.',
-            confirmText: 'Delete Record',
-            cancelText: 'Cancel',
+            title: l10n.deleteServiceRecordTitle,
+            message: l10n.deleteRecordLongMessage(record.title),
+            confirmText: l10n.deleteRecordConfirmButton,
+            cancelText: l10n.cancel,
             isDestructive: true,
             icon: Icons.delete_outline_rounded,
           );
@@ -52,10 +53,10 @@ class RecordDetailView extends StatelessWidget {
           if (confirmed && context.mounted) {
             activeController.deleteRecord(record.id, vehicleId: vehicleId);
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('✓ Service record deleted successfully'),
+              SnackBar(
+                content: Text(l10n.serviceRecordDeletedToast),
                 backgroundColor: AppColors.error,
-                duration: Duration(seconds: 2),
+                duration: const Duration(seconds: 2),
               ),
             );
             context.router.maybePop();
@@ -76,9 +77,9 @@ class RecordDetailView extends StatelessWidget {
               ),
             ),
             centerTitle: true,
-            title: const Text(
-              'Service Breakdown',
-              style: TextStyle(
+            title: Text(
+              l10n.serviceBreakdownTitle,
+              style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
                 color: Colors.white,
@@ -91,9 +92,9 @@ class RecordDetailView extends StatelessWidget {
                     ManualEntryFormRoute(record: record, vehicleId: vehicleId),
                   );
                 },
-                child: const Text(
-                  'Edit',
-                  style: TextStyle(
+                child: Text(
+                  l10n.edit,
+                  style: const TextStyle(
                     color: AppColors.primaryLight,
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -144,8 +145,8 @@ class RecordDetailView extends StatelessWidget {
                               const SizedBox(width: 4),
                               Text(
                                 isFormal
-                                    ? 'OFFICIAL STORE RECEIPT'
-                                    : 'PHOTO-VERIFIED PART',
+                                    ? l10n.officialStoreReceiptBadge
+                                    : l10n.photoVerifiedPartBadge,
                                 style: TextStyle(
                                   fontSize: 10,
                                   fontWeight: FontWeight.w800,
@@ -173,7 +174,12 @@ class RecordDetailView extends StatelessWidget {
                         ),
                       ),
                       child: Text(
-                        'Odometer: ${record.mileageKm.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]},')} km',
+                        l10n.odometerValueBadge(
+                          record.mileageKm.toString().replaceAllMapped(
+                            RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+                            (m) => '${m[1]},',
+                          ),
+                        ),
                         style: const TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
@@ -214,9 +220,9 @@ class RecordDetailView extends StatelessWidget {
                       ),
                     ),
                     icon: const Icon(Icons.delete_outline_rounded, size: 18),
-                    label: const Text(
-                      'Delete Service Record',
-                      style: TextStyle(
+                    label: Text(
+                      l10n.deleteServiceRecordTitle,
+                      style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
                       ),
@@ -257,8 +263,8 @@ class RecordDetailView extends StatelessWidget {
                   ),
                   label: Text(
                     activeController.isIncludedInDossier
-                        ? '✓ Included in Resale Dossier'
-                        : 'Include in Resale Dossier',
+                        ? l10n.includedInResaleDossier
+                        : l10n.includeInResaleDossier,
                     style: const TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
@@ -270,8 +276,8 @@ class RecordDetailView extends StatelessWidget {
                       SnackBar(
                         content: Text(
                           activeController.isIncludedInDossier
-                              ? '✓ Verified and linked to public dossier certificate'
-                              : 'Excluded from public dossier certificate',
+                              ? l10n.verifiedAndLinkedToDossierToast
+                              : l10n.excludedFromDossierToast,
                         ),
                         backgroundColor: activeController.isIncludedInDossier
                             ? AppColors.verified

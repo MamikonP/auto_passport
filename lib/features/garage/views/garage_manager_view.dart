@@ -5,7 +5,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import '../../../core/di/locator.dart';
 import '../../../core/routes/app_router.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/widgets/app_confirmation_dialog.dart';
+import '../../../l10n/app_localizations.dart';
 import '../controllers/garage_controller.dart';
 import '../widgets/garage_register_card.dart';
 import '../widgets/garage_vehicle_card.dart';
@@ -20,6 +20,7 @@ class GarageManagerView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final activeController = controller ?? Locator.garageController;
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: AppColors.darkBackground,
@@ -46,7 +47,7 @@ class GarageManagerView extends StatelessWidget {
               const SizedBox(width: 8),
               Flexible(
                 child: Text(
-                  'My Garage (${activeController.totalVehiclesCount})',
+                  l10n.myGarageTitle(activeController.totalVehiclesCount),
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     fontSize: 17,
@@ -85,29 +86,6 @@ class GarageManagerView extends StatelessWidget {
                         onVehicleSelected!();
                       } else {
                         context.router.push(TimelineFeedRoute());
-                      }
-                    },
-                    onDelete: () async {
-                      final confirmed = await AppConfirmationDialog.show(
-                        context: context,
-                        title: 'Remove Car from Garage',
-                        message:
-                            'Are you sure you want to remove "${item.fullName}"? All logged service records and passport history for this vehicle will be deleted.',
-                        confirmText: 'Remove Car',
-                        cancelText: 'Cancel',
-                        isDestructive: true,
-                      );
-                      if (confirmed && context.mounted) {
-                        activeController.deleteVehicle(item.id);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              '✓ ${item.fullName} removed from garage',
-                            ),
-                            backgroundColor: AppColors.error,
-                            duration: const Duration(seconds: 2),
-                          ),
-                        );
                       }
                     },
                   ),

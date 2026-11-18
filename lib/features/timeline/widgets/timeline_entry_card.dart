@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimensions.dart';
+import '../../../l10n/app_localizations.dart';
 import '../models/timeline_models.dart';
 import 'timeline_proof_badge.dart';
 
@@ -14,6 +15,7 @@ class TimelineEntryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final record = item.record;
+    final l10n = AppLocalizations.of(context)!;
 
     return IntrinsicHeight(
       child: Row(
@@ -124,19 +126,19 @@ class TimelineEntryCard extends StatelessWidget {
                           children: [
                             GestureDetector(
                               onTap: onTap,
-                              child: const Row(
+                              child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Text(
-                                    'View Breakdown',
-                                    style: TextStyle(
+                                    l10n.viewBreakdown,
+                                    style: const TextStyle(
                                       fontSize: 11,
                                       fontWeight: FontWeight.w700,
                                       color: AppColors.primaryLight,
                                     ),
                                   ),
-                                  SizedBox(width: 2),
-                                  Icon(
+                                  const SizedBox(width: 2),
+                                  const Icon(
                                     Icons.arrow_forward_rounded,
                                     size: 12,
                                     color: AppColors.primaryLight,

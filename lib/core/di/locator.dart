@@ -172,6 +172,7 @@ class Locator {
     setup();
     await databaseService.init();
     await settingsRepository.loadSettings();
+    settingsController.setAppLanguage(settingsRepository.appLanguage);
     await vehicleRepository.loadFromDatabase();
   }
 

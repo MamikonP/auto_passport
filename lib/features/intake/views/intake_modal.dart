@@ -5,7 +5,9 @@ import '../../../core/di/locator.dart';
 import '../../../core/routes/app_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimensions.dart';
+import '../../../l10n/app_localizations.dart';
 import '../controllers/intake_controller.dart';
+import '../models/intake_method_model.dart';
 import '../widgets/intake_option_card.dart';
 import 'voice_service_log_sheet.dart';
 
@@ -26,6 +28,7 @@ class IntakeModal extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final activeController = controller ?? Locator.intakeController;
+    final l10n = AppLocalizations.of(context)!;
 
     return Container(
       decoration: const BoxDecoration(
@@ -61,22 +64,22 @@ class IntakeModal extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Expanded(
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Log Service Proof',
-                        style: TextStyle(
+                        l10n.logServiceProofTitle,
+                        style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w700,
                           color: Colors.white,
                         ),
                       ),
-                      SizedBox(height: 4),
+                      const SizedBox(height: 4),
                       Text(
-                        'Choose how you want to document this repair:',
-                        style: TextStyle(
+                        l10n.logServiceProofSubtitle,
+                        style: const TextStyle(
                           fontSize: 13,
                           color: AppColors.textSecondary,
                         ),
@@ -96,10 +99,27 @@ class IntakeModal extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             ...activeController.intakeMethods.map((method) {
+              final isVoice = method.id == 'voice_log';
+              final localizedMethod = IntakeMethodModel(
+                id: method.id,
+                title: isVoice
+                    ? l10n.intakeVoiceLogTitle
+                    : l10n.intakeManualEntryTitle,
+                subtitle: isVoice
+                    ? l10n.intakeVoiceLogSubtitle
+                    : l10n.intakeManualEntrySubtitle,
+                icon: method.icon,
+                iconColor: method.iconColor,
+                iconBgColor: method.iconBgColor,
+                badgeText: isVoice
+                    ? l10n.intakeVoiceLogBadge
+                    : method.badgeText,
+                badgeColor: method.badgeColor,
+              );
               return Padding(
                 padding: const EdgeInsets.only(bottom: 12),
                 child: IntakeOptionCard(
-                  method: method,
+                  method: localizedMethod,
                   onTap: () {
                     Navigator.of(context).pop();
                     if (method.id == 'voice_log') {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../core/models/vehicle_model.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimensions.dart';
+import '../../../l10n/app_localizations.dart';
 
 class DossierPassportSummaryCard extends StatelessWidget {
   final VehiclePassportModel vehicle;
@@ -13,6 +14,8 @@ class DossierPassportSummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -26,11 +29,11 @@ class DossierPassportSummaryCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Expanded(
+              Expanded(
                 child: Text(
-                  'OFFICIAL VEHICLE HEALTH PASSPORT',
+                  l10n.officialVehicleHealthPassportHeader,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.w800,
                     letterSpacing: 0.5,
@@ -46,7 +49,7 @@ class DossierPassportSummaryCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
-                  'VERIFIED (${vehicle.verifiedRecordsCount} ENTRIES)',
+                  l10n.verifiedEntriesBadge(vehicle.verifiedRecordsCount),
                   style: const TextStyle(
                     fontSize: 9,
                     fontWeight: FontWeight.w800,
@@ -58,7 +61,7 @@ class DossierPassportSummaryCard extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           Text(
-            'VIN: ${vehicle.maskedVin}  •  Mileage: ${vehicle.formattedMileage}',
+            l10n.vinAndMileageSummary(vehicle.maskedVin, vehicle.formattedMileage),
             style: const TextStyle(
               fontFamily: 'monospace',
               fontSize: 11,
@@ -77,7 +80,7 @@ class DossierPassportSummaryCard extends StatelessWidget {
                   const Text('• ', style: TextStyle(color: AppColors.verified, fontSize: 13)),
                   Expanded(
                     child: Text(
-                      '${r.formattedDate}: ${r.title} — ${r.proofBadges.isNotEmpty ? r.proofBadges.first : "Logged"}',
+                      '${r.formattedDate}: ${r.title} — ${r.proofBadges.isNotEmpty ? r.proofBadges.first : l10n.loggedFallbackBadge}',
                       style: const TextStyle(
                         fontSize: 12,
                         color: Color(0xFFE2E8F0),

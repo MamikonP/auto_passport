@@ -46,6 +46,8 @@ abstract class _SettingsControllerBase with Store {
     _settingsRepository.setAppLanguage(lang);
     if (lang == 'Հայերեն') {
       _themeController.setLocale(const Locale('hy'));
+    } else if (lang == 'Русский') {
+      _themeController.setLocale(const Locale('ru'));
     } else {
       _themeController.setLocale(const Locale('en'));
     }

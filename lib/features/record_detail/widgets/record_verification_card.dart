@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimensions.dart';
+import '../../../l10n/app_localizations.dart';
 import '../models/record_detail_model.dart';
 
 class RecordVerificationCard extends StatelessWidget {
@@ -13,6 +14,8 @@ class RecordVerificationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
@@ -23,13 +26,13 @@ class RecordVerificationCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(Icons.shield_outlined, size: 16, color: AppColors.warning),
-              SizedBox(width: 6),
+              const Icon(Icons.shield_outlined, size: 16, color: AppColors.warning),
+              const SizedBox(width: 6),
               Text(
-                'Dossier Verification Status',
-                style: TextStyle(
+                l10n.dossierVerificationStatus,
+                style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
                   color: AppColors.warning,

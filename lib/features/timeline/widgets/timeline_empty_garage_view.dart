@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/routes/app_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimensions.dart';
+import '../../../l10n/app_localizations.dart';
 
 class TimelineEmptyGarageView extends StatelessWidget {
   final VoidCallback? onRegisterFirstVehicle;
@@ -14,6 +15,8 @@ class TimelineEmptyGarageView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
       child: Column(
@@ -33,11 +36,11 @@ class TimelineEmptyGarageView extends StatelessWidget {
                       child: const Icon(Icons.shield_rounded, color: AppColors.primaryLight, size: 20),
                     ),
                     const SizedBox(width: 10),
-                    const Flexible(
+                    Flexible(
                       child: Text(
-                        'AutoPassport',
+                        l10n.appTitle,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w800,
                           color: Colors.white,
@@ -54,9 +57,9 @@ class TimelineEmptyGarageView extends StatelessWidget {
                   gradient: AppColors.proBadgeGradient,
                   borderRadius: BorderRadius.circular(6),
                 ),
-                child: const Text(
-                  'PRO',
-                  style: TextStyle(
+                child: Text(
+                  l10n.proBadge,
+                  style: const TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w800,
                     color: Colors.black,
@@ -93,20 +96,20 @@ class TimelineEmptyGarageView extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 20),
-                const Text(
-                  'Your Garage is Empty',
+                Text(
+                  l10n.yourGarageIsEmpty,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w800,
                     color: Colors.white,
                   ),
                 ),
                 const SizedBox(height: 10),
-                const Text(
-                  'Register your first vehicle to generate its immutable digital passport and start logging service records.',
+                Text(
+                  l10n.emptyGarageSubtitle,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 13,
                     color: AppColors.textSecondary,
                     height: 1.4,
@@ -126,9 +129,9 @@ class TimelineEmptyGarageView extends StatelessWidget {
                       elevation: 0,
                     ),
                     icon: const Icon(Icons.add_rounded, size: 20),
-                    label: const Text(
-                      'Register First Vehicle',
-                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+                    label: Text(
+                      l10n.registerFirstVehicle,
+                      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
                     ),
                     onPressed: () {
                       if (onRegisterFirstVehicle != null) {

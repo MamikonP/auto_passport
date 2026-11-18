@@ -31,9 +31,372 @@
   "cancel": "Cancel",
   "delete": "Delete",
   "edit": "Edit",
+  "confirm": "Confirm",
+  "done": "Done",
+  "back": "Back",
   "specifications": "Specifications",
   "fuelType": "Fuel Type",
   "transmission": "Transmission",
   "engineCapacity": "Engine Capacity",
-  "color": "Color"
+  "color": "Color",
+  "navTimeline": "Timeline",
+  "navScan": "Scan",
+  "navDossier": "Dossier",
+  "navSettings": "Settings",
+  "garageCarsCount": "Garage ({count} cars)",
+  "@garageCarsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "proBadge": "PRO",
+  "trackedSummary": "{mileage} • {spent} tracked",
+  "@trackedSummary": {
+    "placeholders": {
+      "mileage": {
+        "type": "String"
+      },
+      "spent": {
+        "type": "String"
+      }
+    }
+  },
+  "carOptionsTooltip": "Car options",
+  "removeCar": "Remove Car",
+  "editCar": "Edit Car",
+  "filterAll": "All ({count})",
+  "@filterAll": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "filterSuspension": "Suspension",
+  "filterBrakes": "Brakes",
+  "filterOilFilter": "Oil & Filter",
+  "noServiceRecordsInCategory": "No service records found in this category",
+  "deleteServiceRecordTitle": "Delete Service Record",
+  "deleteServiceRecordMessage": "Are you sure you want to delete \"{title}\"? This action cannot be undone.",
+  "@deleteServiceRecordMessage": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "serviceRecordDeletedToast": "✓ Service record deleted successfully",
+  "logService": "Log Service",
+  "removeCarDialogTitle": "Remove Car from Garage",
+  "removeCarDialogMessage": "Are you sure you want to remove \"{vehicleName}\"? All logged service records and passport history for this vehicle will be deleted.",
+  "@removeCarDialogMessage": {
+    "placeholders": {
+      "vehicleName": {
+        "type": "String"
+      }
+    }
+  },
+  "carRemovedFromGarageToast": "✓ {vehicleName} removed from garage",
+  "@carRemovedFromGarageToast": {
+    "placeholders": {
+      "vehicleName": {
+        "type": "String"
+      }
+    }
+  },
+  "editRecordTooltip": "Edit record",
+  "deleteRecordTooltip": "Delete record",
+  "viewBreakdown": "View Breakdown",
+  "yourGarageIsEmpty": "Your Garage is Empty",
+  "emptyGarageSubtitle": "Register your first vehicle to generate its immutable digital passport and start logging service records.",
+  "registerFirstVehicle": "Register First Vehicle",
+  "registerAnotherVehicle": "Register Another Vehicle",
+  "registerCardSubtitle": "Track DIY repairs, parts, and increase resale value",
+  "myGarageTitle": "My Garage ({count})",
+  "@myGarageTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "activeBadge": "ACTIVE",
+  "selectButton": "Select",
+  "removeCarTooltip": "Remove car",
+  "vinPrefix": "VIN: {vin}",
+  "@vinPrefix": {
+    "placeholders": {
+      "vin": {
+        "type": "String"
+      }
+    }
+  },
+  "odometerLabel": "Odometer",
+  "recordsLabel": "Records",
+  "verifiedCount": "{count} Verified",
+  "@verifiedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "totalSpentLabel": "Total Spent",
+  "logServiceProofTitle": "Log Service Proof",
+  "logServiceProofSubtitle": "Choose how you want to document this repair:",
+  "intakeVoiceLogTitle": "Voice Quick Log",
+  "intakeVoiceLogSubtitle": "Speak repair details — auto-extracts service, cost & mileage",
+  "intakeVoiceLogBadge": "Speech-to-Text",
+  "intakeManualEntryTitle": "Manual Service Entry",
+  "intakeManualEntrySubtitle": "Enter repair details, cost, mileage & attach photo or receipt proofs",
+  "voiceSheetSubtitle": "Speak your repair details (service, mileage, cost & master)",
+  "initializingMicrophone": "Initializing microphone...",
+  "listeningTapToStop": "Listening... Tap to stop",
+  "tapToSpeakServiceDetails": "Tap to speak service details",
+  "speechUnavailableMessage": "Speech recognition is unavailable on this device. You can type or tap a sample phrase below.",
+  "microphoneAccessErrorMessage": "Could not access microphone. Check microphone permissions or type below.",
+  "microphonePausedMessage": "Microphone paused ({error}). Tap mic to resume or type below.",
+  "@microphonePausedMessage": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "voiceTranscriptHint": "e.g. \"Changed front brake pads at 185,000 km for 45,000 dram with Master Karen\"",
+  "autoParsedPreviewHeader": "AUTO-PARSED SERVICE LOG PREVIEW",
+  "costLabel": "Cost",
+  "workshopLabel": "Workshop",
+  "editInForm": "Edit in Form",
+  "confirmAndAddLog": "Confirm & Add Log",
+  "serviceLogAddedTitle": "Service Log Added to Timeline!",
+  "serviceLogAddedSubtitle": "Your voice note was parsed and saved to your vehicle history:",
+  "newServiceRecordTitle": "New Service Record",
+  "editServiceRecordTitle": "Edit Service Record",
+  "proofVerificationClassification": "Proof Verification Classification",
+  "informalMasterProof": "Informal Master Proof",
+  "formalStoreReceipt": "Formal Store Receipt",
+  "informalMasterDescription": "Private Mechanic / Master Repair: Verified through part box photos, car on a lift, or mobile transfer screenshots.",
+  "formalStoreDescription": "Official Service / Store Receipt: Verified through printed store invoices, OEM part numbers, or official service stamps.",
+  "serviceItemDescriptionLabel": "Service Item / Description",
+  "serviceItemHint": "e.g. Front CV Joint & Control Arms",
+  "serviceDescriptionRequiredError": "Service description is required",
+  "oemPartOrInvoiceLabel": "OEM Part # / Store Invoice No. (Optional)",
+  "oemPartOrInvoiceHint": "e.g. OEM 31126794203 or INV-2048",
+  "repairMaintenanceCategoryLabel": "Repair / Maintenance Category",
+  "serviceDateLabel": "Service Date",
+  "odometerKmLabel": "Odometer (km)",
+  "odometerRequiredError": "Odometer is required",
+  "enterValidKmError": "Enter valid km",
+  "partsCostLabel": "Parts Cost",
+  "partsCostRequiredError": "Parts cost is required",
+  "enterValidCostError": "Enter valid cost",
+  "totalMustBeGreaterThanZeroError": "Total must be > 0",
+  "laborCostLabel": "Labor Cost",
+  "laborCostRequiredError": "Labor cost is required",
+  "autoCalculatedTotalCost": "Auto-Calculated Total Cost",
+  "serviceCenterStoreNameLabel": "Service Center / Store Name",
+  "mechanicMasterNameLabel": "Mechanic / Master Name",
+  "serviceCenterHint": "e.g. Liqui Moly Center / Official Service",
+  "mechanicNameHint": "e.g. Gago Varpet",
+  "serviceCenterRequiredError": "Service center or store name is required",
+  "mechanicNameRequiredError": "Mechanic / master name is required",
+  "proofAttachmentsLabel": "Proof Attachments (Photos / Screenshots)",
+  "formalProofAttachmentsInfo": "Upload photos of official store receipts, printed tax invoices, warranty cards, or oil change door stickers.",
+  "informalProofAttachmentsInfo": "Upload photos of new part boxes or labels, the car on a service lift, or payment transfer screenshots (Idram, Telcell, bank app).",
+  "photoProofAttachedToast": "Photo proof attached",
+  "addPhotoLabel": "+ Photo",
+  "updateServiceRecordButton": "✓ Update Service Record",
+  "saveToTimelineFeedButton": "✓ Save to Timeline Feed",
+  "serviceRecordUpdatedToast": "✓ Service record updated",
+  "serviceRecordSavedToast": "✓ Service record saved to timeline feed",
+  "serviceBreakdownTitle": "Service Breakdown",
+  "deleteRecordConfirmButton": "Delete Record",
+  "deleteRecordLongMessage": "Are you sure you want to delete \"{title}\"? This action cannot be undone and will update your vehicle lifetime totals.",
+  "@deleteRecordLongMessage": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "officialStoreReceiptBadge": "OFFICIAL STORE RECEIPT",
+  "photoVerifiedPartBadge": "PHOTO-VERIFIED PART",
+  "odometerValueBadge": "Odometer: {mileage} km",
+  "@odometerValueBadge": {
+    "placeholders": {
+      "mileage": {
+        "type": "String"
+      }
+    }
+  },
+  "totalInvestment": "Total Investment",
+  "partsBreakdownLine": "Parts: {title} ({oem})",
+  "@partsBreakdownLine": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "oem": {
+        "type": "String"
+      }
+    }
+  },
+  "laborBreakdownLine": "Labor: {facility} ({type})",
+  "@laborBreakdownLine": {
+    "placeholders": {
+      "facility": {
+        "type": "String"
+      },
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "serviceFacilityHeader": "SERVICE FACILITY",
+  "dossierVerificationStatus": "Dossier Verification Status",
+  "includedInResaleDossier": "✓ Included in Resale Dossier",
+  "includeInResaleDossier": "Include in Resale Dossier",
+  "verifiedAndLinkedToDossierToast": "✓ Verified and linked to public dossier certificate",
+  "excludedFromDossierToast": "Excluded from public dossier certificate",
+  "cancelClose": "✕ Cancel",
+  "editVehicleTitle": "Edit Vehicle",
+  "newVehicleSetupTitle": "New Vehicle Setup",
+  "vehicleAddedToGarageToast": "✓ {vehicleName} added to your Garage",
+  "@vehicleAddedToGarageToast": {
+    "placeholders": {
+      "vehicleName": {
+        "type": "String"
+      }
+    }
+  },
+  "vehicleUpdatedInGarageToast": "✓ {make} updated in your Garage",
+  "@vehicleUpdatedInGarageToast": {
+    "placeholders": {
+      "make": {
+        "type": "String"
+      }
+    }
+  },
+  "cameraPermissionRequiredTitle": "Camera Permission Required",
+  "cameraPermissionRequiredMessage": "Camera access is needed to scan 17-character VIN plates and capture vehicle photos. Please enable Camera permission in Settings.",
+  "openSettings": "Open Settings",
+  "scanVehicleVinTitle": "Scan Vehicle VIN (OCR)",
+  "scanVehicleVinSubtitle": "Point camera at windshield VIN plate, door jamb sticker, or registration card",
+  "scanVinWithCamera": "Scan VIN with Camera",
+  "scanVinFromPhotoLibrary": "Scan VIN from Photo Library",
+  "vinDetectedToast": "✓ VIN detected: {vin}",
+  "@vinDetectedToast": {
+    "placeholders": {
+      "vin": {
+        "type": "String"
+      }
+    }
+  },
+  "noVinDetectedToast": "No 17-character VIN detected. Try closer lighting or a clearer angle.",
+  "selectDetectedVinTitle": "Select Detected VIN / Chassis Number",
+  "isoVinSubtitle": "17-Character ISO VIN",
+  "chassisCodeSubtitle": "Chassis / Frame Code ({count} chars)",
+  "@chassisCodeSubtitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "vinAppliedToast": "✓ VIN applied: {vin}",
+  "@vinAppliedToast": {
+    "placeholders": {
+      "vin": {
+        "type": "String"
+      }
+    }
+  },
+  "vehiclePhotoSheetTitle": "Vehicle Photo",
+  "takePhoto": "Take Photo",
+  "chooseFromGallery": "Choose from Gallery",
+  "removePhoto": "Remove Photo",
+  "frontAnglePhotoCapturedToast": "Front angle photo captured",
+  "frontAnglePhotoAttachedToast": "Front angle photo attached",
+  "photoRemovedToast": "Photo removed",
+  "vinChassisNumberLabel": "VIN / Chassis Number",
+  "vinHint": "e.g. WBA5A7C52FD129482",
+  "vinRequiredError": "VIN / Chassis number is required",
+  "enterValidVinError": "Enter a valid VIN / chassis number",
+  "scannedVinWarningInfo": "Please double-check the scanned VIN characters carefully. Camera OCR may occasionally misread similar symbols (such as 0/O, 1/I, 5/S, or 8/B).",
+  "makeRequiredError": "Make is required",
+  "modelRequiredError": "Model is required",
+  "yearRequiredError": "Year is required",
+  "enterValidYearError": "Enter a valid year",
+  "fuelPowertrainLabel": "Fuel / Powertrain",
+  "bodyTypeLabel": "Body Type",
+  "currentMileageLabel": "Current Mileage",
+  "mileageRequiredError": "Mileage is required",
+  "enterValidMileageError": "Enter a valid mileage",
+  "distanceUnitLabel": "Distance Unit",
+  "kmUnit": "km",
+  "milesUnit": "miles",
+  "vehicleCostTrackingCurrency": "Vehicle Cost Tracking Currency",
+  "vehiclePhotoOptionalLabel": "Vehicle Photo (Optional)",
+  "frontAnglePhotoAttachedTapToChange": "Front Angle Photo Attached ✓ (Tap to change)",
+  "addFrontAnglePhoto": "Add Front / Angle Photo",
+  "stampedOnBuyerPdfCover": "Will be stamped on the exported buyer PDF cover",
+  "saveAndOpenPassportTimeline": "Save & Open Passport Timeline →",
+  "buyerResaleDossierTitle": "Buyer Resale Dossier",
+  "readyBadge": "READY",
+  "lifetimeVehiclePass": "Lifetime Vehicle Pass",
+  "unlimitedPdfExports": "Unlimited PDF exports for this car",
+  "downloadCertifiedPdfDossier": "Download Certified PDF Dossier",
+  "certifiedPdfGeneratedToast": "✓ Certified PDF Dossier generated and downloaded",
+  "publicBuyerLinkHeader": "PUBLIC BUYER LINK",
+  "copyButton": "Copy",
+  "linkCopiedToast": "✓ Link copied to clipboard",
+  "attachLinkHint": "Attach link to Auto.am or list.am listing for instant buyer credibility.",
+  "officialVehicleHealthPassportHeader": "OFFICIAL VEHICLE HEALTH PASSPORT",
+  "verifiedEntriesBadge": "VERIFIED ({count} ENTRIES)",
+  "@verifiedEntriesBadge": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "vinAndMileageSummary": "VIN: {vin}  •  Mileage: {mileage}",
+  "@vinAndMileageSummary": {
+    "placeholders": {
+      "vin": {
+        "type": "String"
+      },
+      "mileage": {
+        "type": "String"
+      }
+    }
+  },
+  "loggedFallbackBadge": "Logged",
+  "includePartBoxPhotos": "Include Part Box Photos",
+  "includeCostCurrencyTotals": "Include Cost / Currency Totals",
+  "watermarkWithVin": "Watermark with VIN",
+  "noVehicleSelectedTitle": "No Vehicle Selected",
+  "noVehicleSelectedSubtitle": "Add a car to your garage to generate a certified buyer dossier and shareable public link.",
+  "addVehicleToGarage": "Add Vehicle to Garage",
+  "settingsAndPreferencesTitle": "Settings & Preferences",
+  "planStatusHeader": "PLAN STATUS",
+  "proLifetimeMember": "Pro Lifetime Member",
+  "allVehiclesAndExportsUnlocked": "All vehicles & PDF exports unlocked",
+  "appLanguageLabel": "App Language (Լեզու)",
+  "defaultDisplayCurrencyLabel": "Default Display Currency",
+  "distanceAndSpeedUnitLabel": "Distance & Speed Unit",
+  "kilometersOption": "Kilometers (km)",
+  "milesOption": "Miles (mi)",
+  "cloudBackupLabel": "Cloud Backup (Supabase)",
+  "syncedStatus": "Synced",
+  "rawRecordsExportedToast": "✓ Raw records exported as JSON/CSV",
+  "exportRawRecordsLabel": "Export Raw Records (JSON / CSV)",
+  "resetLocalDatabaseTitle": "Reset Local Database",
+  "resetLocalDatabaseMessage": "Are you sure you want to clear all data? All registered vehicles and service records will be erased.",
+  "resetAllConfirmButton": "Reset All",
+  "localDatabaseClearedToast": "✓ Local database cleared (Clean slate)",
+  "clearLocalStorageLabel": "Clear Local Storage (Reset to Empty)"
 }

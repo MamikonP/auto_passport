@@ -7,6 +7,7 @@ import '../../../core/di/locator.dart';
 import '../../../core/routes/app_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/app_confirmation_dialog.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../intake/views/intake_modal.dart';
 import '../controllers/timeline_controller.dart';
 import '../widgets/timeline_empty_garage_view.dart';
@@ -23,6 +24,7 @@ class TimelineFeedView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final activeController = controller ?? Locator.timelineController;
+    final l10n = AppLocalizations.of(context)!;
     final popupMenuItems = ['edit', 'remove'];
 
     return Observer(
@@ -74,7 +76,10 @@ class TimelineFeedView extends StatelessWidget {
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           Text(
-                                            'Garage (${activeController.totalVehiclesCount} cars)',
+                                            l10n.garageCarsCount(
+                                              activeController
+                                                  .totalVehiclesCount,
+                                            ),
                                             style: const TextStyle(
                                               color: AppColors.textSecondary,
                                               fontSize: 12,
@@ -100,9 +105,9 @@ class TimelineFeedView extends StatelessWidget {
                                       gradient: AppColors.proBadgeGradient,
                                       borderRadius: BorderRadius.circular(6),
                                     ),
-                                    child: const Text(
-                                      'PRO',
-                                      style: TextStyle(
+                                    child: Text(
+                                      l10n.proBadge,
+                                      style: const TextStyle(
                                         fontSize: 11,
                                         fontWeight: FontWeight.w800,
                                         color: Colors.black,
@@ -132,7 +137,10 @@ class TimelineFeedView extends StatelessWidget {
                                         ),
                                         const SizedBox(height: 4),
                                         Text(
-                                          '${vehicle.formattedMileage} • ${vehicle.formattedTotalSpent} tracked',
+                                          l10n.trackedSummary(
+                                            vehicle.formattedMileage,
+                                            vehicle.formattedTotalSpent,
+                                          ),
                                           style: const TextStyle(
                                             fontSize: 13,
                                             color: AppColors.textSecondary,
@@ -155,7 +163,7 @@ class TimelineFeedView extends StatelessWidget {
                                         color: AppColors.darkBorder,
                                       ),
                                     ),
-                                    tooltip: 'Car options',
+                                    tooltip: l10n.carOptionsTooltip,
                                     onSelected: (value) async {
                                       if (value == 'remove') {
                                         _onRemove(
@@ -186,8 +194,8 @@ class TimelineFeedView extends StatelessWidget {
                                             ),
                                             Text(
                                               item == 'remove'
-                                                  ? 'Remove Car'
-                                                  : 'Edit Car',
+                                                  ? l10n.removeCar
+                                                  : l10n.editCar,
                                               style: TextStyle(
                                                 color: item == 'remove'
                                                     ? AppColors.error
@@ -220,8 +228,9 @@ class TimelineFeedView extends StatelessWidget {
                             child: Row(
                               children: [
                                 TimelineFilterPill(
-                                  label:
-                                      'All (${vehicle.serviceRecords.length})',
+                                  label: l10n.filterAll(
+                                    vehicle.serviceRecords.length,
+                                  ),
                                   isSelected:
                                       activeController.selectedCategoryFilter ==
                                       'All',
@@ -230,7 +239,7 @@ class TimelineFeedView extends StatelessWidget {
                                 ),
                                 const SizedBox(width: 8),
                                 TimelineFilterPill(
-                                  label: 'Suspension',
+                                  label: l10n.filterSuspension,
                                   isSelected:
                                       activeController.selectedCategoryFilter ==
                                       'Suspension',
@@ -239,7 +248,7 @@ class TimelineFeedView extends StatelessWidget {
                                 ),
                                 const SizedBox(width: 8),
                                 TimelineFilterPill(
-                                  label: 'Brakes',
+                                  label: l10n.filterBrakes,
                                   isSelected:
                                       activeController.selectedCategoryFilter ==
                                       'Brakes',
@@ -248,7 +257,7 @@ class TimelineFeedView extends StatelessWidget {
                                 ),
                                 const SizedBox(width: 8),
                                 TimelineFilterPill(
-                                  label: 'Oil & Filter',
+                                  label: l10n.filterOilFilter,
                                   isSelected:
                                       activeController.selectedCategoryFilter ==
                                       'Oil & Filter',
@@ -263,12 +272,14 @@ class TimelineFeedView extends StatelessWidget {
 
                       // Vertical Timeline Rail
                       if (entries.isEmpty)
-                        const SliverFillRemaining(
+                        SliverFillRemaining(
                           hasScrollBody: false,
                           child: Center(
                             child: Text(
-                              'No service records found in this category',
-                              style: TextStyle(color: AppColors.textSecondary),
+                              l10n.noServiceRecordsInCategory,
+                              style: const TextStyle(
+                                color: AppColors.textSecondary,
+                              ),
                             ),
                           ),
                         )
@@ -304,9 +315,12 @@ class TimelineFeedView extends StatelessWidget {
                   foregroundColor: Colors.white,
                   elevation: 6,
                   icon: const Icon(Icons.add_rounded, size: 20),
-                  label: const Text(
-                    'Log Service',
-                    style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+                  label: Text(
+                    l10n.logService,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 14,
+                    ),
                   ),
                   onPressed: () => IntakeModal.show(context),
                 )
@@ -321,20 +335,20 @@ class TimelineFeedView extends StatelessWidget {
     VehiclePassportModel vehicle,
     TimelineController activeController,
   ) async {
+    final l10n = AppLocalizations.of(context)!;
     final confirmed = await AppConfirmationDialog.show(
       context: context,
-      title: 'Remove Car from Garage',
-      message:
-          'Are you sure you want to remove "${vehicle.fullName}"? All logged service records and passport history for this vehicle will be deleted.',
-      confirmText: 'Remove Car',
-      cancelText: 'Cancel',
+      title: l10n.removeCarDialogTitle,
+      message: l10n.removeCarDialogMessage(vehicle.fullName),
+      confirmText: l10n.removeCar,
+      cancelText: l10n.cancel,
       isDestructive: true,
     );
     if (confirmed && context.mounted) {
       activeController.deleteVehicle(vehicle.id);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('✓ ${vehicle.fullName} removed from garage'),
+          content: Text(l10n.carRemovedFromGarageToast(vehicle.fullName)),
           backgroundColor: AppColors.error,
           duration: const Duration(seconds: 2),
         ),

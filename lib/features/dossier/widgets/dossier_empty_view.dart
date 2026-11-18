@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/routes/app_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimensions.dart';
+import '../../../l10n/app_localizations.dart';
 
 class DossierEmptyView extends StatelessWidget {
   final VoidCallback? onAddVehicle;
@@ -14,6 +15,8 @@ class DossierEmptyView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(28),
@@ -46,19 +49,19 @@ class DossierEmptyView extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 18),
-              const Text(
-                'No Vehicle Selected',
-                style: TextStyle(
+              Text(
+                l10n.noVehicleSelectedTitle,
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w800,
                   color: Colors.white,
                 ),
               ),
               const SizedBox(height: 8),
-              const Text(
-                'Add a car to your garage to generate a certified buyer dossier and shareable public link.',
+              Text(
+                l10n.noVehicleSelectedSubtitle,
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 13,
                   color: AppColors.textSecondary,
                   height: 1.4,
@@ -78,9 +81,9 @@ class DossierEmptyView extends StatelessWidget {
                     elevation: 0,
                   ),
                   icon: const Icon(Icons.add_rounded, size: 18),
-                  label: const Text(
-                    'Add Vehicle to Garage',
-                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+                  label: Text(
+                    l10n.addVehicleToGarage,
+                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
                   ),
                   onPressed: () {
                     if (onAddVehicle != null) {

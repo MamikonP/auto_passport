@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimensions.dart';
+import '../../../l10n/app_localizations.dart';
 
 class DossierPublicLinkCard extends StatelessWidget {
   final String publicUrl;
@@ -13,6 +14,8 @@ class DossierPublicLinkCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -34,9 +37,9 @@ class DossierPublicLinkCard extends StatelessWidget {
                 child: const Icon(Icons.qr_code_rounded, color: AppColors.primaryLight, size: 20),
               ),
               const SizedBox(width: 10),
-              const Text(
-                'PUBLIC BUYER LINK',
-                style: TextStyle(
+              Text(
+                l10n.publicBuyerLinkHeader,
+                style: const TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w700,
                   letterSpacing: 0.8,
@@ -69,10 +72,10 @@ class DossierPublicLinkCard extends StatelessWidget {
                   onTap: () {
                     Clipboard.setData(ClipboardData(text: 'https://$publicUrl'));
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('✓ Link copied to clipboard'),
+                      SnackBar(
+                        content: Text(l10n.linkCopiedToast),
                         backgroundColor: AppColors.verified,
-                        duration: Duration(seconds: 2),
+                        duration: const Duration(seconds: 2),
                       ),
                     );
                   },
@@ -82,9 +85,9 @@ class DossierPublicLinkCard extends StatelessWidget {
                       color: AppColors.primary,
                       borderRadius: BorderRadius.circular(6),
                     ),
-                    child: const Text(
-                      'Copy',
-                      style: TextStyle(
+                    child: Text(
+                      l10n.copyButton,
+                      style: const TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.w700,
                         color: Colors.white,
@@ -96,9 +99,9 @@ class DossierPublicLinkCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
-            'Attach link to Auto.am or list.am listing for instant buyer credibility.',
-            style: TextStyle(
+          Text(
+            l10n.attachLinkHint,
+            style: const TextStyle(
               fontSize: 12,
               color: AppColors.textSecondary,
               height: 1.35,

@@ -11,6 +11,7 @@ import '../../../core/models/vehicle_model.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/custom_text_field.dart';
 import '../../../core/widgets/info_description_box.dart';
+import '../../../l10n/app_localizations.dart';
 import '../controllers/add_vehicle_controller.dart';
 
 @RoutePage()
@@ -82,6 +83,7 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
 
   void _submit() {
     if (_formKey.currentState?.validate() ?? false) {
+      final l10n = AppLocalizations.of(context)!;
       _controller.setVin(_vinTextController.text.trim());
       _controller.setMake(_makeTextController.text.trim());
       _controller.setModel(_modelTextController.text.trim());
@@ -98,7 +100,7 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('✓ ${newVehicle.fullName} added to your Garage'),
+            content: Text(l10n.vehicleAddedToGarageToast(newVehicle.fullName)),
             backgroundColor: AppColors.verified,
           ),
         );
@@ -106,7 +108,7 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
         _controller.updateVehicle(widget.vehicle!.id);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('✓ ${_controller.make} updated in your Garage'),
+            content: Text(l10n.vehicleUpdatedInGarageToast(_controller.make)),
             backgroundColor: AppColors.pending,
           ),
         );
@@ -120,6 +122,7 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
     final status = await _controller.ensureCameraPermission();
     if (status.isGranted) return true;
     if (!mounted) return false;
+    final l10n = AppLocalizations.of(context)!;
 
     await showDialog<void>(
       context: context,
@@ -129,24 +132,24 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
           borderRadius: BorderRadius.circular(14),
           side: const BorderSide(color: AppColors.darkBorder),
         ),
-        title: const Text(
-          'Camera Permission Required',
-          style: TextStyle(
+        title: Text(
+          l10n.cameraPermissionRequiredTitle,
+          style: const TextStyle(
             color: Colors.white,
             fontSize: 16,
             fontWeight: FontWeight.w700,
           ),
         ),
-        content: const Text(
-          'Camera access is needed to scan 17-character VIN plates and capture vehicle photos. Please enable Camera permission in Settings.',
-          style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
+        content: Text(
+          l10n.cameraPermissionRequiredMessage,
+          style: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text(
-              'Cancel',
-              style: TextStyle(color: AppColors.textSecondary),
+            child: Text(
+              l10n.cancel,
+              style: const TextStyle(color: AppColors.textSecondary),
             ),
           ),
           ElevatedButton(
@@ -158,7 +161,7 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
               Navigator.of(dialogContext).pop();
               _controller.openAppSettings();
             },
-            child: const Text('Open Settings'),
+            child: Text(l10n.openSettings),
           ),
         ],
       ),
@@ -167,6 +170,7 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
   }
 
   Future<void> _showVinScannerSheet() async {
+    final l10n = AppLocalizations.of(context)!;
     await showModalBottomSheet<void>(
       context: context,
       backgroundColor: AppColors.darkSurface,
@@ -189,19 +193,22 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
-                const Text(
-                  'Scan Vehicle VIN (OCR)',
-                  style: TextStyle(
+                Text(
+                  l10n.scanVehicleVinTitle,
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
                     color: Colors.white,
                   ),
                 ),
                 const SizedBox(height: 4),
-                const Text(
-                  'Point camera at windshield VIN plate, door jamb sticker, or registration card',
+                Text(
+                  l10n.scanVehicleVinSubtitle,
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 12, color: AppColors.textMuted),
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: AppColors.textMuted,
+                  ),
                 ),
                 const SizedBox(height: 12),
                 ListTile(
@@ -209,9 +216,9 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
                     Icons.document_scanner_rounded,
                     color: AppColors.primaryLight,
                   ),
-                  title: const Text(
-                    'Scan VIN with Camera',
-                    style: TextStyle(
+                  title: Text(
+                    l10n.scanVinWithCamera,
+                    style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w600,
                     ),
@@ -229,9 +236,9 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
                     Icons.photo_library_rounded,
                     color: AppColors.primaryLight,
                   ),
-                  title: const Text(
-                    'Scan VIN from Photo Library',
-                    style: TextStyle(
+                  title: Text(
+                    l10n.scanVinFromPhotoLibrary,
+                    style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w600,
                     ),
@@ -252,6 +259,7 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
 
   void _handleOcrResult(OcrScanResult? result) {
     if (!mounted || result == null) return;
+    final l10n = AppLocalizations.of(context)!;
 
     if (result.candidates.length > 1) {
       _showVinCandidateSelectionSheet(result.candidates);
@@ -267,16 +275,14 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
       });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('✓ VIN detected: $detected'),
+          content: Text(l10n.vinDetectedToast(detected)),
           backgroundColor: AppColors.verified,
         ),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'No 17-character VIN detected. Try closer lighting or a clearer angle.',
-          ),
+        SnackBar(
+          content: Text(l10n.noVinDetectedToast),
           backgroundColor: AppColors.pending,
         ),
       );
@@ -284,6 +290,7 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
   }
 
   Future<void> _showVinCandidateSelectionSheet(List<String> candidates) async {
+    final l10n = AppLocalizations.of(context)!;
     await showModalBottomSheet<void>(
       context: context,
       backgroundColor: AppColors.darkSurface,
@@ -297,9 +304,9 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text(
-                  'Select Detected VIN / Chassis Number',
-                  style: TextStyle(
+                Text(
+                  l10n.selectDetectedVinTitle,
+                  style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
                     color: Colors.white,
@@ -323,8 +330,8 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
                     ),
                     subtitle: Text(
                       candidate.length == 17
-                          ? '17-Character ISO VIN'
-                          : 'Chassis / Frame Code (${candidate.length} chars)',
+                          ? l10n.isoVinSubtitle
+                          : l10n.chassisCodeSubtitle(candidate.length),
                       style: const TextStyle(
                         color: AppColors.textMuted,
                         fontSize: 12,
@@ -339,7 +346,7 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
                       });
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text('✓ VIN applied: $candidate'),
+                          content: Text(l10n.vinAppliedToast(candidate)),
                           backgroundColor: AppColors.verified,
                         ),
                       );
@@ -355,6 +362,7 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
   }
 
   Future<void> _showPhotoPickerSheet() async {
+    final l10n = AppLocalizations.of(context)!;
     await showModalBottomSheet<void>(
       context: context,
       backgroundColor: AppColors.darkSurface,
@@ -377,9 +385,9 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
-                const Text(
-                  'Vehicle Photo',
-                  style: TextStyle(
+                Text(
+                  l10n.vehiclePhotoSheetTitle,
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
                     color: Colors.white,
@@ -391,9 +399,9 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
                     Icons.camera_alt_rounded,
                     color: AppColors.primaryLight,
                   ),
-                  title: const Text(
-                    'Take Photo',
-                    style: TextStyle(
+                  title: Text(
+                    l10n.takePhoto,
+                    style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w600,
                     ),
@@ -405,9 +413,9 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
                     final path = await _controller.capturePhotoFromCamera();
                     if (path != null && mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Front angle photo captured'),
-                          duration: Duration(seconds: 1),
+                        SnackBar(
+                          content: Text(l10n.frontAnglePhotoCapturedToast),
+                          duration: const Duration(seconds: 1),
                         ),
                       );
                     }
@@ -418,9 +426,9 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
                     Icons.photo_library_rounded,
                     color: AppColors.primaryLight,
                   ),
-                  title: const Text(
-                    'Choose from Gallery',
-                    style: TextStyle(
+                  title: Text(
+                    l10n.chooseFromGallery,
+                    style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w600,
                     ),
@@ -430,9 +438,9 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
                     final path = await _controller.pickPhotoFromGallery();
                     if (path != null && mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Front angle photo attached'),
-                          duration: Duration(seconds: 1),
+                        SnackBar(
+                          content: Text(l10n.frontAnglePhotoAttachedToast),
+                          duration: const Duration(seconds: 1),
                         ),
                       );
                     }
@@ -444,9 +452,9 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
                       Icons.delete_outline_rounded,
                       color: Colors.redAccent,
                     ),
-                    title: const Text(
-                      'Remove Photo',
-                      style: TextStyle(
+                    title: Text(
+                      l10n.removePhoto,
+                      style: const TextStyle(
                         color: Colors.redAccent,
                         fontWeight: FontWeight.w600,
                       ),
@@ -455,9 +463,9 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
                       Navigator.of(sheetContext).pop();
                       _controller.removePhoto();
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Photo removed'),
-                          duration: Duration(seconds: 1),
+                        SnackBar(
+                          content: Text(l10n.photoRemovedToast),
+                          duration: const Duration(seconds: 1),
                         ),
                       );
                     },
@@ -472,6 +480,8 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: AppColors.darkBackground,
       appBar: AppBar(
@@ -479,9 +489,9 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
         elevation: 0,
         leading: TextButton(
           onPressed: () => context.router.maybePop(),
-          child: const Text(
-            '✕ Cancel',
-            style: TextStyle(
+          child: Text(
+            l10n.cancelClose,
+            style: const TextStyle(
               color: AppColors.textSecondary,
               fontSize: 14,
               fontWeight: FontWeight.w600,
@@ -491,7 +501,9 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
         leadingWidth: 90,
         centerTitle: true,
         title: Text(
-          widget.vehicle != null ? 'Edit Vehicle' : 'New Vehicle Setup',
+          widget.vehicle != null
+              ? l10n.editVehicleTitle
+              : l10n.newVehicleSetupTitle,
           style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w700,
@@ -528,10 +540,10 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               CustomTextField(
-                label: 'VIN / Chassis Number',
+                label: l10n.vinChassisNumberLabel,
                 controller: _vinTextController,
                 textCapitalization: TextCapitalization.characters,
-                hintText: 'e.g. WBA5A7C52FD129482',
+                hintText: l10n.vinHint,
                 style: const TextStyle(
                   color: Colors.white,
                   fontFamily: 'monospace',
@@ -541,10 +553,10 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
                 validator: (value) {
                   final trimmed = value?.trim() ?? '';
                   if (trimmed.isEmpty) {
-                    return 'VIN / Chassis number is required';
+                    return l10n.vinRequiredError;
                   }
                   if (trimmed.length < 6) {
-                    return 'Enter a valid VIN / chassis number';
+                    return l10n.enterValidVinError;
                   }
                   return null;
                 },
@@ -582,9 +594,8 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
               ),
               if (_isVinScannedFromCamera) ...[
                 const SizedBox(height: 8),
-                const InfoDescriptionBox.warning(
-                  text:
-                      'Please double-check the scanned VIN characters carefully. Camera OCR may occasionally misread similar symbols (such as 0/O, 1/I, 5/S, or 8/B).',
+                InfoDescriptionBox.warning(
+                  text: l10n.scannedVinWarningInfo,
                 ),
               ],
               const SizedBox(height: 16),
@@ -593,12 +604,12 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
                 children: [
                   Expanded(
                     child: CustomTextField(
-                      label: 'Make',
+                      label: l10n.make,
                       controller: _makeTextController,
                       hintText: 'BMW',
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
-                          return 'Make is required';
+                          return l10n.makeRequiredError;
                         }
                         return null;
                       },
@@ -607,12 +618,12 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: CustomTextField(
-                      label: 'Model',
+                      label: l10n.model,
                       controller: _modelTextController,
                       hintText: '528i xDrive',
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
-                          return 'Model is required';
+                          return l10n.modelRequiredError;
                         }
                         return null;
                       },
@@ -626,7 +637,7 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
                 children: [
                   Expanded(
                     child: CustomTextField(
-                      label: 'Year',
+                      label: l10n.year,
                       controller: _yearTextController,
                       keyboardType: TextInputType.number,
                       hintText: '2013',
@@ -637,12 +648,12 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
                       validator: (value) {
                         final trimmed = value?.trim() ?? '';
                         if (trimmed.isEmpty) {
-                          return 'Year is required';
+                          return l10n.yearRequiredError;
                         }
                         final year = int.tryParse(trimmed);
                         final maxYear = DateTime.now().year + 1;
                         if (year == null || year < 1900 || year > maxYear) {
-                          return 'Enter a valid year';
+                          return l10n.enterValidYearError;
                         }
                         return null;
                       },
@@ -653,9 +664,9 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'Fuel / Powertrain',
-                          style: TextStyle(
+                        Text(
+                          l10n.fuelPowertrainLabel,
+                          style: const TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
                             color: AppColors.textSecondary,
@@ -701,9 +712,9 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
                 ],
               ),
               const SizedBox(height: 16),
-              const Text(
-                'Body Type',
-                style: TextStyle(
+              Text(
+                l10n.bodyTypeLabel,
+                style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                   color: AppColors.textSecondary,
@@ -750,7 +761,7 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
                   Expanded(
                     flex: 3,
                     child: CustomTextField(
-                      label: 'Current Mileage',
+                      label: l10n.currentMileageLabel,
                       controller: _mileageTextController,
                       keyboardType: TextInputType.number,
                       hintText: '142,000',
@@ -761,11 +772,11 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
                       validator: (value) {
                         final trimmed = value?.replaceAll(',', '').trim() ?? '';
                         if (trimmed.isEmpty) {
-                          return 'Mileage is required';
+                          return l10n.mileageRequiredError;
                         }
                         final mileage = int.tryParse(trimmed);
                         if (mileage == null || mileage <= 0) {
-                          return 'Enter a valid mileage';
+                          return l10n.enterValidMileageError;
                         }
                         return null;
                       },
@@ -777,9 +788,9 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'Distance Unit',
-                          style: TextStyle(
+                        Text(
+                          l10n.distanceUnitLabel,
+                          style: const TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
                             color: AppColors.textSecondary,
@@ -815,7 +826,7 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
                                       ),
                                       child: Center(
                                         child: Text(
-                                          'km',
+                                          l10n.kmUnit,
                                           style: TextStyle(
                                             fontSize: 12,
                                             fontWeight: FontWeight.w700,
@@ -849,7 +860,7 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
                                       ),
                                       child: Center(
                                         child: Text(
-                                          'miles',
+                                          l10n.milesUnit,
                                           style: TextStyle(
                                             fontSize: 12,
                                             fontWeight: FontWeight.w700,
@@ -874,9 +885,9 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
                 ],
               ),
               const SizedBox(height: 18),
-              const Text(
-                'Vehicle Cost Tracking Currency',
-                style: TextStyle(
+              Text(
+                l10n.vehicleCostTrackingCurrency,
+                style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                   color: AppColors.textSecondary,
@@ -925,9 +936,9 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
                 ),
               ),
               const SizedBox(height: 18),
-              const Text(
-                'Vehicle Photo (Optional)',
-                style: TextStyle(
+              Text(
+                l10n.vehiclePhotoOptionalLabel,
+                style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                   color: AppColors.textSecondary,
@@ -989,8 +1000,8 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
                           ],
                           Text(
                             hasPhoto
-                                ? 'Front Angle Photo Attached ✓ (Tap to change)'
-                                : 'Add Front / Angle Photo',
+                                ? l10n.frontAnglePhotoAttachedTapToChange
+                                : l10n.addFrontAnglePhoto,
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w700,
@@ -1000,9 +1011,9 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
                             ),
                           ),
                           const SizedBox(height: 4),
-                          const Text(
-                            'Will be stamped on the exported buyer PDF cover',
-                            style: TextStyle(
+                          Text(
+                            l10n.stampedOnBuyerPdfCover,
+                            style: const TextStyle(
                               fontSize: 12,
                               color: AppColors.textMuted,
                             ),
@@ -1037,9 +1048,9 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
               ),
             ),
             onPressed: _submit,
-            child: const Text(
-              'Save & Open Passport Timeline →',
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+            child: Text(
+              l10n.saveAndOpenPassportTimeline,
+              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
             ),
           ),
         ),

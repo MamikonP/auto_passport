@@ -11,6 +11,7 @@ import '../../../core/services/voice/voice_log_parser.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimensions.dart';
 import '../../../core/widgets/info_description_box.dart';
+import '../../../l10n/app_localizations.dart';
 
 class VoiceServiceLogSheet extends StatefulWidget {
   const VoiceServiceLogSheet({super.key});
@@ -316,6 +317,7 @@ class _VoiceServiceLogSheetState extends State<VoiceServiceLogSheet> {
     ServiceRecordModel record,
   ) {
     final vehicleId = Locator.timelineController.activeVehicle?.id;
+    final l10n = AppLocalizations.of(context)!;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -344,19 +346,19 @@ class _VoiceServiceLogSheetState extends State<VoiceServiceLogSheet> {
           ),
         ),
         const SizedBox(height: 14),
-        const Text(
-          'Service Log Added to Timeline!',
-          style: TextStyle(
+        Text(
+          l10n.serviceLogAddedTitle,
+          style: const TextStyle(
             fontSize: 19,
             fontWeight: FontWeight.w800,
             color: Colors.white,
           ),
         ),
         const SizedBox(height: 6),
-        const Text(
-          'Your voice note was parsed and saved to your vehicle history:',
+        Text(
+          l10n.serviceLogAddedSubtitle,
           textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 13, color: AppColors.textSecondary),
+          style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
         ),
         const SizedBox(height: 16),
         Container(
@@ -426,9 +428,12 @@ class _VoiceServiceLogSheetState extends State<VoiceServiceLogSheet> {
                     ),
                   );
                 },
-                child: const Text(
-                  'View Breakdown',
-                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+                child: Text(
+                  l10n.viewBreakdown,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 14,
+                  ),
                 ),
               ),
             ),
@@ -444,9 +449,12 @@ class _VoiceServiceLogSheetState extends State<VoiceServiceLogSheet> {
                   ),
                 ),
                 onPressed: () => Navigator.of(context).pop(),
-                child: const Text(
-                  'Done',
-                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+                child: Text(
+                  l10n.done,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 14,
+                  ),
                 ),
               ),
             ),
@@ -458,6 +466,7 @@ class _VoiceServiceLogSheetState extends State<VoiceServiceLogSheet> {
 
   Widget _buildVoiceCaptureView(BuildContext context) {
     final hasTranscript = _parsedLog.hasMeaningfulInput;
+    final l10n = AppLocalizations.of(context)!;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -477,22 +486,22 @@ class _VoiceServiceLogSheetState extends State<VoiceServiceLogSheet> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Expanded(
+            Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Voice Quick Log',
-                    style: TextStyle(
+                    l10n.intakeVoiceLogTitle,
+                    style: const TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.w800,
                       color: Colors.white,
                     ),
                   ),
-                  SizedBox(height: 3),
+                  const SizedBox(height: 3),
                   Text(
-                    'Speak your repair details (service, mileage, cost & master)',
-                    style: TextStyle(
+                    l10n.voiceSheetSubtitle,
+                    style: const TextStyle(
                       fontSize: 12,
                       color: AppColors.textSecondary,
                     ),
@@ -553,10 +562,10 @@ class _VoiceServiceLogSheetState extends State<VoiceServiceLogSheet> {
                   const SizedBox(width: 10),
                   Text(
                     _isInitializing
-                        ? 'Initializing microphone...'
+                        ? l10n.initializingMicrophone
                         : (_isListening
-                              ? 'Listening... Tap to stop'
-                              : 'Tap to speak service details'),
+                              ? l10n.listeningTapToStop
+                              : l10n.tapToSpeakServiceDetails),
                     style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
@@ -584,8 +593,7 @@ class _VoiceServiceLogSheetState extends State<VoiceServiceLogSheet> {
           decoration: InputDecoration(
             filled: true,
             fillColor: AppColors.darkBackground,
-            hintText:
-                'e.g. "Changed front brake pads at 185,000 km for 45,000 dram with Master Karen"',
+            hintText: l10n.voiceTranscriptHint,
             hintStyle: const TextStyle(color: AppColors.textMuted, fontSize: 13),
             contentPadding: const EdgeInsets.all(12),
             suffixIcon: hasTranscript
@@ -638,9 +646,9 @@ class _VoiceServiceLogSheetState extends State<VoiceServiceLogSheet> {
         const SizedBox(height: 16),
 
         // Live Parsed Preview Card
-        const Text(
-          'AUTO-PARSED SERVICE LOG PREVIEW',
-          style: TextStyle(
+        Text(
+          l10n.autoParsedPreviewHeader,
+          style: const TextStyle(
             fontSize: 11,
             fontWeight: FontWeight.w800,
             letterSpacing: 0.7,
@@ -705,20 +713,20 @@ class _VoiceServiceLogSheetState extends State<VoiceServiceLogSheet> {
                 children: [
                   Expanded(
                     child: _buildPreviewMetric(
-                      label: 'Cost',
+                      label: l10n.costLabel,
                       value:
                           '${_parsedLog.currency.symbol} ${_formatNumber(_parsedLog.totalCost.toInt())}',
                     ),
                   ),
                   Expanded(
                     child: _buildPreviewMetric(
-                      label: 'Odometer',
+                      label: l10n.odometerLabel,
                       value: '${_formatNumber(_parsedLog.odometerKm)} km',
                     ),
                   ),
                   Expanded(
                     child: _buildPreviewMetric(
-                      label: 'Workshop',
+                      label: l10n.workshopLabel,
                       value: _parsedLog.mechanicName,
                     ),
                   ),
@@ -743,9 +751,12 @@ class _VoiceServiceLogSheetState extends State<VoiceServiceLogSheet> {
                   ),
                 ),
                 icon: const Icon(Icons.tune_rounded, size: 17),
-                label: const Text(
-                  'Edit in Form',
-                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                label: Text(
+                  l10n.editInForm,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 13,
+                  ),
                 ),
                 onPressed: _openInManualForm,
               ),
@@ -763,9 +774,12 @@ class _VoiceServiceLogSheetState extends State<VoiceServiceLogSheet> {
                   ),
                 ),
                 icon: const Icon(Icons.check_circle_outline_rounded, size: 18),
-                label: const Text(
-                  'Confirm & Add Log',
-                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+                label: Text(
+                  l10n.confirmAndAddLog,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 14,
+                  ),
                 ),
                 onPressed: hasTranscript ? _saveVoiceLogDirectly : null,
               ),

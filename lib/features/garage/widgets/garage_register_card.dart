@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimensions.dart';
+import '../../../l10n/app_localizations.dart';
 
 class GarageRegisterCard extends StatelessWidget {
   final bool isEmpty;
@@ -14,6 +15,8 @@ class GarageRegisterCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -47,7 +50,7 @@ class GarageRegisterCard extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Text(
-              isEmpty ? 'Register First Vehicle' : 'Register Another Vehicle',
+              isEmpty ? l10n.registerFirstVehicle : l10n.registerAnotherVehicle,
               style: const TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w700,
@@ -55,10 +58,10 @@ class GarageRegisterCard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 4),
-            const Text(
-              'Track DIY repairs, parts, and increase resale value',
+            Text(
+              l10n.registerCardSubtitle,
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 12,
                 color: AppColors.textSecondary,
               ),

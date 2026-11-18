@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../l10n/app_localizations.dart';
 
 class ManualEntryAddPhotoButton extends StatelessWidget {
   final VoidCallback onTap;
@@ -11,6 +12,8 @@ class ManualEntryAddPhotoButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -23,14 +26,14 @@ class ManualEntryAddPhotoButton extends StatelessWidget {
             color: AppColors.darkBorder,
           ),
         ),
-        child: const Column(
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.add_a_photo_outlined, size: 20, color: AppColors.primaryLight),
-            SizedBox(height: 4),
+            const Icon(Icons.add_a_photo_outlined, size: 20, color: AppColors.primaryLight),
+            const SizedBox(height: 4),
             Text(
-              '+ Photo',
-              style: TextStyle(fontSize: 10, color: AppColors.textSecondary),
+              l10n.addPhotoLabel,
+              style: const TextStyle(fontSize: 10, color: AppColors.textSecondary),
             ),
           ],
         ),

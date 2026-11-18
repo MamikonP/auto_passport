@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+
 import '../../../core/di/locator.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../dossier/views/dossier_hub_view.dart';
@@ -16,10 +17,7 @@ import '../widgets/shell_bottom_nav_item.dart';
 class MainShellView extends StatelessWidget {
   final ShellController? controller;
 
-  const MainShellView({
-    super.key,
-    this.controller,
-  });
+  const MainShellView({super.key, this.controller});
 
   @override
   Widget build(BuildContext context) {

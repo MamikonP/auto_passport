@@ -7,6 +7,7 @@ import '../../../core/models/vehicle_model.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/custom_text_field.dart';
 import '../../../core/widgets/info_description_box.dart';
+import '../../../l10n/app_localizations.dart';
 import '../controllers/manual_entry_controller.dart';
 import '../widgets/manual_entry_add_photo_button.dart';
 import '../widgets/manual_entry_attachment_thumbnail.dart';
@@ -72,7 +73,10 @@ class _ManualEntryFormViewState extends State<ManualEntryFormView> {
     final existingRecord = widget.record;
 
     if (existingRecord != null) {
-      _controller.initializeForEdit(existingRecord, vehicleId: widget.vehicleId);
+      _controller.initializeForEdit(
+        existingRecord,
+        vehicleId: widget.vehicleId,
+      );
       final initialParts = existingRecord.partsCost > 0
           ? existingRecord.partsCost.toInt().toString()
           : (existingRecord.laborCost == 0 && existingRecord.totalCost > 0
@@ -135,6 +139,7 @@ class _ManualEntryFormViewState extends State<ManualEntryFormView> {
 
   void _saveRecord() {
     if (_formKey.currentState?.validate() ?? false) {
+      final l10n = AppLocalizations.of(context)!;
       final odometer =
           int.tryParse(_odometerController.text.replaceAll(',', '')) ?? 184250;
 
@@ -151,8 +156,8 @@ class _ManualEntryFormViewState extends State<ManualEntryFormView> {
         );
 
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('✓ Service record updated'),
+          SnackBar(
+            content: Text(l10n.serviceRecordUpdatedToast),
             backgroundColor: AppColors.verified,
           ),
         );
@@ -167,8 +172,8 @@ class _ManualEntryFormViewState extends State<ManualEntryFormView> {
         );
 
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('✓ Service record saved to timeline feed'),
+          SnackBar(
+            content: Text(l10n.serviceRecordSavedToast),
             backgroundColor: AppColors.verified,
           ),
         );
@@ -180,6 +185,8 @@ class _ManualEntryFormViewState extends State<ManualEntryFormView> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       backgroundColor: AppColors.darkBackground,
       appBar: AppBar(
@@ -192,9 +199,9 @@ class _ManualEntryFormViewState extends State<ManualEntryFormView> {
             size: 14,
             color: AppColors.primaryLight,
           ),
-          label: const Text(
-            'Back',
-            style: TextStyle(
+          label: Text(
+            l10n.back,
+            style: const TextStyle(
               color: AppColors.primaryLight,
               fontSize: 14,
               fontWeight: FontWeight.w600,
@@ -204,7 +211,7 @@ class _ManualEntryFormViewState extends State<ManualEntryFormView> {
         leadingWidth: 100,
         centerTitle: true,
         title: Text(
-          _isEditing ? 'Edit Service Record' : 'New Service Record',
+          _isEditing ? l10n.editServiceRecordTitle : l10n.newServiceRecordTitle,
           style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w700,
@@ -219,9 +226,9 @@ class _ManualEntryFormViewState extends State<ManualEntryFormView> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Proof Verification Classification',
-                style: TextStyle(
+              Text(
+                l10n.proofVerificationClassification,
+                style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                   color: AppColors.textSecondary,
@@ -275,16 +282,20 @@ class _ManualEntryFormViewState extends State<ManualEntryFormView> {
                                         : AppColors.textSecondary,
                                   ),
                                   const SizedBox(width: 6),
-                                  Text(
-                                    'Informal Master Proof',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w700,
-                                      color:
-                                          _controller.proofClassification ==
-                                              ProofClassification.informalMaster
-                                          ? AppColors.warning
-                                          : AppColors.textSecondary,
+                                  Flexible(
+                                    child: Text(
+                                      l10n.informalMasterProof,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w700,
+                                        color:
+                                            _controller.proofClassification ==
+                                                ProofClassification
+                                                    .informalMaster
+                                            ? AppColors.warning
+                                            : AppColors.textSecondary,
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -332,17 +343,20 @@ class _ManualEntryFormViewState extends State<ManualEntryFormView> {
                                         : AppColors.textSecondary,
                                   ),
                                   const SizedBox(width: 6),
-                                  Text(
-                                    'Formal Store Receipt',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w700,
-                                      color:
-                                          _controller.proofClassification ==
-                                              ProofClassification
-                                                  .formalStoreReceipt
-                                          ? Colors.white
-                                          : AppColors.textSecondary,
+                                  Flexible(
+                                    child: Text(
+                                      l10n.formalStoreReceipt,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w700,
+                                        color:
+                                            _controller.proofClassification ==
+                                                ProofClassification
+                                                    .formalStoreReceipt
+                                            ? Colors.white
+                                            : AppColors.textSecondary,
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -371,20 +385,20 @@ class _ManualEntryFormViewState extends State<ManualEntryFormView> {
                   text:
                       _controller.proofClassification ==
                           ProofClassification.informalMaster
-                      ? 'Private Mechanic / Master Repair: Verified through part box photos, car on a lift, or mobile transfer screenshots.'
-                      : 'Official Service / Store Receipt: Verified through printed store invoices, OEM part numbers, or official service stamps.',
+                      ? l10n.informalMasterDescription
+                      : l10n.formalStoreDescription,
                 ),
               ),
               const SizedBox(height: 18),
               CustomTextField(
-                label: 'Service Item / Description',
+                label: l10n.serviceItemDescriptionLabel,
                 isRequired: true,
                 controller: _titleController,
                 style: const TextStyle(color: Colors.white, fontSize: 15),
-                hintText: 'e.g. Front CV Joint & Control Arms',
+                hintText: l10n.serviceItemHint,
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
-                    return 'Service description is required';
+                    return l10n.serviceDescriptionRequiredError;
                   }
                   return null;
                 },
@@ -398,24 +412,24 @@ class _ManualEntryFormViewState extends State<ManualEntryFormView> {
                   return Padding(
                     padding: const EdgeInsets.only(top: 16),
                     child: CustomTextField(
-                      label: 'OEM Part # / Store Invoice No. (Optional)',
+                      label: l10n.oemPartOrInvoiceLabel,
                       isRequired: false,
                       controller: _oemNumberController,
-                      hintText: 'e.g. OEM 31126794203 or INV-2048',
+                      hintText: l10n.oemPartOrInvoiceHint,
                     ),
                   );
                 },
               ),
               const SizedBox(height: 16),
-              const Text.rich(
+              Text.rich(
                 TextSpan(
-                  text: 'Repair / Maintenance Category',
-                  style: TextStyle(
+                  text: l10n.repairMaintenanceCategoryLabel,
+                  style: const TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                     color: AppColors.textSecondary,
                   ),
-                  children: [
+                  children: const [
                     TextSpan(
                       text: ' *',
                       style: TextStyle(
@@ -467,15 +481,15 @@ class _ManualEntryFormViewState extends State<ManualEntryFormView> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text.rich(
+                        Text.rich(
                           TextSpan(
-                            text: 'Service Date',
-                            style: TextStyle(
+                            text: l10n.serviceDateLabel,
+                            style: const TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
                               color: AppColors.textSecondary,
                             ),
-                            children: [
+                            children: const [
                               TextSpan(
                                 text: ' *',
                                 style: TextStyle(
@@ -537,7 +551,7 @@ class _ManualEntryFormViewState extends State<ManualEntryFormView> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: CustomTextField(
-                      label: 'Odometer (km)',
+                      label: l10n.odometerKmLabel,
                       isRequired: true,
                       controller: _odometerController,
                       keyboardType: TextInputType.number,
@@ -545,11 +559,11 @@ class _ManualEntryFormViewState extends State<ManualEntryFormView> {
                       validator: (value) {
                         final trimmed = value?.replaceAll(',', '').trim() ?? '';
                         if (trimmed.isEmpty) {
-                          return 'Odometer is required';
+                          return l10n.odometerRequiredError;
                         }
                         final odo = int.tryParse(trimmed);
                         if (odo == null || odo <= 0) {
-                          return 'Enter valid km';
+                          return l10n.enterValidKmError;
                         }
                         return null;
                       },
@@ -563,7 +577,7 @@ class _ManualEntryFormViewState extends State<ManualEntryFormView> {
                 children: [
                   Expanded(
                     child: CustomTextField(
-                      label: 'Parts Cost',
+                      label: l10n.partsCostLabel,
                       isRequired: true,
                       controller: _partsCostController,
                       keyboardType: TextInputType.number,
@@ -576,14 +590,14 @@ class _ManualEntryFormViewState extends State<ManualEntryFormView> {
                       validator: (value) {
                         final trimmed = value?.replaceAll(',', '').trim() ?? '';
                         if (trimmed.isEmpty) {
-                          return 'Parts cost is required';
+                          return l10n.partsCostRequiredError;
                         }
                         final cost = double.tryParse(trimmed);
                         if (cost == null || cost < 0) {
-                          return 'Enter valid cost';
+                          return l10n.enterValidCostError;
                         }
                         if (_totalCostValue <= 0) {
-                          return 'Total must be > 0';
+                          return l10n.totalMustBeGreaterThanZeroError;
                         }
                         return null;
                       },
@@ -592,7 +606,7 @@ class _ManualEntryFormViewState extends State<ManualEntryFormView> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: CustomTextField(
-                      label: 'Labor Cost',
+                      label: l10n.laborCostLabel,
                       isRequired: true,
                       controller: _laborCostController,
                       keyboardType: TextInputType.number,
@@ -605,11 +619,11 @@ class _ManualEntryFormViewState extends State<ManualEntryFormView> {
                       validator: (value) {
                         final trimmed = value?.replaceAll(',', '').trim() ?? '';
                         if (trimmed.isEmpty) {
-                          return 'Labor cost is required';
+                          return l10n.laborCostRequiredError;
                         }
                         final cost = double.tryParse(trimmed);
                         if (cost == null || cost < 0) {
-                          return 'Enter valid cost';
+                          return l10n.enterValidCostError;
                         }
                         return null;
                       },
@@ -636,9 +650,9 @@ class _ManualEntryFormViewState extends State<ManualEntryFormView> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              'Auto-Calculated Total Cost',
-                              style: TextStyle(
+                            Text(
+                              l10n.autoCalculatedTotalCost,
+                              style: const TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
                                 color: AppColors.textSecondary,
@@ -709,18 +723,18 @@ class _ManualEntryFormViewState extends State<ManualEntryFormView> {
                       ProofClassification.formalStoreReceipt;
                   return CustomTextField(
                     label: isFormal
-                        ? 'Service Center / Store Name'
-                        : 'Mechanic / Master Name',
+                        ? l10n.serviceCenterStoreNameLabel
+                        : l10n.mechanicMasterNameLabel,
                     isRequired: true,
                     controller: _mechanicController,
                     hintText: isFormal
-                        ? 'e.g. Liqui Moly Center / Official Service'
-                        : 'e.g. Gago Varpet',
+                        ? l10n.serviceCenterHint
+                        : l10n.mechanicNameHint,
                     validator: (value) {
                       if (value == null || value.trim().isEmpty) {
                         return isFormal
-                            ? 'Service center or store name is required'
-                            : 'Mechanic / master name is required';
+                            ? l10n.serviceCenterRequiredError
+                            : l10n.mechanicNameRequiredError;
                       }
                       return null;
                     },
@@ -728,9 +742,9 @@ class _ManualEntryFormViewState extends State<ManualEntryFormView> {
                 },
               ),
               const SizedBox(height: 18),
-              const Text(
-                'Proof Attachments (Photos / Screenshots)',
-                style: TextStyle(
+              Text(
+                l10n.proofAttachmentsLabel,
+                style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                   color: AppColors.textSecondary,
@@ -744,8 +758,8 @@ class _ManualEntryFormViewState extends State<ManualEntryFormView> {
                       ProofClassification.formalStoreReceipt;
                   return InfoDescriptionBox(
                     text: isFormal
-                        ? 'Upload photos of official store receipts, printed tax invoices, warranty cards, or oil change door stickers.'
-                        : 'Upload photos of new part boxes or labels, the car on a service lift, or payment transfer screenshots (Idram, Telcell, bank app).',
+                        ? l10n.formalProofAttachmentsInfo
+                        : l10n.informalProofAttachmentsInfo,
                   );
                 },
               ),
@@ -765,9 +779,9 @@ class _ManualEntryFormViewState extends State<ManualEntryFormView> {
                       onTap: () {
                         _controller.addAttachment('Photo Proof');
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Photo proof attached'),
-                            duration: Duration(seconds: 1),
+                          SnackBar(
+                            content: Text(l10n.photoProofAttachedToast),
+                            duration: const Duration(seconds: 1),
                           ),
                         );
                       },
@@ -801,8 +815,8 @@ class _ManualEntryFormViewState extends State<ManualEntryFormView> {
             onPressed: _saveRecord,
             child: Text(
               _isEditing
-                  ? '✓ Update Service Record'
-                  : '✓ Save to Timeline Feed',
+                  ? l10n.updateServiceRecordButton
+                  : l10n.saveToTimelineFeedButton,
               style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
             ),
           ),
