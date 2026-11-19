@@ -1,6 +1,7 @@
 import 'package:mobx/mobx.dart';
 import '../../../core/di/locator.dart';
 import '../../../core/enums/currency.dart';
+import '../../../core/enums/distance_unit.dart';
 import '../../../core/models/vehicle_passport_model.dart';
 import '../../../core/repository/service_record_repository.dart';
 import '../../../core/repository/settings_repository.dart';
@@ -30,6 +31,8 @@ abstract class _TimelineControllerBase with Store {
 
   Currency get displayCurrency => _settingsRepository.displayCurrency;
 
+  DistanceUnit get distanceUnit => _settingsRepository.distanceUnit;
+
   @computed
   VehiclePassportModel? get activeVehicle => _vehicleRepository.activeVehicle;
 
@@ -45,6 +48,7 @@ abstract class _TimelineControllerBase with Store {
     if (vehicle == null) return const [];
 
     final targetCurrency = _settingsRepository.displayCurrency;
+    final targetDistanceUnit = _settingsRepository.distanceUnit;
     final records = _serviceRecordRepository.getRecordsForVehicle(vehicleId: vehicle.id);
     final filtered = _serviceRecordRepository.filterRecords(records, selectedCategoryFilter);
 
@@ -52,6 +56,7 @@ abstract class _TimelineControllerBase with Store {
       return TimelineEntryModel(
         record: filtered[index],
         currency: targetCurrency,
+        distanceUnit: targetDistanceUnit,
         isLast: index == filtered.length - 1,
       );
     });

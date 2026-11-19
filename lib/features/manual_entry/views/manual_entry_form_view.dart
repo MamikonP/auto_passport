@@ -551,7 +551,8 @@ class _ManualEntryFormViewState extends State<ManualEntryFormView> {
                   const SizedBox(width: 12),
                   Expanded(
                     child: CustomTextField(
-                      label: l10n.odometerKmLabel,
+                      label:
+                          '${l10n.odometerLabel} (${_controller.selectedDistanceUnit.label})',
                       isRequired: true,
                       controller: _odometerController,
                       keyboardType: TextInputType.number,

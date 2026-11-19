@@ -967,7 +967,7 @@ abstract class AppLocalizations {
   /// No description provided for @odometerValueBadge.
   ///
   /// In en, this message translates to:
-  /// **'Odometer: {mileage} km'**
+  /// **'Odometer: {mileage}'**
   String odometerValueBadge(String mileage);
 
   /// No description provided for @totalInvestment.
@@ -1539,6 +1539,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Clear Local Storage (Reset to Empty)'**
   String get clearLocalStorageLabel;
+
+  /// No description provided for @servicedAtSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'Serviced at {facility} ({mileage}).'**
+  String servicedAtSummary(String facility, String mileage);
 }
 
 class _AppLocalizationsDelegate

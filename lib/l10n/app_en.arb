@@ -224,7 +224,7 @@
   },
   "officialStoreReceiptBadge": "OFFICIAL STORE RECEIPT",
   "photoVerifiedPartBadge": "PHOTO-VERIFIED PART",
-  "odometerValueBadge": "Odometer: {mileage} km",
+  "odometerValueBadge": "Odometer: {mileage}",
   "@odometerValueBadge": {
     "placeholders": {
       "mileage": {
@@ -398,5 +398,16 @@
   "resetLocalDatabaseMessage": "Are you sure you want to clear all data? All registered vehicles and service records will be erased.",
   "resetAllConfirmButton": "Reset All",
   "localDatabaseClearedToast": "✓ Local database cleared (Clean slate)",
-  "clearLocalStorageLabel": "Clear Local Storage (Reset to Empty)"
+  "clearLocalStorageLabel": "Clear Local Storage (Reset to Empty)",
+  "servicedAtSummary": "Serviced at {facility} ({mileage}).",
+  "@servicedAtSummary": {
+    "placeholders": {
+      "facility": {
+        "type": "String"
+      },
+      "mileage": {
+        "type": "String"
+      }
+    }
+  }
 }

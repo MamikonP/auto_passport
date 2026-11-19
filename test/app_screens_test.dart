@@ -59,7 +59,6 @@ void main() {
         ServiceRecordModel(
           id: 'rec-01',
           title: 'Front CV Joint & Control Arms',
-          description: 'Replaced torn outer CV boot and lower control arm bushings.',
           date: DateTime(2026, 10, 24),
           mileageKm: 184250,
           partsCost: 45000,
@@ -156,7 +155,6 @@ void main() {
         ServiceRecordModel(
           id: 'rec-del-01',
           title: 'Transmission Fluid Flush',
-          description: 'Replaced ATF fluid and filter.',
           date: DateTime(2026, 10, 24),
           mileageKm: 184250,
           partsCost: 50000,

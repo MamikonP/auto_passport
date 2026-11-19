@@ -3,12 +3,17 @@ import '../../../core/models/vehicle_model.dart';
 class RecordBreakdownModel {
   final ServiceRecordModel record;
   final Currency currency;
+  final DistanceUnit distanceUnit;
 
-  const RecordBreakdownModel({required this.record, required this.currency});
+  const RecordBreakdownModel({
+    required this.record,
+    required this.currency,
+    this.distanceUnit = DistanceUnit.km,
+  });
 
   String get title => record.title;
-  String get description => record.description;
-  int get mileageKm => record.mileageKm;
+  int get mileageKm => record.mileageIn(distanceUnit);
+  String get formattedMileage => record.formattedMileageIn(distanceUnit);
   double get partsCost => record.partsCostIn(currency);
   double get laborCost => record.laborCostIn(currency);
   double get totalCost => (record.partsCost + record.laborCost) > 0

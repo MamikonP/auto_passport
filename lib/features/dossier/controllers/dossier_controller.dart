@@ -1,6 +1,7 @@
 import 'package:mobx/mobx.dart';
 import '../../../core/di/locator.dart';
 import '../../../core/models/vehicle_model.dart';
+import '../../../core/repository/settings_repository.dart';
 import '../../../core/repository/vehicle_repository.dart';
 
 part 'dossier_controller.g.dart';
@@ -10,9 +11,15 @@ class DossierController = _DossierControllerBase with _$DossierController;
 
 abstract class _DossierControllerBase with Store {
   final VehicleRepository _repository;
+  final SettingsRepository _settingsRepository;
 
-  _DossierControllerBase({VehicleRepository? repository})
-      : _repository = repository ?? Locator.vehicleRepository;
+  _DossierControllerBase({
+    VehicleRepository? repository,
+    SettingsRepository? settingsRepository,
+  })  : _repository = repository ?? Locator.vehicleRepository,
+        _settingsRepository = settingsRepository ?? Locator.settingsRepository;
+
+  DistanceUnit get distanceUnit => _settingsRepository.distanceUnit;
 
   @observable
   bool includePartBoxPhotos = true;

@@ -66,11 +66,11 @@ abstract class VehiclePassportModel with _$VehiclePassportModel {
 
   String get formattedTotalSpent => formattedTotalSpentIn(currency);
 
-  String get formattedMileage {
-    final formatted = currentMileage.toString().replaceAllMapped(
-      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-      (Match m) => '${m[1]},',
-    );
-    return '$formatted ${distanceUnit.label}';
-  }
+  int mileageIn(DistanceUnit targetUnit) =>
+      distanceUnit.convertToInt(currentMileage, to: targetUnit);
+
+  String formattedMileageIn(DistanceUnit targetUnit) =>
+      targetUnit.format(mileageIn(targetUnit));
+
+  String get formattedMileage => formattedMileageIn(distanceUnit);
 }

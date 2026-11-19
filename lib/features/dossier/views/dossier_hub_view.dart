@@ -77,7 +77,10 @@ class DossierHubView extends StatelessWidget {
                   children: [
                     DossierPublicLinkCard(publicUrl: activeController.publicUrl),
                     const SizedBox(height: 16),
-                    DossierPassportSummaryCard(vehicle: vehicle),
+                    DossierPassportSummaryCard(
+                      vehicle: vehicle,
+                      displayDistanceUnit: activeController.distanceUnit,
+                    ),
                     const SizedBox(height: 16),
                     DossierCustomizationCard(
                       includePartBoxPhotos: activeController.includePartBoxPhotos,

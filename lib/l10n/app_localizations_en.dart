@@ -487,7 +487,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String odometerValueBadge(String mileage) {
-    return 'Odometer: $mileage km';
+    return 'Odometer: $mileage';
   }
 
   @override
@@ -807,4 +807,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get clearLocalStorageLabel => 'Clear Local Storage (Reset to Empty)';
+
+  @override
+  String servicedAtSummary(String facility, String mileage) {
+    return 'Serviced at $facility ($mileage).';
+  }
 }

@@ -7,6 +7,7 @@ class ManualEntryFormModel {
   final ServiceCategory category;
   final DateTime date;
   final int odometerKm;
+  final DistanceUnit distanceUnit;
   final double partsCost;
   final double laborCost;
   final Currency currency;
@@ -21,6 +22,7 @@ class ManualEntryFormModel {
     required this.category,
     required this.date,
     required this.odometerKm,
+    this.distanceUnit = DistanceUnit.km,
     required this.partsCost,
     required this.laborCost,
     required this.currency,
@@ -45,9 +47,9 @@ class ManualEntryFormModel {
     return ServiceRecordModel(
       id: id ?? 'rec-${DateTime.now().millisecondsSinceEpoch}',
       title: title.isNotEmpty ? title : '${category.enName} Service',
-      description: 'Serviced at $effectiveFacility ($odometerKm km).',
       date: date,
       mileageKm: odometerKm,
+      distanceUnit: distanceUnit,
       totalCost: totalCost,
       partsCost: partsCost,
       laborCost: laborCost,

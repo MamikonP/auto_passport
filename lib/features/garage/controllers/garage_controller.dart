@@ -22,11 +22,13 @@ abstract class _GarageControllerBase with Store {
   @computed
   List<GarageItemModel> get garageItems {
     final targetCurrency = _settingsRepository.displayCurrency;
+    final targetDistanceUnit = _settingsRepository.distanceUnit;
     return _repository.vehicles.map((v) {
       return GarageItemModel(
         vehicle: v,
         isActive: v.id == _repository.activeVehicleId,
         displayCurrency: targetCurrency,
+        displayDistanceUnit: targetDistanceUnit,
       );
     }).toList();
   }

@@ -10,9 +10,11 @@ _ServiceRecordModel _$ServiceRecordModelFromJson(Map<String, dynamic> json) =>
     _ServiceRecordModel(
       id: json['id'] as String,
       title: json['title'] as String,
-      description: json['description'] as String,
       date: DateTime.parse(json['date'] as String),
       mileageKm: (json['mileageKm'] as num).toInt(),
+      distanceUnit:
+          $enumDecodeNullable(_$DistanceUnitEnumMap, json['distanceUnit']) ??
+          DistanceUnit.km,
       totalCost: (json['totalCost'] as num).toDouble(),
       partsCost: (json['partsCost'] as num?)?.toDouble() ?? 0.0,
       laborCost: (json['laborCost'] as num?)?.toDouble() ?? 0.0,
@@ -43,9 +45,9 @@ Map<String, dynamic> _$ServiceRecordModelToJson(_ServiceRecordModel instance) =>
     <String, dynamic>{
       'id': instance.id,
       'title': instance.title,
-      'description': instance.description,
       'date': instance.date.toIso8601String(),
       'mileageKm': instance.mileageKm,
+      'distanceUnit': _$DistanceUnitEnumMap[instance.distanceUnit]!,
       'totalCost': instance.totalCost,
       'partsCost': instance.partsCost,
       'laborCost': instance.laborCost,
@@ -80,4 +82,9 @@ const _$CurrencyEnumMap = {
   Currency.usd: 'usd',
   Currency.eur: 'eur',
   Currency.rub: 'rub',
+};
+
+const _$DistanceUnitEnumMap = {
+  DistanceUnit.km: 'km',
+  DistanceUnit.miles: 'miles',
 };

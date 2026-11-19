@@ -81,6 +81,28 @@ mixin _$ManualEntryController on _ManualEntryControllerBase, Store {
     });
   }
 
+  late final _$selectedDistanceUnitAtom = Atom(
+    name: '_ManualEntryControllerBase.selectedDistanceUnit',
+    context: context,
+  );
+
+  @override
+  DistanceUnit get selectedDistanceUnit {
+    _$selectedDistanceUnitAtom.reportRead();
+    return super.selectedDistanceUnit;
+  }
+
+  @override
+  set selectedDistanceUnit(DistanceUnit value) {
+    _$selectedDistanceUnitAtom.reportWrite(
+      value,
+      super.selectedDistanceUnit,
+      () {
+        super.selectedDistanceUnit = value;
+      },
+    );
+  }
+
   late final _$proofBadgesAtom = Atom(
     name: '_ManualEntryControllerBase.proofBadges',
     context: context,
@@ -167,6 +189,17 @@ mixin _$ManualEntryController on _ManualEntryControllerBase, Store {
         .startAction(name: '_ManualEntryControllerBase.setCurrency');
     try {
       return super.setCurrency(val);
+    } finally {
+      _$_ManualEntryControllerBaseActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void setDistanceUnit(DistanceUnit val) {
+    final _$actionInfo = _$_ManualEntryControllerBaseActionController
+        .startAction(name: '_ManualEntryControllerBase.setDistanceUnit');
+    try {
+      return super.setDistanceUnit(val);
     } finally {
       _$_ManualEntryControllerBaseActionController.endAction(_$actionInfo);
     }

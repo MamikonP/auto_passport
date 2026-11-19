@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimensions.dart';
 import '../../../l10n/app_localizations.dart';
@@ -7,10 +8,7 @@ import '../models/record_detail_model.dart';
 class RecordFacilityCard extends StatelessWidget {
   final RecordBreakdownModel breakdown;
 
-  const RecordFacilityCard({
-    super.key,
-    required this.breakdown,
-  });
+  const RecordFacilityCard({super.key, required this.breakdown});
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +57,11 @@ class RecordFacilityCard extends StatelessWidget {
           const SizedBox(height: 10),
           Row(
             children: [
-              const Icon(Icons.build_circle_rounded, size: 18, color: AppColors.primaryLight),
+              const Icon(
+                Icons.build_circle_rounded,
+                size: 18,
+                color: AppColors.primaryLight,
+              ),
               const SizedBox(width: 8),
               Text(
                 breakdown.facilityName,
@@ -73,7 +75,10 @@ class RecordFacilityCard extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            breakdown.description,
+            l10n.servicedAtSummary(
+              breakdown.facilityName,
+              breakdown.formattedMileage,
+            ),
             style: const TextStyle(
               fontSize: 13,
               height: 1.45,

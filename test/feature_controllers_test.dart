@@ -40,7 +40,6 @@ VehiclePassportModel createTestVehicle({
       ServiceRecordModel(
         id: 'rec-01',
         title: 'Front CV Joint & Control Arms',
-        description: 'Replaced torn outer CV boot and lower control arm bushings.',
         date: DateTime(2026, 10, 24),
         mileageKm: 184250,
         partsCost: 45000,
@@ -52,7 +51,6 @@ VehiclePassportModel createTestVehicle({
       ServiceRecordModel(
         id: 'rec-02',
         title: 'Brembo Front Brake Rotors & Pads',
-        description: 'New ceramic pads & ventilated discs.',
         date: DateTime(2026, 8, 15),
         mileageKm: 180100,
         partsCost: 85000,
@@ -64,7 +62,6 @@ VehiclePassportModel createTestVehicle({
       ServiceRecordModel(
         id: 'rec-03',
         title: 'Motul 8100 X-clean+ 5W30 & Mann Filter',
-        description: 'Engine oil and OEM filter replacement.',
         date: DateTime(2026, 6, 10),
         mileageKm: 175000,
         partsCost: 35000,
@@ -97,7 +94,6 @@ void main() {
       final record = ServiceRecordModel(
         id: 'rec-test-01',
         title: 'New Spark Plugs & Ignition Coils',
-        description: 'NGK laser iridium plugs installed.',
         date: DateTime(2026, 11, 1),
         mileageKm: 185000,
         totalCost: 35000,
@@ -250,7 +246,6 @@ void main() {
       final record = ServiceRecordModel(
         id: 'rec-test-01',
         title: 'New Spark Plugs & Ignition Coils',
-        description: 'NGK laser iridium plugs installed.',
         date: DateTime(2026, 11, 1),
         mileageKm: 185000,
         totalCost: 35000,
@@ -568,7 +563,6 @@ void main() {
       final record100kAmd = ServiceRecordModel(
         id: 'rec-curr-1',
         title: 'Major Service',
-        description: '100,000 AMD service',
         date: DateTime(2026, 11, 19),
         mileageKm: 120000,
         partsCost: 70000,
@@ -625,6 +619,89 @@ void main() {
       settingsRepo.setDisplayCurrency(Currency.rub);
       expect(timelineController.timelineEntries.first.formattedCost, '₽ 23,810');
       expect(garageController.garageItems.first.formattedTotalSpent, '₽ 23,810');
+    });
+
+    test('converts user specified KM and Miles distances based on Settings distance unit', () {
+      final settingsRepo = SettingsRepository();
+      final vehicleRepo = VehicleRepository();
+      final serviceRecordRepo = ServiceRecordRepository(
+        vehicleRepository: vehicleRepo,
+      );
+      final timelineController = TimelineController(
+        vehicleRepository: vehicleRepo,
+        serviceRecordRepository: serviceRecordRepo,
+        settingsRepository: settingsRepo,
+      );
+      final garageController = GarageController(
+        repository: vehicleRepo,
+        settingsRepository: settingsRepo,
+      );
+      final recordDetailController = RecordDetailController(
+        vehicleRepository: vehicleRepo,
+        serviceRecordRepository: serviceRecordRepo,
+        settingsRepository: settingsRepo,
+      );
+
+      final recordKm = ServiceRecordModel(
+        id: 'rec-dist-1',
+        title: 'Brake Service',
+        date: DateTime(2026, 11, 19),
+        mileageKm: 100000,
+        distanceUnit: DistanceUnit.km,
+        partsCost: 50000,
+        laborCost: 20000,
+        totalCost: 70000,
+        facilityName: 'AutoMaster',
+        category: ServiceCategory.brakes,
+      );
+
+      final vehicle = VehiclePassportModel(
+        id: 'veh-dist-1',
+        make: 'BMW',
+        model: 'X5',
+        year: 2021,
+        vin: '5UXCR6C09M9D12345',
+        fuelPowertrain: 'Petrol 3.0',
+        bodyType: 'SUV',
+        currentMileage: 100000,
+        distanceUnit: DistanceUnit.km,
+        isActive: true,
+        serviceRecords: [recordKm],
+      );
+
+      vehicleRepo.addVehicle(vehicle);
+      vehicleRepo.setActiveVehicle(vehicle.id);
+
+      // Default Settings unit is KM
+      expect(settingsRepo.distanceUnit, DistanceUnit.km);
+      expect(timelineController.timelineEntries.first.formattedMileage, '100,000 km');
+      expect(garageController.garageItems.first.formattedMileage, '100,000 km');
+      expect(
+        recordDetailController.getRecordDetail('rec-dist-1').formattedMileage,
+        '100,000 km',
+      );
+
+      // Switch Settings unit to Miles (100,000 km / 1.609344 = 62,137 miles)
+      settingsRepo.setDistanceUnit(DistanceUnit.miles);
+      expect(timelineController.distanceUnit, DistanceUnit.miles);
+      expect(timelineController.timelineEntries.first.formattedMileage, '62,137 miles');
+      expect(garageController.garageItems.first.formattedMileage, '62,137 miles');
+      expect(
+        recordDetailController.getRecordDetail('rec-dist-1').formattedMileage,
+        '62,137 miles',
+      );
+
+      // Check Miles -> KM conversion (100,000 miles * 1.609344 = 160,934 km)
+      expect(
+        DistanceUnit.miles.convertToInt(100000, to: DistanceUnit.km),
+        160934,
+      );
+      expect(
+        DistanceUnit.km.format(
+          DistanceUnit.miles.convertToInt(100000, to: DistanceUnit.km),
+        ),
+        '160,934 km',
+      );
     });
   });
 

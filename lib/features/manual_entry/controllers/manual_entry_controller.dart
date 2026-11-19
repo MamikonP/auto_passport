@@ -1,6 +1,7 @@
 import 'package:mobx/mobx.dart';
 import '../../../core/di/locator.dart';
 import '../../../core/enums/currency.dart';
+import '../../../core/enums/distance_unit.dart';
 import '../../../core/enums/proof_classification.dart';
 import '../../../core/enums/service_category.dart';
 import '../../../core/models/service_record_model.dart';
@@ -37,6 +38,9 @@ abstract class _ManualEntryControllerBase with Store {
   Currency selectedCurrency = Currency.amd;
 
   @observable
+  DistanceUnit selectedDistanceUnit = DistanceUnit.km;
+
+  @observable
   ObservableList<String> proofBadges = ObservableList<String>.of(['Part Box', 'Idram Transfer']);
 
   VoiceParsedServiceLog? _pendingVoiceLog;
@@ -62,6 +66,7 @@ abstract class _ManualEntryControllerBase with Store {
   @action
   void initializeWithProofType(String? proofType) {
     selectedCurrency = Locator.settingsRepository.displayCurrency;
+    selectedDistanceUnit = Locator.settingsRepository.distanceUnit;
     if (proofType == 'paper_receipt') {
       setClassification(ProofClassification.formalStoreReceipt);
     } else {
@@ -75,6 +80,7 @@ abstract class _ManualEntryControllerBase with Store {
     selectedCategory = record.category;
     serviceDate = record.date;
     selectedCurrency = record.currency;
+    selectedDistanceUnit = record.distanceUnit;
     proofBadges = ObservableList<String>.of(record.proofBadges);
   }
 
@@ -103,6 +109,9 @@ abstract class _ManualEntryControllerBase with Store {
   void setCurrency(Currency val) => selectedCurrency = val;
 
   @action
+  void setDistanceUnit(DistanceUnit val) => selectedDistanceUnit = val;
+
+  @action
   void addAttachment(String badge) {
     if (!proofBadges.contains(badge)) {
       proofBadges.add(badge);
@@ -129,6 +138,7 @@ abstract class _ManualEntryControllerBase with Store {
       category: selectedCategory,
       date: serviceDate,
       odometerKm: odometer,
+      distanceUnit: selectedDistanceUnit,
       partsCost: partsCost,
       laborCost: laborCost,
       currency: selectedCurrency,
@@ -164,6 +174,7 @@ abstract class _ManualEntryControllerBase with Store {
       category: selectedCategory,
       date: serviceDate,
       odometerKm: odometer,
+      distanceUnit: selectedDistanceUnit,
       partsCost: partsCost,
       laborCost: laborCost,
       currency: selectedCurrency,

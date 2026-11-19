@@ -144,7 +144,7 @@
   "deleteRecordLongMessage": "Վստա՞հ եք, որ ցանկանում եք ջնջել «{title}»-ը։ Այս գործողությունը հնարավոր չէ հետարկել և կթարմացնի մեքենայի ընդհանուր ծախսերը։",
   "officialStoreReceiptBadge": "ՊԱՇՏՈՆԱԿԱՆ ԿՏՐՈՆ",
   "photoVerifiedPartBadge": "ԼՈՒՍԱՆԿԱՐՈՎ ՀԱՍՏԱՏՎԱԾ",
-  "odometerValueBadge": "Վազք՝ {mileage} կմ",
+  "odometerValueBadge": "Վազք՝ {mileage}",
   "totalInvestment": "Ընդհանուր ներդրում",
   "partsBreakdownLine": "Պահեստամասեր՝ {title} ({oem})",
   "laborBreakdownLine": "Աշխատանք՝ {facility} ({type})",
@@ -239,5 +239,6 @@
   "resetLocalDatabaseMessage": "Վստա՞հ եք, որ ցանկանում եք ջնջել բոլոր տվյալները։ Բոլոր գրանցված մեքենաները և սպասարկման գրառումները կջնջվեն։",
   "resetAllConfirmButton": "Ջնջել բոլորը",
   "localDatabaseClearedToast": "✓ Տեղային տվյալների բազան մաքրվեց",
-  "clearLocalStorageLabel": "Մաքրել տեղային հիշողությունը (Սկսել զրոյից)"
+  "clearLocalStorageLabel": "Մաքրել տեղային հիշողությունը (Սկսել զրոյից)",
+  "servicedAtSummary": "Սպասարկվել է՝ {facility} ({mileage})։"
 }

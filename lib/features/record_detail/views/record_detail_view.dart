@@ -109,7 +109,9 @@ class RecordDetailView extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
+                Wrap(
+                  spacing: 6,
+                  runSpacing: 6,
                   children: [
                     Builder(
                       builder: (_) {
@@ -159,7 +161,6 @@ class RecordDetailView extends StatelessWidget {
                         );
                       },
                     ),
-                    const SizedBox(width: 8),
                     Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 10,
@@ -174,12 +175,7 @@ class RecordDetailView extends StatelessWidget {
                         ),
                       ),
                       child: Text(
-                        l10n.odometerValueBadge(
-                          record.mileageKm.toString().replaceAllMapped(
-                            RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-                            (m) => '${m[1]},',
-                          ),
-                        ),
+                        l10n.odometerValueBadge(breakdown.formattedMileage),
                         style: const TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w600,

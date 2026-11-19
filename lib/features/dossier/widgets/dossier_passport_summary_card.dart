@@ -6,10 +6,12 @@ import '../../../l10n/app_localizations.dart';
 
 class DossierPassportSummaryCard extends StatelessWidget {
   final VehiclePassportModel vehicle;
+  final DistanceUnit? displayDistanceUnit;
 
   const DossierPassportSummaryCard({
     super.key,
     required this.vehicle,
+    this.displayDistanceUnit,
   });
 
   @override
@@ -61,7 +63,12 @@ class DossierPassportSummaryCard extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           Text(
-            l10n.vinAndMileageSummary(vehicle.maskedVin, vehicle.formattedMileage),
+            l10n.vinAndMileageSummary(
+              vehicle.maskedVin,
+              vehicle.formattedMileageIn(
+                displayDistanceUnit ?? vehicle.distanceUnit,
+              ),
+            ),
             style: const TextStyle(
               fontFamily: 'monospace',
               fontSize: 11,

@@ -144,7 +144,7 @@
   "deleteRecordLongMessage": "Вы уверены, что хотите удалить «{title}»? Это действие нельзя отменить, общие затраты по авто будут пересчитаны.",
   "officialStoreReceiptBadge": "ОФИЦИАЛЬНЫЙ ЧЕК",
   "photoVerifiedPartBadge": "ФОТО-ПОДТВЕРЖДЕНИЕ",
-  "odometerValueBadge": "Пробег: {mileage} км",
+  "odometerValueBadge": "Пробег: {mileage}",
   "totalInvestment": "Общая стоимость",
   "partsBreakdownLine": "Запчасти: {title} ({oem})",
   "laborBreakdownLine": "Работа: {facility} ({type})",
@@ -239,5 +239,6 @@
   "resetLocalDatabaseMessage": "Вы уверены, что хотите очистить все данные? Все автомобили и записи обслуживания будут удалены.",
   "resetAllConfirmButton": "Сбросить все",
   "localDatabaseClearedToast": "✓ Локальная база данных очищена",
-  "clearLocalStorageLabel": "Очистить хранилище (Сброс до пустого)"
+  "clearLocalStorageLabel": "Очистить хранилище (Сброс до пустого)",
+  "servicedAtSummary": "Обслужено в {facility} ({mileage})."
 }

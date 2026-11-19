@@ -487,7 +487,7 @@ class AppLocalizationsHy extends AppLocalizations {
 
   @override
   String odometerValueBadge(String mileage) {
-    return 'Վազք՝ $mileage կմ';
+    return 'Վազք՝ $mileage';
   }
 
   @override
@@ -811,4 +811,9 @@ class AppLocalizationsHy extends AppLocalizations {
   @override
   String get clearLocalStorageLabel =>
       'Մաքրել տեղային հիշողությունը (Սկսել զրոյից)';
+
+  @override
+  String servicedAtSummary(String facility, String mileage) {
+    return 'Սպասարկվել է՝ $facility ($mileage)։';
+  }
 }

@@ -5,18 +5,20 @@ import '../../../core/theme/app_colors.dart';
 class TimelineEntryModel {
   final ServiceRecordModel record;
   final Currency currency;
+  final DistanceUnit distanceUnit;
   final bool isLast;
 
   const TimelineEntryModel({
     required this.record,
     required this.currency,
+    this.distanceUnit = DistanceUnit.km,
     required this.isLast,
   });
 
   String get id => record.id;
   String get title => record.title;
-  String get description => record.description;
-  int get mileageKm => record.mileageKm;
+  int get mileageKm => record.mileageIn(distanceUnit);
+  String get formattedMileage => record.formattedMileageIn(distanceUnit);
   String get formattedCost => record.formattedCost(currency);
   List<String> get proofBadges => record.proofBadges;
   ServiceCategory get category => record.category;

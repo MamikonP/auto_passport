@@ -90,7 +90,10 @@ class TimelineEntryCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      record.description,
+                      l10n.servicedAtSummary(
+                        record.facilityName,
+                        item.formattedMileage,
+                      ),
                       style: const TextStyle(
                         fontSize: 12,
                         color: AppColors.textSecondary,
@@ -112,7 +115,7 @@ class TimelineEntryCard extends StatelessWidget {
                       children: [
                         Expanded(
                           child: Text(
-                            '${record.mileageKm.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]},')} km',
+                            item.formattedMileage,
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
                               fontSize: 11,

@@ -42,6 +42,9 @@ class _AddNewVehicleViewState extends State<AddNewVehicleView> {
     _controller = Locator.addVehicleController;
     if (widget.vehicle != null) {
       _onInitializeVehicle(widget.vehicle!, _controller);
+    } else {
+      _controller.setDistanceUnit(Locator.settingsRepository.distanceUnit);
+      _controller.setCurrency(Locator.settingsRepository.displayCurrency);
     }
 
     _vinTextController = TextEditingController(text: _controller.vin);

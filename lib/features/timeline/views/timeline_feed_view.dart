@@ -138,7 +138,9 @@ class TimelineFeedView extends StatelessWidget {
                                         const SizedBox(height: 4),
                                         Text(
                                           l10n.trackedSummary(
-                                            vehicle.formattedMileage,
+                                            vehicle.formattedMileageIn(
+                                              activeController.distanceUnit,
+                                            ),
                                             vehicle.formattedTotalSpentIn(
                                               activeController.displayCurrency,
                                             ),

@@ -1,5 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import '../enums/currency.dart';
+import '../enums/distance_unit.dart';
 import '../enums/proof_classification.dart';
 import '../enums/service_category.dart';
 
@@ -13,9 +14,9 @@ abstract class ServiceRecordModel with _$ServiceRecordModel {
   const factory ServiceRecordModel({
     required String id,
     required String title,
-    required String description,
     required DateTime date,
     required int mileageKm,
+    @Default(DistanceUnit.km) DistanceUnit distanceUnit,
     required double totalCost,
     @Default(0.0) double partsCost,
     @Default(0.0) double laborCost,
@@ -36,11 +37,16 @@ abstract class ServiceRecordModel with _$ServiceRecordModel {
 
   String get serviceCenter => facilityName;
   double get cost => totalCost;
-  String get notes => description;
   String get proofType => proofClassification.label;
 
   String get formattedDate =>
       '${date.day.toString().padLeft(2, '0')}.${date.month.toString().padLeft(2, '0')}.${date.year}';
+
+  int mileageIn(DistanceUnit targetUnit) =>
+      distanceUnit.convertToInt(mileageKm, to: targetUnit);
+
+  String formattedMileageIn(DistanceUnit targetUnit) =>
+      targetUnit.format(mileageIn(targetUnit));
 
   double totalCostIn(Currency targetCurrency) =>
       currency.convert(totalCost, to: targetCurrency);
