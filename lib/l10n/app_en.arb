@@ -409,5 +409,38 @@
         "type": "String"
       }
     }
-  }
+  },
+  "exportEncryptedBackupLabel": "Export Encrypted Backup (Sync)",
+  "importEncryptedBackupLabel": "Import Encrypted Backup",
+  "exportBackupSheetTitle": "Export Encrypted Sync Backup",
+  "exportBackupSheetSubtitle": "All {vehiclesCount} vehicle(s) and {recordsCount} service record(s) are compressed and encrypted so they cannot be opened externally.",
+  "@exportBackupSheetSubtitle": {
+    "placeholders": {
+      "vehiclesCount": {
+        "type": "int"
+      },
+      "recordsCount": {
+        "type": "int"
+      }
+    }
+  },
+  "noVehiclesToExportToast": "No vehicles in your garage to export",
+  "copySyncCodeButton": "Copy Encrypted Sync Code",
+  "syncCodeCopiedToast": "✓ Encrypted sync code copied to clipboard",
+  "importBackupSheetTitle": "Import Encrypted Sync Backup",
+  "importBackupSheetSubtitle": "Paste an encrypted AutoPassport sync code exported from another device.",
+  "pasteFromClipboardButton": "Paste from Clipboard",
+  "syncCodeFieldHint": "Paste APSYNC1:... code here",
+  "mergeWithGarageOption": "Merge with Garage",
+  "replaceGarageOption": "Replace All",
+  "importVehiclesButton": "Import Vehicles",
+  "vehiclesImportedToast": "✓ Imported {count} vehicle(s) successfully",
+  "@vehiclesImportedToast": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "invalidSyncCodeError": "Invalid or corrupted encrypted sync code"
 }

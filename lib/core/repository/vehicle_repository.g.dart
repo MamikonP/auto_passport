@@ -106,6 +106,26 @@ mixin _$VehicleRepository on _VehicleRepositoryBase, Store {
     return _$clearAllAsyncAction.run(() => super.clearAll());
   }
 
+  late final _$importVehiclesAsyncAction = AsyncAction(
+    '_VehicleRepositoryBase.importVehicles',
+    context: context,
+  );
+
+  @override
+  Future<int> importVehicles(
+    List<VehiclePassportModel> incomingVehicles, {
+    String? preferredActiveVehicleId,
+    bool replaceExisting = false,
+  }) {
+    return _$importVehiclesAsyncAction.run(
+      () => super.importVehicles(
+        incomingVehicles,
+        preferredActiveVehicleId: preferredActiveVehicleId,
+        replaceExisting: replaceExisting,
+      ),
+    );
+  }
+
   late final _$_VehicleRepositoryBaseActionController = ActionController(
     name: '_VehicleRepositoryBase',
     context: context,

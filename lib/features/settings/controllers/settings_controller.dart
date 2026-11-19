@@ -5,6 +5,7 @@ import '../../../core/enums/currency.dart';
 import '../../../core/enums/distance_unit.dart';
 import '../../../core/repository/settings_repository.dart';
 import '../../../core/repository/vehicle_repository.dart';
+import '../../../core/services/vehicle_sync_codec.dart';
 import '../../../core/theme/theme_controller.dart';
 
 part 'settings_controller.g.dart';
@@ -76,5 +77,33 @@ abstract class _SettingsControllerBase with Store {
   @action
   Future<void> clearAllData() async {
     await _vehicleRepository.clearAll();
+  }
+
+  int get vehiclesCount => _vehicleRepository.totalVehiclesCount;
+
+  int get totalRecordsCount => _vehicleRepository.vehicles.fold(
+    0,
+    (sum, v) => sum + v.serviceRecords.length,
+  );
+
+  /// Encodes all vehicles and their service records into an encrypted sync code.
+  String exportEncryptedVehicles() {
+    return VehicleSyncCodec.encode(
+      vehicles: _vehicleRepository.vehicles.toList(),
+      activeVehicleId: _vehicleRepository.activeVehicleId,
+    );
+  }
+
+  /// Decodes an encrypted sync code and imports all vehicles into the garage.
+  Future<int> importEncryptedVehicles(
+    String encoded, {
+    bool replaceExisting = false,
+  }) async {
+    final payload = VehicleSyncCodec.decode(encoded);
+    return _vehicleRepository.importVehicles(
+      payload.vehicles,
+      preferredActiveVehicleId: payload.activeVehicleId,
+      replaceExisting: replaceExisting,
+    );
   }
 }

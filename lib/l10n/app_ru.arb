@@ -240,5 +240,21 @@
   "resetAllConfirmButton": "Сбросить все",
   "localDatabaseClearedToast": "✓ Локальная база данных очищена",
   "clearLocalStorageLabel": "Очистить хранилище (Сброс до пустого)",
-  "servicedAtSummary": "Обслужено в {facility} ({mileage})."
+  "servicedAtSummary": "Обслужено в {facility} ({mileage}).",
+  "exportEncryptedBackupLabel": "Экспорт зашифрованного бэкапа (Синхр.)",
+  "importEncryptedBackupLabel": "Импорт зашифрованного бэкапа",
+  "exportBackupSheetTitle": "Экспорт зашифрованного бэкапа",
+  "exportBackupSheetSubtitle": "Все {vehiclesCount} авто и {recordsCount} записей сжаты и зашифрованы — их невозможно открыть вне AutoPassport.",
+  "noVehiclesToExportToast": "В гараже нет автомобилей для экспорта",
+  "copySyncCodeButton": "Скопировать зашифрованный код",
+  "syncCodeCopiedToast": "✓ Зашифрованный код синхронизации скопирован",
+  "importBackupSheetTitle": "Импорт зашифрованного бэкапа",
+  "importBackupSheetSubtitle": "Вставьте зашифрованный код синхронизации AutoPassport, экспортированный с другого устройства.",
+  "pasteFromClipboardButton": "Вставить из буфера обмена",
+  "syncCodeFieldHint": "Вставьте код APSYNC1:... сюда",
+  "mergeWithGarageOption": "Объединить с гаражом",
+  "replaceGarageOption": "Заменить все",
+  "importVehiclesButton": "Импортировать авто",
+  "vehiclesImportedToast": "✓ Успешно импортировано авто: {count}",
+  "invalidSyncCodeError": "Неверный или поврежденный зашифрованный код"
 }

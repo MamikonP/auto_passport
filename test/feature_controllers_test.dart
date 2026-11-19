@@ -6,6 +6,7 @@ import 'package:auto_passport/core/repository/settings_repository.dart';
 import 'package:auto_passport/core/repository/vehicle_repository.dart';
 import 'package:auto_passport/core/services/hive_database/hive_local_database_service.dart';
 import 'package:auto_passport/core/services/local_database_service.dart';
+import 'package:auto_passport/core/services/vehicle_sync_codec.dart';
 import 'package:auto_passport/features/add_vehicle/controllers/add_vehicle_controller.dart';
 import 'package:auto_passport/features/dossier/controllers/dossier_controller.dart';
 import 'package:auto_passport/features/garage/controllers/garage_controller.dart';
@@ -702,6 +703,119 @@ void main() {
         ),
         '160,934 km',
       );
+    });
+  });
+
+  group('Encrypted Vehicle Sync Export & Import Tests', () {
+    test('encodes vehicles into opaque encrypted token and decodes back accurately', () {
+      final v1 = createTestVehicle(id: 'veh-sync-1', make: 'Porsche', model: 'Cayenne');
+      final v2 = createSecondTestVehicle();
+
+      final encoded1 = VehicleSyncCodec.encode(
+        vehicles: [v1, v2],
+        activeVehicleId: v2.id,
+      );
+      final encoded2 = VehicleSyncCodec.encode(
+        vehicles: [v1, v2],
+        activeVehicleId: v2.id,
+      );
+
+      // Must start with APSYNC1: and not expose plaintext VIN/make/JSON
+      expect(encoded1.startsWith('APSYNC1:'), isTrue);
+      expect(encoded1.contains('Porsche'), isFalse);
+      expect(encoded1.contains('Cayenne'), isFalse);
+      expect(encoded1.contains('WBAXG5C54FD123456'), isFalse);
+      expect(encoded1.contains('"vehicles"'), isFalse);
+
+      // Randomized nonce produces different ciphertexts for identical payloads
+      expect(encoded1, isNot(equals(encoded2)));
+
+      final decoded = VehicleSyncCodec.decode(encoded1);
+      expect(decoded.vehicles.length, 2);
+      expect(decoded.activeVehicleId, v2.id);
+      expect(decoded.vehicles.first.make, 'Porsche');
+      expect(decoded.vehicles.first.serviceRecords.length, v1.serviceRecords.length);
+      expect(decoded.vehicles.last.vin, v2.vin);
+    });
+
+    test('rejects tampered or malformed sync tokens', () {
+      final v1 = createTestVehicle(id: 'veh-tamper-1');
+      final encoded = VehicleSyncCodec.encode(vehicles: [v1]);
+
+      // Flip a character in the middle of the payload
+      final mid = encoded.length ~/ 2;
+      final flippedChar = encoded[mid] == 'A' ? 'B' : 'A';
+      final tampered =
+          '${encoded.substring(0, mid)}$flippedChar${encoded.substring(mid + 1)}';
+
+      expect(
+        () => VehicleSyncCodec.decode(tampered),
+        throwsA(isA<VehicleSyncException>()),
+      );
+      expect(
+        () => VehicleSyncCodec.decode('not-a-valid-token'),
+        throwsA(isA<VehicleSyncException>()),
+      );
+      expect(
+        () => VehicleSyncCodec.decode('{"vehicles":[]}'),
+        throwsA(isA<VehicleSyncException>()),
+      );
+    });
+
+    test('SettingsController exports from device A and imports to device B (merge & replace)', () async {
+      final vehicleRepoA = VehicleRepository();
+      final settingsRepoA = SettingsRepository();
+      final controllerA = SettingsController(
+        settingsRepository: settingsRepoA,
+        vehicleRepository: vehicleRepoA,
+      );
+
+      final v1 = createTestVehicle(id: 'veh-a-1', make: 'Audi', model: 'Q7');
+      final v2 = createSecondTestVehicle();
+      vehicleRepoA.addVehicle(v1);
+      vehicleRepoA.addVehicle(v2);
+
+      // Export from Device A
+      final syncCode = controllerA.exportEncryptedVehicles();
+
+      // Device B starts with one different vehicle
+      final vehicleRepoB = VehicleRepository();
+      final settingsRepoB = SettingsRepository();
+      final controllerB = SettingsController(
+        settingsRepository: settingsRepoB,
+        vehicleRepository: vehicleRepoB,
+      );
+      final existingOnB = const VehiclePassportModel(
+        id: 'veh-b-only',
+        make: 'Lexus',
+        model: 'RX 350',
+        year: 2020,
+        vin: '2T2HZMDA0LC999999',
+        fuelPowertrain: 'Petrol 3.5 V6',
+        bodyType: 'SUV',
+        currentMileage: 85000,
+      );
+      vehicleRepoB.addVehicle(existingOnB);
+
+      // Merge mode keeps Device B's vehicle and adds Device A's 2 vehicles
+      final mergedCount = await controllerB.importEncryptedVehicles(
+        syncCode,
+        replaceExisting: false,
+      );
+      expect(mergedCount, 2);
+      expect(vehicleRepoB.vehicles.length, 3);
+      expect(vehicleRepoB.vehicles.any((v) => v.id == 'veh-b-only'), isTrue);
+      expect(vehicleRepoB.vehicles.any((v) => v.make == 'Audi'), isTrue);
+
+      // Replace mode replaces Device B's garage with only Device A's 2 vehicles
+      final replacedCount = await controllerB.importEncryptedVehicles(
+        syncCode,
+        replaceExisting: true,
+      );
+      expect(replacedCount, 2);
+      expect(vehicleRepoB.vehicles.length, 2);
+      expect(vehicleRepoB.vehicles.any((v) => v.id == 'veh-b-only'), isFalse);
+      expect(vehicleRepoB.vehicles.any((v) => v.make == 'Audi'), isTrue);
     });
   });
 

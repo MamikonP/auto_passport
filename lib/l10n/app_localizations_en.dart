@@ -812,4 +812,57 @@ class AppLocalizationsEn extends AppLocalizations {
   String servicedAtSummary(String facility, String mileage) {
     return 'Serviced at $facility ($mileage).';
   }
+
+  @override
+  String get exportEncryptedBackupLabel => 'Export Encrypted Backup (Sync)';
+
+  @override
+  String get importEncryptedBackupLabel => 'Import Encrypted Backup';
+
+  @override
+  String get exportBackupSheetTitle => 'Export Encrypted Sync Backup';
+
+  @override
+  String exportBackupSheetSubtitle(int vehiclesCount, int recordsCount) {
+    return 'All $vehiclesCount vehicle(s) and $recordsCount service record(s) are compressed and encrypted so they cannot be opened externally.';
+  }
+
+  @override
+  String get noVehiclesToExportToast => 'No vehicles in your garage to export';
+
+  @override
+  String get copySyncCodeButton => 'Copy Encrypted Sync Code';
+
+  @override
+  String get syncCodeCopiedToast => '✓ Encrypted sync code copied to clipboard';
+
+  @override
+  String get importBackupSheetTitle => 'Import Encrypted Sync Backup';
+
+  @override
+  String get importBackupSheetSubtitle =>
+      'Paste an encrypted AutoPassport sync code exported from another device.';
+
+  @override
+  String get pasteFromClipboardButton => 'Paste from Clipboard';
+
+  @override
+  String get syncCodeFieldHint => 'Paste APSYNC1:... code here';
+
+  @override
+  String get mergeWithGarageOption => 'Merge with Garage';
+
+  @override
+  String get replaceGarageOption => 'Replace All';
+
+  @override
+  String get importVehiclesButton => 'Import Vehicles';
+
+  @override
+  String vehiclesImportedToast(int count) {
+    return '✓ Imported $count vehicle(s) successfully';
+  }
+
+  @override
+  String get invalidSyncCodeError => 'Invalid or corrupted encrypted sync code';
 }

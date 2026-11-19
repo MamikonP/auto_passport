@@ -240,5 +240,21 @@
   "resetAllConfirmButton": "Ջնջել բոլորը",
   "localDatabaseClearedToast": "✓ Տեղային տվյալների բազան մաքրվեց",
   "clearLocalStorageLabel": "Մաքրել տեղային հիշողությունը (Սկսել զրոյից)",
-  "servicedAtSummary": "Սպասարկվել է՝ {facility} ({mileage})։"
+  "servicedAtSummary": "Սպասարկվել է՝ {facility} ({mileage})։",
+  "exportEncryptedBackupLabel": "Արտահանել կոդավորված պահուստ (Սինխ)",
+  "importEncryptedBackupLabel": "Ներմուծել կոդավորված պահուստ",
+  "exportBackupSheetTitle": "Արտահանել կոդավորված սինխ պահուստ",
+  "exportBackupSheetSubtitle": "Բոլոր {vehiclesCount} մեքենաները և {recordsCount} սպասարկման գրառումները սեղմված և կոդավորված են, որպեսզի հնարավոր չլինի բացել արտաքին ծրագրերով։",
+  "noVehiclesToExportToast": "Ավտոտնակում արտահանելու մեքենա չկա",
+  "copySyncCodeButton": "Պատճենել կոդավորված սինխ կոդը",
+  "syncCodeCopiedToast": "✓ Կոդավորված սինխ կոդը պատճենվեց",
+  "importBackupSheetTitle": "Ներմուծել կոդավորված սինխ պահուստ",
+  "importBackupSheetSubtitle": "Տեղադրեք մյուս սարքից արտահանված կոդավորված AutoPassport սինխ կոդը։",
+  "pasteFromClipboardButton": "Տեղադրել սեղմատախտակից",
+  "syncCodeFieldHint": "Տեղադրեք APSYNC1:... կոդը այստեղ",
+  "mergeWithGarageOption": "Միավորել ավտոտնակին",
+  "replaceGarageOption": "Փոխարինել բոլորը",
+  "importVehiclesButton": "Ներմուծել մեքենաները",
+  "vehiclesImportedToast": "✓ Հաջողությամբ ներմուծվեց {count} մեքենա",
+  "invalidSyncCodeError": "Սխալ կամ վնասված կոդավորված սինխ կոդ"
 }

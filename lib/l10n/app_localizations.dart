@@ -1545,6 +1545,102 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Serviced at {facility} ({mileage}).'**
   String servicedAtSummary(String facility, String mileage);
+
+  /// No description provided for @exportEncryptedBackupLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Export Encrypted Backup (Sync)'**
+  String get exportEncryptedBackupLabel;
+
+  /// No description provided for @importEncryptedBackupLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Import Encrypted Backup'**
+  String get importEncryptedBackupLabel;
+
+  /// No description provided for @exportBackupSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Export Encrypted Sync Backup'**
+  String get exportBackupSheetTitle;
+
+  /// No description provided for @exportBackupSheetSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'All {vehiclesCount} vehicle(s) and {recordsCount} service record(s) are compressed and encrypted so they cannot be opened externally.'**
+  String exportBackupSheetSubtitle(int vehiclesCount, int recordsCount);
+
+  /// No description provided for @noVehiclesToExportToast.
+  ///
+  /// In en, this message translates to:
+  /// **'No vehicles in your garage to export'**
+  String get noVehiclesToExportToast;
+
+  /// No description provided for @copySyncCodeButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy Encrypted Sync Code'**
+  String get copySyncCodeButton;
+
+  /// No description provided for @syncCodeCopiedToast.
+  ///
+  /// In en, this message translates to:
+  /// **'✓ Encrypted sync code copied to clipboard'**
+  String get syncCodeCopiedToast;
+
+  /// No description provided for @importBackupSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Import Encrypted Sync Backup'**
+  String get importBackupSheetTitle;
+
+  /// No description provided for @importBackupSheetSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste an encrypted AutoPassport sync code exported from another device.'**
+  String get importBackupSheetSubtitle;
+
+  /// No description provided for @pasteFromClipboardButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste from Clipboard'**
+  String get pasteFromClipboardButton;
+
+  /// No description provided for @syncCodeFieldHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste APSYNC1:... code here'**
+  String get syncCodeFieldHint;
+
+  /// No description provided for @mergeWithGarageOption.
+  ///
+  /// In en, this message translates to:
+  /// **'Merge with Garage'**
+  String get mergeWithGarageOption;
+
+  /// No description provided for @replaceGarageOption.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace All'**
+  String get replaceGarageOption;
+
+  /// No description provided for @importVehiclesButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Import Vehicles'**
+  String get importVehiclesButton;
+
+  /// No description provided for @vehiclesImportedToast.
+  ///
+  /// In en, this message translates to:
+  /// **'✓ Imported {count} vehicle(s) successfully'**
+  String vehiclesImportedToast(int count);
+
+  /// No description provided for @invalidSyncCodeError.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid or corrupted encrypted sync code'**
+  String get invalidSyncCodeError;
 }
 
 class _AppLocalizationsDelegate

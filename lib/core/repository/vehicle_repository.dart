@@ -1,6 +1,7 @@
 import 'package:mobx/mobx.dart';
 
 import '../di/locator.dart';
+import '../models/service_record_model.dart';
 import '../models/vehicle_passport_model.dart';
 import '../services/local_database_service.dart';
 
@@ -119,5 +120,68 @@ abstract class _VehicleRepositoryBase with Store {
         _databaseService.setActiveVehicleId(null);
       }
     }
+  }
+
+  /// Imports vehicles from an encrypted sync backup.
+  /// When [replaceExisting] is true, replaces the local garage completely.
+  /// Otherwise merges matching vehicles (by ID or VIN) and adds new ones.
+  @action
+  Future<int> importVehicles(
+    List<VehiclePassportModel> incomingVehicles, {
+    String? preferredActiveVehicleId,
+    bool replaceExisting = false,
+  }) async {
+    if (replaceExisting) {
+      vehicles.clear();
+      await _databaseService.clearVehicles();
+      vehicles.addAll(incomingVehicles);
+    } else {
+      for (final incoming in incomingVehicles) {
+        final existingIndex = vehicles.indexWhere(
+          (v) =>
+              v.id == incoming.id ||
+              (v.vin.trim().isNotEmpty &&
+                  v.vin.trim().toUpperCase() ==
+                      incoming.vin.trim().toUpperCase()),
+        );
+        if (existingIndex == -1) {
+          vehicles.add(incoming);
+        } else {
+          final existing = vehicles[existingIndex];
+          final mergedRecordsMap = <String, ServiceRecordModel>{
+            for (final r in existing.serviceRecords) r.id: r,
+            for (final r in incoming.serviceRecords) r.id: r,
+          };
+          final mergedRecords = mergedRecordsMap.values.toList()
+            ..sort((a, b) => b.date.compareTo(a.date));
+
+          vehicles[existingIndex] = incoming.copyWith(
+            id: existing.id,
+            serviceRecords: mergedRecords,
+          );
+        }
+      }
+    }
+
+    String? nextActiveId = activeVehicleId;
+    if (replaceExisting || nextActiveId == null || !vehicles.any((v) => v.id == nextActiveId)) {
+      if (preferredActiveVehicleId != null &&
+          vehicles.any((v) => v.id == preferredActiveVehicleId)) {
+        nextActiveId = preferredActiveVehicleId;
+      } else {
+        nextActiveId = vehicles.isNotEmpty ? vehicles.first.id : null;
+      }
+    }
+
+    activeVehicleId = nextActiveId;
+    for (int i = 0; i < vehicles.length; i++) {
+      vehicles[i] = vehicles[i].copyWith(
+        isActive: vehicles[i].id == nextActiveId,
+      );
+    }
+
+    await _databaseService.saveVehicles(vehicles.toList());
+    await _databaseService.setActiveVehicleId(nextActiveId);
+    return incomingVehicles.length;
   }
 }

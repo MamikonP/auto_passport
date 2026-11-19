@@ -811,4 +811,60 @@ class AppLocalizationsRu extends AppLocalizations {
   String servicedAtSummary(String facility, String mileage) {
     return 'Обслужено в $facility ($mileage).';
   }
+
+  @override
+  String get exportEncryptedBackupLabel =>
+      'Экспорт зашифрованного бэкапа (Синхр.)';
+
+  @override
+  String get importEncryptedBackupLabel => 'Импорт зашифрованного бэкапа';
+
+  @override
+  String get exportBackupSheetTitle => 'Экспорт зашифрованного бэкапа';
+
+  @override
+  String exportBackupSheetSubtitle(int vehiclesCount, int recordsCount) {
+    return 'Все $vehiclesCount авто и $recordsCount записей сжаты и зашифрованы — их невозможно открыть вне AutoPassport.';
+  }
+
+  @override
+  String get noVehiclesToExportToast => 'В гараже нет автомобилей для экспорта';
+
+  @override
+  String get copySyncCodeButton => 'Скопировать зашифрованный код';
+
+  @override
+  String get syncCodeCopiedToast =>
+      '✓ Зашифрованный код синхронизации скопирован';
+
+  @override
+  String get importBackupSheetTitle => 'Импорт зашифрованного бэкапа';
+
+  @override
+  String get importBackupSheetSubtitle =>
+      'Вставьте зашифрованный код синхронизации AutoPassport, экспортированный с другого устройства.';
+
+  @override
+  String get pasteFromClipboardButton => 'Вставить из буфера обмена';
+
+  @override
+  String get syncCodeFieldHint => 'Вставьте код APSYNC1:... сюда';
+
+  @override
+  String get mergeWithGarageOption => 'Объединить с гаражом';
+
+  @override
+  String get replaceGarageOption => 'Заменить все';
+
+  @override
+  String get importVehiclesButton => 'Импортировать авто';
+
+  @override
+  String vehiclesImportedToast(int count) {
+    return '✓ Успешно импортировано авто: $count';
+  }
+
+  @override
+  String get invalidSyncCodeError =>
+      'Неверный или поврежденный зашифрованный код';
 }

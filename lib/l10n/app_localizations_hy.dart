@@ -816,4 +816,58 @@ class AppLocalizationsHy extends AppLocalizations {
   String servicedAtSummary(String facility, String mileage) {
     return 'Սպասարկվել է՝ $facility ($mileage)։';
   }
+
+  @override
+  String get exportEncryptedBackupLabel =>
+      'Արտահանել կոդավորված պահուստ (Սինխ)';
+
+  @override
+  String get importEncryptedBackupLabel => 'Ներմուծել կոդավորված պահուստ';
+
+  @override
+  String get exportBackupSheetTitle => 'Արտահանել կոդավորված սինխ պահուստ';
+
+  @override
+  String exportBackupSheetSubtitle(int vehiclesCount, int recordsCount) {
+    return 'Բոլոր $vehiclesCount մեքենաները և $recordsCount սպասարկման գրառումները սեղմված և կոդավորված են, որպեսզի հնարավոր չլինի բացել արտաքին ծրագրերով։';
+  }
+
+  @override
+  String get noVehiclesToExportToast => 'Ավտոտնակում արտահանելու մեքենա չկա';
+
+  @override
+  String get copySyncCodeButton => 'Պատճենել կոդավորված սինխ կոդը';
+
+  @override
+  String get syncCodeCopiedToast => '✓ Կոդավորված սինխ կոդը պատճենվեց';
+
+  @override
+  String get importBackupSheetTitle => 'Ներմուծել կոդավորված սինխ պահուստ';
+
+  @override
+  String get importBackupSheetSubtitle =>
+      'Տեղադրեք մյուս սարքից արտահանված կոդավորված AutoPassport սինխ կոդը։';
+
+  @override
+  String get pasteFromClipboardButton => 'Տեղադրել սեղմատախտակից';
+
+  @override
+  String get syncCodeFieldHint => 'Տեղադրեք APSYNC1:... կոդը այստեղ';
+
+  @override
+  String get mergeWithGarageOption => 'Միավորել ավտոտնակին';
+
+  @override
+  String get replaceGarageOption => 'Փոխարինել բոլորը';
+
+  @override
+  String get importVehiclesButton => 'Ներմուծել մեքենաները';
+
+  @override
+  String vehiclesImportedToast(int count) {
+    return '✓ Հաջողությամբ ներմուծվեց $count մեքենա';
+  }
+
+  @override
+  String get invalidSyncCodeError => 'Սխալ կամ վնասված կոդավորված սինխ կոդ';
 }
