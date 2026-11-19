@@ -51,6 +51,7 @@ class ManualEntryFormModel {
       totalCost: totalCost,
       partsCost: partsCost,
       laborCost: laborCost,
+      currency: currency,
       partsOemNumber: trimmedOem,
       facilityName: effectiveFacility,
       facilityType: isFormal ? 'Official Dealership / Store' : 'Private Garage',

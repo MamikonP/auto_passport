@@ -61,6 +61,7 @@ abstract class _ManualEntryControllerBase with Store {
 
   @action
   void initializeWithProofType(String? proofType) {
+    selectedCurrency = Locator.settingsRepository.displayCurrency;
     if (proofType == 'paper_receipt') {
       setClassification(ProofClassification.formalStoreReceipt);
     } else {
@@ -70,15 +71,10 @@ abstract class _ManualEntryControllerBase with Store {
 
   @action
   void initializeForEdit(ServiceRecordModel record, {String? vehicleId}) {
-    final vehicle = vehicleId != null
-        ? _vehicleRepository.vehicles.where((v) => v.id == vehicleId).firstOrNull
-        : _vehicleRepository.activeVehicle;
     proofClassification = record.proofClassification;
     selectedCategory = record.category;
     serviceDate = record.date;
-    if (vehicle != null) {
-      selectedCurrency = vehicle.currency;
-    }
+    selectedCurrency = record.currency;
     proofBadges = ObservableList<String>.of(record.proofBadges);
   }
 

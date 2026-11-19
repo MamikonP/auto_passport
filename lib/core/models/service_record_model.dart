@@ -19,6 +19,7 @@ abstract class ServiceRecordModel with _$ServiceRecordModel {
     required double totalCost,
     @Default(0.0) double partsCost,
     @Default(0.0) double laborCost,
+    @Default(Currency.amd) Currency currency,
     @Default('') String partsOemNumber,
     required String facilityName,
     @Default('Private Garage') String facilityType,
@@ -41,12 +42,15 @@ abstract class ServiceRecordModel with _$ServiceRecordModel {
   String get formattedDate =>
       '${date.day.toString().padLeft(2, '0')}.${date.month.toString().padLeft(2, '0')}.${date.year}';
 
-  String formattedCost(Currency curr) {
-    final intCost = totalCost.toInt();
-    final formatted = intCost.toString().replaceAllMapped(
-      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-      (Match m) => '${m[1]},',
-    );
-    return '${curr.symbol} $formatted';
-  }
+  double totalCostIn(Currency targetCurrency) =>
+      currency.convert(totalCost, to: targetCurrency);
+
+  double partsCostIn(Currency targetCurrency) =>
+      currency.convert(partsCost, to: targetCurrency);
+
+  double laborCostIn(Currency targetCurrency) =>
+      currency.convert(laborCost, to: targetCurrency);
+
+  String formattedCost(Currency targetCurrency) =>
+      targetCurrency.format(totalCostIn(targetCurrency));
 }

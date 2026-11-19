@@ -573,7 +573,7 @@ class _ManualEntryFormViewState extends State<ManualEntryFormView> {
               ),
               const SizedBox(height: 16),
               Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Expanded(
                     child: CustomTextField(
@@ -633,56 +633,87 @@ class _ManualEntryFormViewState extends State<ManualEntryFormView> {
               ),
               const SizedBox(height: 12),
               Observer(
-                builder: (_) => Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 12,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.darkSurface,
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: AppColors.darkBorder),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                builder: (_) {
+                  final displayCurrency =
+                      Locator.settingsRepository.displayCurrency;
+                  final showConvertedPreview =
+                      _controller.selectedCurrency != displayCurrency &&
+                      _totalCostValue > 0;
+                  final convertedPreview = showConvertedPreview
+                      ? displayCurrency.format(
+                          _controller.selectedCurrency.convert(
+                            _totalCostValue,
+                            to: displayCurrency,
+                          ),
+                        )
+                      : null;
+
+                  return Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 12,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.darkSurface,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: AppColors.darkBorder),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
-                              l10n.autoCalculatedTotalCost,
-                              style: const TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.textSecondary,
+                            Expanded(
+                              child: Text(
+                                l10n.autoCalculatedTotalCost,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.textSecondary,
+                                ),
                               ),
                             ),
-                            const SizedBox(height: 2),
-                            Text(
-                              '${_controller.selectedCurrency.symbol} ${_formatAmount(_totalCostValue)}',
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w800,
-                                color: Colors.white,
-                              ),
+                            const SizedBox(width: 8),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text(
+                                  '${_controller.selectedCurrency.symbol} ${_formatAmount(_totalCostValue)}',
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w800,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                if (convertedPreview != null)
+                                  Text(
+                                    '≈ $convertedPreview',
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.primaryLight,
+                                    ),
+                                  ),
+                              ],
                             ),
                           ],
                         ),
-                      ),
-                      Row(
-                        children: [Currency.amd, Currency.usd, Currency.rub]
-                            .map((curr) {
-                              final isSelected =
-                                  _controller.selectedCurrency == curr;
-                              return Padding(
-                                padding: const EdgeInsets.only(left: 4),
+                        const SizedBox(height: 10),
+                        Row(
+                          children: Currency.values.map((curr) {
+                            final isSelected =
+                                _controller.selectedCurrency == curr;
+                            return Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 3,
+                                ),
                                 child: GestureDetector(
                                   onTap: () => _controller.setCurrency(curr),
                                   child: Container(
                                     padding: const EdgeInsets.symmetric(
-                                      horizontal: 10,
-                                      vertical: 10,
+                                      vertical: 9,
                                     ),
                                     decoration: BoxDecoration(
                                       color: isSelected
@@ -695,25 +726,28 @@ class _ManualEntryFormViewState extends State<ManualEntryFormView> {
                                             : AppColors.darkBorder,
                                       ),
                                     ),
-                                    child: Text(
-                                      '${curr.code} ${curr.symbol}',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w700,
-                                        color: isSelected
-                                            ? Colors.white
-                                            : AppColors.textSecondary,
+                                    child: Center(
+                                      child: Text(
+                                        '${curr.code} ${curr.symbol}',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w700,
+                                          color: isSelected
+                                              ? Colors.white
+                                              : AppColors.textSecondary,
+                                        ),
                                       ),
                                     ),
                                   ),
                                 ),
-                              );
-                            })
-                            .toList(),
-                      ),
-                    ],
-                  ),
-                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ],
+                    ),
+                  );
+                },
               ),
               const SizedBox(height: 16),
               Observer(

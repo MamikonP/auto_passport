@@ -1,9 +1,9 @@
 import 'package:mobx/mobx.dart';
 import '../../../core/di/locator.dart';
-import '../../../core/enums/currency.dart';
 import '../../../core/enums/service_category.dart';
 import '../../../core/models/service_record_model.dart';
 import '../../../core/repository/service_record_repository.dart';
+import '../../../core/repository/settings_repository.dart';
 import '../../../core/repository/vehicle_repository.dart';
 import '../models/record_detail_model.dart';
 
@@ -15,12 +15,15 @@ class RecordDetailController = _RecordDetailControllerBase with _$RecordDetailCo
 abstract class _RecordDetailControllerBase with Store {
   final VehicleRepository _vehicleRepository;
   final ServiceRecordRepository _serviceRecordRepository;
+  final SettingsRepository _settingsRepository;
 
   _RecordDetailControllerBase({
     VehicleRepository? vehicleRepository,
     ServiceRecordRepository? serviceRecordRepository,
+    SettingsRepository? settingsRepository,
   })  : _vehicleRepository = vehicleRepository ?? Locator.vehicleRepository,
-        _serviceRecordRepository = serviceRecordRepository ?? Locator.serviceRecordRepository;
+        _serviceRecordRepository = serviceRecordRepository ?? Locator.serviceRecordRepository,
+        _settingsRepository = settingsRepository ?? Locator.settingsRepository;
 
   @observable
   bool isIncludedInDossier = true;
@@ -60,7 +63,7 @@ abstract class _RecordDetailControllerBase with Store {
 
     return RecordBreakdownModel(
       record: record,
-      currency: vehicle?.currency ?? Currency.amd,
+      currency: _settingsRepository.displayCurrency,
     );
   }
 

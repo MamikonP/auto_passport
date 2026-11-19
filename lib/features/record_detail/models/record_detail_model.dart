@@ -9,10 +9,14 @@ class RecordBreakdownModel {
   String get title => record.title;
   String get description => record.description;
   int get mileageKm => record.mileageKm;
-  double get partsCost => record.partsCost;
-  double get laborCost => record.laborCost;
-  double get totalCost =>
-      (partsCost + laborCost) > 0 ? (partsCost + laborCost) : record.totalCost;
+  double get partsCost => record.partsCostIn(currency);
+  double get laborCost => record.laborCostIn(currency);
+  double get totalCost => (record.partsCost + record.laborCost) > 0
+      ? record.currency.convert(
+          record.partsCost + record.laborCost,
+          to: currency,
+        )
+      : record.totalCostIn(currency);
   String get partsOemNumber =>
       record.partsOemNumber.isNotEmpty ? record.partsOemNumber : 'OEM Spec';
   String get facilityName => record.facilityName;
@@ -21,14 +25,7 @@ class RecordBreakdownModel {
       ? record.verificationNotes
       : 'Stamped with timestamp and geo-location metadata. Photo of parts box includes serial code recognized by buyer validation engine.';
 
-  String _formatCurrency(double amount) {
-    final intCost = amount.toInt();
-    final formatted = intCost.toString().replaceAllMapped(
-      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-      (Match m) => '${m[1]},',
-    );
-    return '${currency.symbol} $formatted';
-  }
+  String _formatCurrency(double amount) => currency.format(amount);
 
   String get formattedTotalCost => _formatCurrency(totalCost);
   String get formattedPartsCost => _formatCurrency(partsCost);

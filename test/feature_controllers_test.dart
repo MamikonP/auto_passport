@@ -538,8 +538,93 @@ void main() {
     });
 
     test('Intake controller provides methods', () {
-      expect(controller.intakeMethods.length, 4);
-      expect(controller.intakeMethods.first.title, contains('Photo of Part'));
+      expect(controller.intakeMethods.length, 2);
+      expect(controller.intakeMethods.first.title, contains('Voice Quick Log'));
+    });
+  });
+
+  group('Currency Conversion & Settings Display Currency Tests', () {
+    test('converts user specified AMD amount to EUR and formats accordingly', () {
+      final settingsRepo = SettingsRepository();
+      final vehicleRepo = VehicleRepository();
+      final serviceRecordRepo = ServiceRecordRepository(
+        vehicleRepository: vehicleRepo,
+      );
+      final timelineController = TimelineController(
+        vehicleRepository: vehicleRepo,
+        serviceRecordRepository: serviceRecordRepo,
+        settingsRepository: settingsRepo,
+      );
+      final garageController = GarageController(
+        repository: vehicleRepo,
+        settingsRepository: settingsRepo,
+      );
+      final recordDetailController = RecordDetailController(
+        vehicleRepository: vehicleRepo,
+        serviceRecordRepository: serviceRecordRepo,
+        settingsRepository: settingsRepo,
+      );
+
+      final record100kAmd = ServiceRecordModel(
+        id: 'rec-curr-1',
+        title: 'Major Service',
+        description: '100,000 AMD service',
+        date: DateTime(2026, 11, 19),
+        mileageKm: 120000,
+        partsCost: 70000,
+        laborCost: 30000,
+        totalCost: 100000,
+        currency: Currency.amd,
+        facilityName: 'Yerevan Motors',
+        category: ServiceCategory.engine,
+      );
+
+      final vehicle = VehiclePassportModel(
+        id: 'veh-curr-1',
+        make: 'Toyota',
+        model: 'Camry',
+        year: 2022,
+        vin: '4T1BF1FK0CU123456',
+        fuelPowertrain: 'Hybrid 2.5',
+        bodyType: 'Sedan',
+        currentMileage: 120000,
+        currency: Currency.amd,
+        isActive: true,
+        serviceRecords: [record100kAmd],
+      );
+
+      vehicleRepo.addVehicle(vehicle);
+      vehicleRepo.setActiveVehicle(vehicle.id);
+
+      // Default display currency is AMD
+      expect(settingsRepo.displayCurrency, Currency.amd);
+      expect(timelineController.timelineEntries.first.formattedCost, '֏ 100,000');
+      expect(garageController.garageItems.first.formattedTotalSpent, '֏ 100,000');
+      expect(
+        recordDetailController.getRecordDetail('rec-curr-1').formattedTotalCost,
+        '֏ 100,000',
+      );
+
+      // Change Settings display currency to EUR (1 EUR = 425 AMD -> 100,000 AMD = 235.29 EUR)
+      settingsRepo.setDisplayCurrency(Currency.eur);
+      expect(timelineController.displayCurrency, Currency.eur);
+      expect(timelineController.timelineEntries.first.formattedCost, '€ 235.29');
+      expect(garageController.garageItems.first.formattedTotalSpent, '€ 235.29');
+
+      final breakdownEur = recordDetailController.getRecordDetail('rec-curr-1');
+      expect(breakdownEur.formattedTotalCost, '€ 235.29');
+      expect(breakdownEur.formattedPartsCost, '€ 164.71');
+      expect(breakdownEur.formattedLaborCost, '€ 70.59');
+
+      // Change Settings display currency to USD (1 USD = 390 AMD -> 100,000 AMD = 256.41 USD)
+      settingsRepo.setDisplayCurrency(Currency.usd);
+      expect(timelineController.timelineEntries.first.formattedCost, '\$ 256.41');
+      expect(garageController.garageItems.first.formattedTotalSpent, '\$ 256.41');
+
+      // Change Settings display currency to RUB (1 RUB = 4.2 AMD -> 100,000 AMD = 23,810 RUB)
+      settingsRepo.setDisplayCurrency(Currency.rub);
+      expect(timelineController.timelineEntries.first.formattedCost, '₽ 23,810');
+      expect(garageController.garageItems.first.formattedTotalSpent, '₽ 23,810');
     });
   });
 

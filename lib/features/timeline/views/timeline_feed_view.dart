@@ -139,7 +139,9 @@ class TimelineFeedView extends StatelessWidget {
                                         Text(
                                           l10n.trackedSummary(
                                             vehicle.formattedMileage,
-                                            vehicle.formattedTotalSpent,
+                                            vehicle.formattedTotalSpentIn(
+                                              activeController.displayCurrency,
+                                            ),
                                           ),
                                           style: const TextStyle(
                                             fontSize: 13,

@@ -49,17 +49,22 @@ abstract class VehiclePassportModel with _$VehiclePassportModel {
   int get verifiedRecordsCount =>
       totalVerifiedRecordsOverride ?? serviceRecords.where((r) => r.isVerified).length;
 
-  double get totalSpent =>
-      lifetimeTotalSpentOverride ?? serviceRecords.fold(0.0, (sum, r) => sum + r.totalCost);
-
-  String get formattedTotalSpent {
-    final intCost = totalSpent.toInt();
-    final formatted = intCost.toString().replaceAllMapped(
-      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-      (Match m) => '${m[1]},',
+  double totalSpentIn(Currency targetCurrency) {
+    if (lifetimeTotalSpentOverride != null) {
+      return currency.convert(lifetimeTotalSpentOverride!, to: targetCurrency);
+    }
+    return serviceRecords.fold(
+      0.0,
+      (sum, r) => sum + r.totalCostIn(targetCurrency),
     );
-    return '${currency.symbol} $formatted';
   }
+
+  String formattedTotalSpentIn(Currency targetCurrency) =>
+      targetCurrency.format(totalSpentIn(targetCurrency));
+
+  double get totalSpent => totalSpentIn(currency);
+
+  String get formattedTotalSpent => formattedTotalSpentIn(currency);
 
   String get formattedMileage {
     final formatted = currentMileage.toString().replaceAllMapped(

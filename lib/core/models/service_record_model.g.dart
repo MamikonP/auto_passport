@@ -16,6 +16,9 @@ _ServiceRecordModel _$ServiceRecordModelFromJson(Map<String, dynamic> json) =>
       totalCost: (json['totalCost'] as num).toDouble(),
       partsCost: (json['partsCost'] as num?)?.toDouble() ?? 0.0,
       laborCost: (json['laborCost'] as num?)?.toDouble() ?? 0.0,
+      currency:
+          $enumDecodeNullable(_$CurrencyEnumMap, json['currency']) ??
+          Currency.amd,
       partsOemNumber: json['partsOemNumber'] as String? ?? '',
       facilityName: json['facilityName'] as String,
       facilityType: json['facilityType'] as String? ?? 'Private Garage',
@@ -46,6 +49,7 @@ Map<String, dynamic> _$ServiceRecordModelToJson(_ServiceRecordModel instance) =>
       'totalCost': instance.totalCost,
       'partsCost': instance.partsCost,
       'laborCost': instance.laborCost,
+      'currency': _$CurrencyEnumMap[instance.currency]!,
       'partsOemNumber': instance.partsOemNumber,
       'facilityName': instance.facilityName,
       'facilityType': instance.facilityType,
@@ -69,4 +73,11 @@ const _$ServiceCategoryEnumMap = {
 const _$ProofClassificationEnumMap = {
   ProofClassification.informalMaster: 'informalMaster',
   ProofClassification.formalStoreReceipt: 'formalStoreReceipt',
+};
+
+const _$CurrencyEnumMap = {
+  Currency.amd: 'amd',
+  Currency.usd: 'usd',
+  Currency.eur: 'eur',
+  Currency.rub: 'rub',
 };
