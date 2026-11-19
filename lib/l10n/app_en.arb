@@ -442,5 +442,6 @@
       }
     }
   },
-  "invalidSyncCodeError": "Invalid or corrupted encrypted sync code"
+  "invalidSyncCodeError": "Invalid or corrupted encrypted sync code",
+  "failedToExportPdfDossierToast": "Could not generate or share the PDF dossier. Please try again."
 }

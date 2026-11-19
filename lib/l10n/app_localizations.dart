@@ -1641,6 +1641,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Invalid or corrupted encrypted sync code'**
   String get invalidSyncCodeError;
+
+  /// No description provided for @failedToExportPdfDossierToast.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not generate or share the PDF dossier. Please try again.'**
+  String get failedToExportPdfDossierToast;
 }
 
 class _AppLocalizationsDelegate

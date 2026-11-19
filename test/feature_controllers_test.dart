@@ -4,6 +4,7 @@ import 'package:auto_passport/core/models/vehicle_model.dart';
 import 'package:auto_passport/core/repository/service_record_repository.dart';
 import 'package:auto_passport/core/repository/settings_repository.dart';
 import 'package:auto_passport/core/repository/vehicle_repository.dart';
+import 'package:auto_passport/core/services/dossier_pdf_service/dossier_pdf_service_imp.dart';
 import 'package:auto_passport/core/services/hive_database/hive_local_database_service.dart';
 import 'package:auto_passport/core/services/local_database_service.dart';
 import 'package:auto_passport/core/services/vehicle_sync_codec.dart';
@@ -816,6 +817,71 @@ void main() {
       expect(vehicleRepoB.vehicles.length, 2);
       expect(vehicleRepoB.vehicles.any((v) => v.id == 'veh-b-only'), isFalse);
       expect(vehicleRepoB.vehicles.any((v) => v.make == 'Audi'), isTrue);
+    });
+  });
+
+  group('Certified PDF Dossier Export Tests', () {
+    test('generates valid PDF honoring includeInDossier and all dossier options', () async {
+      final vehicleRepo = VehicleRepository();
+      final serviceRecordRepo = ServiceRecordRepository(
+        vehicleRepository: vehicleRepo,
+      );
+      final settingsRepo = SettingsRepository();
+      final dossierController = DossierController(
+        repository: vehicleRepo,
+        settingsRepository: settingsRepo,
+      );
+      final detailController = RecordDetailController(
+        vehicleRepository: vehicleRepo,
+        serviceRecordRepository: serviceRecordRepo,
+        settingsRepository: settingsRepo,
+      );
+
+      final vehicle = createTestVehicle(id: 'veh-pdf-1');
+      vehicleRepo.addVehicle(vehicle);
+      vehicleRepo.setActiveVehicle(vehicle.id);
+
+      // Initially all 3 records are included in dossier
+      expect(dossierController.includedRecords.length, 3);
+
+      // Exclude rec-02 from resale dossier via RecordDetailController
+      detailController.toggleIncludedInDossier(
+        recordId: 'rec-02',
+        vehicleId: vehicle.id,
+      );
+      expect(dossierController.includedRecords.length, 2);
+      expect(
+        dossierController.includedRecords.any((r) => r.id == 'rec-02'),
+        isFalse,
+      );
+
+      // Generate PDF with all options enabled
+      final fullPdf = await dossierController.generateDossierPdfBytes();
+      expect(fullPdf, isNotNull);
+      expect(fullPdf!.length, greaterThan(1000));
+      // Verify PDF magic header "%PDF-"
+      expect(String.fromCharCodes(fullPdf.take(5)), '%PDF-');
+
+      // Generate PDF with cost totals, part box photos, and VIN watermark turned off
+      dossierController.toggleIncludePartBoxPhotos(false);
+      dossierController.toggleIncludeCostTotals(false);
+      dossierController.toggleWatermarkWithVin(false);
+
+      final minimalPdf = await dossierController.generateDossierPdfBytes();
+      expect(minimalPdf, isNotNull);
+      expect(String.fromCharCodes(minimalPdf!.take(5)), '%PDF-');
+      expect(minimalPdf.length, lessThan(fullPdf.length));
+
+      // Verify formatPdfCurrency formats ASCII currency codes cleanly
+      final pdfService = DossierPdfServiceImp();
+      expect(
+        pdfService.formatPdfCurrency(100000, Currency.amd),
+        'AMD 100,000',
+      );
+      expect(
+        pdfService.formatPdfCurrency(235.294, Currency.eur),
+        'EUR 235.29',
+      );
     });
   });
 

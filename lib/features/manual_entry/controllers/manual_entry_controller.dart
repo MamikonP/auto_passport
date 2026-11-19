@@ -183,14 +183,24 @@ abstract class _ManualEntryControllerBase with Store {
       proofBadges: proofBadges.toList(),
     );
 
-    final updatedRecord = form.toServiceRecord();
     final targetVehicleId =
         vehicleId ??
         _vehicleRepository.activeVehicleId ??
         (_vehicleRepository.vehicles.isNotEmpty
             ? _vehicleRepository.vehicles.first.id
             : null);
+
+    var updatedRecord = form.toServiceRecord();
     if (targetVehicleId != null) {
+      final existingRecord = _serviceRecordRepository
+          .getRecordsForVehicle(vehicleId: targetVehicleId)
+          .where((r) => r.id == recordId)
+          .firstOrNull;
+      if (existingRecord != null) {
+        updatedRecord = updatedRecord.copyWith(
+          includeInDossier: existingRecord.includeInDossier,
+        );
+      }
       _serviceRecordRepository.updateRecord(targetVehicleId, updatedRecord);
     }
     return updatedRecord;

@@ -90,6 +90,36 @@ mixin _$DossierController on _DossierControllerBase, Store {
     });
   }
 
+  late final _$isGeneratingPdfAtom = Atom(
+    name: '_DossierControllerBase.isGeneratingPdf',
+    context: context,
+  );
+
+  @override
+  bool get isGeneratingPdf {
+    _$isGeneratingPdfAtom.reportRead();
+    return super.isGeneratingPdf;
+  }
+
+  @override
+  set isGeneratingPdf(bool value) {
+    _$isGeneratingPdfAtom.reportWrite(value, super.isGeneratingPdf, () {
+      super.isGeneratingPdf = value;
+    });
+  }
+
+  late final _$generateDossierPdfBytesAsyncAction = AsyncAction(
+    '_DossierControllerBase.generateDossierPdfBytes',
+    context: context,
+  );
+
+  @override
+  Future<Uint8List?> generateDossierPdfBytes() {
+    return _$generateDossierPdfBytesAsyncAction.run(
+      () => super.generateDossierPdfBytes(),
+    );
+  }
+
   late final _$_DossierControllerBaseActionController = ActionController(
     name: '_DossierControllerBase',
     context: context,

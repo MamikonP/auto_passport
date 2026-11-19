@@ -256,5 +256,6 @@
   "replaceGarageOption": "Փոխարինել բոլորը",
   "importVehiclesButton": "Ներմուծել մեքենաները",
   "vehiclesImportedToast": "✓ Հաջողությամբ ներմուծվեց {count} մեքենա",
-  "invalidSyncCodeError": "Սխալ կամ վնասված կոդավորված սինխ կոդ"
+  "invalidSyncCodeError": "Սխալ կամ վնասված կոդավորված սինխ կոդ",
+  "failedToExportPdfDossierToast": "Չհաջողվեց ստեղծել կամ կիսվել PDF դոսյեով։ Խնդրում ենք կրկին փորձել։"
 }

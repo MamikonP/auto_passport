@@ -867,4 +867,8 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get invalidSyncCodeError =>
       'Неверный или поврежденный зашифрованный код';
+
+  @override
+  String get failedToExportPdfDossierToast =>
+      'Не удалось создать или отправить PDF-досье. Попробуйте еще раз.';
 }

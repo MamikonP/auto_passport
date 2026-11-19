@@ -240,49 +240,51 @@ class RecordDetailView extends StatelessWidget {
             child: SizedBox(
               width: double.infinity,
               height: 50,
-              child: Observer(
-                builder: (_) => ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: activeController.isIncludedInDossier
-                        ? AppColors.primary
-                        : AppColors.darkSurfaceVariant,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+              child: ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: record.includeInDossier
+                      ? AppColors.primary
+                      : AppColors.darkSurfaceVariant,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  icon: Icon(
-                    activeController.isIncludedInDossier
-                        ? Icons.check_circle_rounded
-                        : Icons.description_outlined,
-                    size: 18,
-                  ),
-                  label: Text(
-                    activeController.isIncludedInDossier
-                        ? l10n.includedInResaleDossier
-                        : l10n.includeInResaleDossier,
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  onPressed: () {
-                    activeController.toggleIncludedInDossier();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
-                          activeController.isIncludedInDossier
-                              ? l10n.verifiedAndLinkedToDossierToast
-                              : l10n.excludedFromDossierToast,
-                        ),
-                        backgroundColor: activeController.isIncludedInDossier
-                            ? AppColors.verified
-                            : AppColors.warning,
-                        duration: const Duration(seconds: 2),
-                      ),
-                    );
-                  },
                 ),
+                icon: Icon(
+                  record.includeInDossier
+                      ? Icons.check_circle_rounded
+                      : Icons.description_outlined,
+                  size: 18,
+                ),
+                label: Text(
+                  record.includeInDossier
+                      ? l10n.includedInResaleDossier
+                      : l10n.includeInResaleDossier,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                onPressed: () {
+                  final nextIncluded = !record.includeInDossier;
+                  activeController.toggleIncludedInDossier(
+                    recordId: record.id,
+                    vehicleId: vehicleId,
+                  );
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        nextIncluded
+                            ? l10n.verifiedAndLinkedToDossierToast
+                            : l10n.excludedFromDossierToast,
+                      ),
+                      backgroundColor: nextIncluded
+                          ? AppColors.verified
+                          : AppColors.warning,
+                      duration: const Duration(seconds: 2),
+                    ),
+                  );
+                },
               ),
             ),
           ),

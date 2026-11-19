@@ -256,5 +256,6 @@
   "replaceGarageOption": "Заменить все",
   "importVehiclesButton": "Импортировать авто",
   "vehiclesImportedToast": "✓ Успешно импортировано авто: {count}",
-  "invalidSyncCodeError": "Неверный или поврежденный зашифрованный код"
+  "invalidSyncCodeError": "Неверный или поврежденный зашифрованный код",
+  "failedToExportPdfDossierToast": "Не удалось создать или отправить PDF-досье. Попробуйте еще раз."
 }

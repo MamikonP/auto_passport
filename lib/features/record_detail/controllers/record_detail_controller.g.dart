@@ -51,13 +51,16 @@ mixin _$RecordDetailController on _RecordDetailControllerBase, Store {
   );
 
   @override
-  void toggleIncludedInDossier() {
+  void toggleIncludedInDossier({String? recordId, String? vehicleId}) {
     final _$actionInfo = _$_RecordDetailControllerBaseActionController
         .startAction(
           name: '_RecordDetailControllerBase.toggleIncludedInDossier',
         );
     try {
-      return super.toggleIncludedInDossier();
+      return super.toggleIncludedInDossier(
+        recordId: recordId,
+        vehicleId: vehicleId,
+      );
     } finally {
       _$_RecordDetailControllerBaseActionController.endAction(_$actionInfo);
     }

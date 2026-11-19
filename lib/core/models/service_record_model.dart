@@ -29,6 +29,7 @@ abstract class ServiceRecordModel with _$ServiceRecordModel {
     @Default(ProofClassification.informalMaster) ProofClassification proofClassification,
     @Default(<String>[]) List<String> proofBadges,
     @Default(true) bool isVerified,
+    @Default(true) bool includeInDossier,
     @Default('') String verificationNotes,
   }) = _ServiceRecordModel;
 

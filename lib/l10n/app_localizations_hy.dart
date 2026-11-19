@@ -870,4 +870,8 @@ class AppLocalizationsHy extends AppLocalizations {
 
   @override
   String get invalidSyncCodeError => 'Սխալ կամ վնասված կոդավորված սինխ կոդ';
+
+  @override
+  String get failedToExportPdfDossierToast =>
+      'Չհաջողվեց ստեղծել կամ կիսվել PDF դոսյեով։ Խնդրում ենք կրկին փորձել։';
 }

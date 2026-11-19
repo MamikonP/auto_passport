@@ -865,4 +865,8 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get invalidSyncCodeError => 'Invalid or corrupted encrypted sync code';
+
+  @override
+  String get failedToExportPdfDossierToast =>
+      'Could not generate or share the PDF dossier. Please try again.';
 }

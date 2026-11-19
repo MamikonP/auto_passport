@@ -17,6 +17,9 @@ class DossierPassportSummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final includedRecords = vehicle.serviceRecords
+        .where((r) => r.includeInDossier)
+        .toList();
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -51,7 +54,7 @@ class DossierPassportSummaryCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
-                  l10n.verifiedEntriesBadge(vehicle.verifiedRecordsCount),
+                  l10n.verifiedEntriesBadge(includedRecords.length),
                   style: const TextStyle(
                     fontSize: 9,
                     fontWeight: FontWeight.w800,
@@ -78,7 +81,7 @@ class DossierPassportSummaryCard extends StatelessWidget {
           const SizedBox(height: 12),
           const Divider(color: AppColors.darkDivider, height: 1),
           const SizedBox(height: 10),
-          ...vehicle.serviceRecords.take(3).map((r) {
+          ...includedRecords.take(3).map((r) {
             return Padding(
               padding: const EdgeInsets.only(bottom: 8),
               child: Row(

@@ -1,6 +1,8 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:printing/printing.dart';
+
 import '../../../core/di/locator.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimensions.dart';
@@ -15,10 +17,7 @@ import '../widgets/dossier_public_link_card.dart';
 class DossierHubView extends StatelessWidget {
   final DossierController? controller;
 
-  const DossierHubView({
-    super.key,
-    this.controller,
-  });
+  const DossierHubView({super.key, this.controller});
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +49,10 @@ class DossierHubView extends StatelessWidget {
                   padding: const EdgeInsets.only(right: 16),
                   child: Center(
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: AppColors.verifiedBg,
                         borderRadius: BorderRadius.circular(20),
@@ -75,7 +77,9 @@ class DossierHubView extends StatelessWidget {
               : ListView(
                   padding: const EdgeInsets.fromLTRB(16, 12, 16, 100),
                   children: [
-                    DossierPublicLinkCard(publicUrl: activeController.publicUrl),
+                    DossierPublicLinkCard(
+                      publicUrl: activeController.publicUrl,
+                    ),
                     const SizedBox(height: 16),
                     DossierPassportSummaryCard(
                       vehicle: vehicle,
@@ -83,12 +87,16 @@ class DossierHubView extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
                     DossierCustomizationCard(
-                      includePartBoxPhotos: activeController.includePartBoxPhotos,
-                      onToggleIncludePartBoxPhotos: activeController.toggleIncludePartBoxPhotos,
+                      includePartBoxPhotos:
+                          activeController.includePartBoxPhotos,
+                      onToggleIncludePartBoxPhotos:
+                          activeController.toggleIncludePartBoxPhotos,
                       includeCostTotals: activeController.includeCostTotals,
-                      onToggleIncludeCostTotals: activeController.toggleIncludeCostTotals,
+                      onToggleIncludeCostTotals:
+                          activeController.toggleIncludeCostTotals,
                       watermarkWithVin: activeController.watermarkWithVin,
-                      onToggleWatermarkWithVin: activeController.toggleWatermarkWithVin,
+                      onToggleWatermarkWithVin:
+                          activeController.toggleWatermarkWithVin,
                     ),
                     const SizedBox(height: 16),
                     Container(
@@ -143,7 +151,9 @@ class DossierHubView extends StatelessWidget {
                   padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
                   decoration: const BoxDecoration(
                     color: AppColors.darkBackground,
-                    border: Border(top: BorderSide(color: AppColors.darkBorder, width: 1)),
+                    border: Border(
+                      top: BorderSide(color: AppColors.darkBorder, width: 1),
+                    ),
                   ),
                   child: SizedBox(
                     width: double.infinity,
@@ -156,19 +166,62 @@ class DossierHubView extends StatelessWidget {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      icon: const Icon(Icons.download_rounded, size: 20),
+                      icon: activeController.isGeneratingPdf
+                          ? const SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                          : const Icon(Icons.download_rounded, size: 20),
                       label: Text(
                         l10n.downloadCertifiedPdfDossier,
-                        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
-                      onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(l10n.certifiedPdfGeneratedToast),
-                            backgroundColor: AppColors.verified,
-                          ),
-                        );
-                      },
+                      onPressed: activeController.isGeneratingPdf
+                          ? null
+                          : () async {
+                              try {
+                                final pdfBytes = await activeController
+                                    .generateDossierPdfBytes();
+                                if (pdfBytes == null || !context.mounted)
+                                  return;
+
+                                await Printing.sharePdf(
+                                  bytes: pdfBytes,
+                                  filename: activeController.pdfFilename,
+                                );
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        l10n.certifiedPdfGeneratedToast,
+                                      ),
+                                      backgroundColor: AppColors.verified,
+                                    ),
+                                  );
+                                }
+                              } catch (e, stackTrace) {
+                                debugPrint(
+                                  'Failed to export PDF dossier: $e\n$stackTrace',
+                                );
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        l10n.failedToExportPdfDossierToast,
+                                      ),
+                                      backgroundColor: AppColors.error,
+                                    ),
+                                  );
+                                }
+                              }
+                            },
                     ),
                   ),
                 )

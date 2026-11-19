@@ -35,7 +35,29 @@ abstract class _RecordDetailControllerBase with Store {
   bool isEditMode = false;
 
   @action
-  void toggleIncludedInDossier() {
+  void toggleIncludedInDossier({String? recordId, String? vehicleId}) {
+    if (recordId != null) {
+      final vehicle = (vehicleId != null)
+          ? (_vehicleRepository.vehicles
+                    .where((v) => v.id == vehicleId)
+                    .firstOrNull ??
+                _vehicleRepository.activeVehicle)
+          : _vehicleRepository.activeVehicle;
+      if (vehicle != null) {
+        final record = vehicle.serviceRecords
+            .where((r) => r.id == recordId)
+            .firstOrNull;
+        if (record != null) {
+          final nextVal = !record.includeInDossier;
+          isIncludedInDossier = nextVal;
+          _serviceRecordRepository.updateRecord(
+            vehicle.id,
+            record.copyWith(includeInDossier: nextVal),
+          );
+          return;
+        }
+      }
+    }
     isIncludedInDossier = !isIncludedInDossier;
   }
 

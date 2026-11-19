@@ -38,6 +38,7 @@ _ServiceRecordModel _$ServiceRecordModelFromJson(Map<String, dynamic> json) =>
               .toList() ??
           const <String>[],
       isVerified: json['isVerified'] as bool? ?? true,
+      includeInDossier: json['includeInDossier'] as bool? ?? true,
       verificationNotes: json['verificationNotes'] as String? ?? '',
     );
 
@@ -61,6 +62,7 @@ Map<String, dynamic> _$ServiceRecordModelToJson(_ServiceRecordModel instance) =>
           _$ProofClassificationEnumMap[instance.proofClassification]!,
       'proofBadges': instance.proofBadges,
       'isVerified': instance.isVerified,
+      'includeInDossier': instance.includeInDossier,
       'verificationNotes': instance.verificationNotes,
     };
 

@@ -5,6 +5,8 @@ import '../controllers/image_picker_controller.dart';
 import '../repository/service_record_repository.dart';
 import '../repository/settings_repository.dart';
 import '../repository/vehicle_repository.dart';
+import '../services/dossier_pdf_service/dossier_pdf_service.dart';
+import '../services/dossier_pdf_service/dossier_pdf_service_imp.dart';
 import '../services/hive_database/hive_local_database_service.dart';
 import '../services/local_database_service.dart';
 import '../services/media_service.dart';
@@ -42,6 +44,9 @@ class Locator {
     }
     if (!getIt.isRegistered<OcrService>()) {
       getIt.registerLazySingleton<OcrService>(() => OcrServiceImp());
+    }
+    if (!getIt.isRegistered<DossierPdfService>()) {
+      getIt.registerFactory<DossierPdfService>(() => DossierPdfServiceImp());
     }
     if (!getIt.isRegistered<ImagePickerController>()) {
       getIt.registerFactory<ImagePickerController>(
@@ -120,7 +125,11 @@ class Locator {
     }
     if (!getIt.isRegistered<DossierController>()) {
       getIt.registerLazySingleton<DossierController>(
-        () => DossierController(repository: getIt<VehicleRepository>()),
+        () => DossierController(
+          repository: getIt<VehicleRepository>(),
+          settingsRepository: getIt<SettingsRepository>(),
+          dossierPdfService: getIt<DossierPdfService>(),
+        ),
       );
     }
     if (!getIt.isRegistered<SettingsController>()) {
@@ -143,6 +152,7 @@ class Locator {
       _get<LocalDatabaseService>();
   static MediaService get mediaService => _get<MediaService>();
   static OcrService get ocrService => _get<OcrService>();
+  static DossierPdfService get dossierPdfService => _get<DossierPdfService>();
   static ImagePickerController get imagePickerController =>
       _get<ImagePickerController>();
   static VehicleRepository get vehicleRepository => _get<VehicleRepository>();
