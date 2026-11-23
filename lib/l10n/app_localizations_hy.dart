@@ -874,4 +874,98 @@ class AppLocalizationsHy extends AppLocalizations {
   @override
   String get failedToExportPdfDossierToast =>
       'Չհաջողվեց ստեղծել կամ կիսվել PDF դոսյեով։ Խնդրում ենք կրկին փորձել։';
+
+  @override
+  String unlockDossierForVehicleTitle(String vehicleName) {
+    return 'Բացել PDF դոսյեն՝ $vehicleName';
+  }
+
+  @override
+  String get upgradeToProTitle => 'Անցնել AutoPassport Pro-ի';
+
+  @override
+  String get multiCarSubscriptionSubtitle =>
+      'Անվճար փաթեթը ներառում է 1 մեքենա։ Բաժանորդագրվեք Pro-ին՝ անսահմանափակ մեքենաներ և բոլոր մեքենաների PDF դոսյեներ ունենալու համար։';
+
+  @override
+  String get oneTimeCarPassOptionTitle =>
+      'Մեկանգամյա վճարում — Միայն այս մեքենայի համար';
+
+  @override
+  String oneTimeCarPassOptionSubtitle(String vehicleName) {
+    return 'Անսահմանափակ PDF դոսյեի արտահանում $vehicleName-ի համար։ Վճարեք մեկ անգամ, օգտվեք ընդմիշտ։';
+  }
+
+  @override
+  String get proSubscriptionOptionTitle =>
+      'AutoPassport Pro բաժանորդագրություն';
+
+  @override
+  String get proSubscriptionOptionSubtitle =>
+      'Անսահմանափակ մեքենաներ ավտոտնակում + PDF դոսյեներ բոլոր մեքենաների համար։';
+
+  @override
+  String get monthlyBillingLabel => 'Ամսական';
+
+  @override
+  String get yearlyBillingLabel => 'Տարեկան (Խնայեք 40%)';
+
+  @override
+  String unlockThisCarButton(String price) {
+    return 'Բացել այս մեքենան ($price)';
+  }
+
+  @override
+  String subscribeProButton(String price) {
+    return 'Բաժանորդագրվել Pro ($price)';
+  }
+
+  @override
+  String get restorePurchasesButton => 'Վերականգնել գնումները';
+
+  @override
+  String get purchasesRestoredToast => '✓ Գնումները վերականգնվեցին';
+
+  @override
+  String vehiclePassUnlockedToast(String vehicleName) {
+    return '✓ PDF դոսյեն բացվեց $vehicleName-ի համար';
+  }
+
+  @override
+  String get proSubscriptionActivatedToast =>
+      '✓ AutoPassport Pro բաժանորդագրությունն ակտիվացվեց';
+
+  @override
+  String get purchaseFailedToast =>
+      'Գնումը չհաջողվեց ավարտել։ Խնդրում ենք կրկին փորձել։';
+
+  @override
+  String get unlockedBadge => 'ԲԱՑՎԱԾ Է';
+
+  @override
+  String unlockAndDownloadPdfButton(String price) {
+    return 'Բացել և ներբեռնել PDF ($price)';
+  }
+
+  @override
+  String get freePlanMember => 'Անվճար փաթեթ';
+
+  @override
+  String get freePlanDescription =>
+      '1 մեքենա ներառված է • Անցեք Pro-ի՝ մի քանի մեքենայի համար';
+
+  @override
+  String get upgradeActionLabel => 'Թարմացնել';
+
+  @override
+  String get resetLocalDatabaseConsumableWarning =>
+      'Վստա՞հ եք, որ ցանկանում եք ջնջել բոլոր տվյալները։ Բոլոր մեքենաները և սպասարկման գրառումները կջնջվեն։\n\nԶգուշացում․ Դուք ունեք մեկ մեքենայի համար մեկանգամյա PDF փաթեթ, որը պահվում է տեղային հիշողությունում։ Տվյալները մաքրելու դեպքում այն կարող է կորչել (նախ արտահանեք կոդավորված պահուստ)։ Pro բաժանորդագրությունները վերականգնվում են խանութից։';
+
+  @override
+  String get noPurchasesToRestoreToast =>
+      'Վերականգնելու ակտիվ բաժանորդագրություն չի գտնվել';
+
+  @override
+  String get restorePurchasesFailedToast =>
+      'Չհաջողվեց վերականգնել գնումները։ Խնդրում ենք կրկին փորձել։';
 }

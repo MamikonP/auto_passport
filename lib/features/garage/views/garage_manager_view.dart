@@ -5,6 +5,7 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import '../../../core/di/locator.dart';
 import '../../../core/routes/app_router.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/billing_paywall_sheet.dart';
 import '../../../l10n/app_localizations.dart';
 import '../controllers/garage_controller.dart';
 import '../widgets/garage_register_card.dart';
@@ -94,8 +95,17 @@ class GarageManagerView extends StatelessWidget {
 
               GarageRegisterCard(
                 isEmpty: items.isEmpty,
-                onTap: () {
-                  context.router.push(AddNewVehicleRoute());
+                onTap: () async {
+                  final canAdd = Locator.billingController.canAddVehicle(
+                    items.length,
+                  );
+                  if (!canAdd) {
+                    final upgraded = await BillingPaywallSheet.show(context);
+                    if (!upgraded || !context.mounted) return;
+                  }
+                  if (context.mounted) {
+                    context.router.push(AddNewVehicleRoute());
+                  }
                 },
               ),
             ],

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobx/mobx.dart';
+import '../../../core/controllers/billing_controller.dart';
 import '../../../core/di/locator.dart';
 import '../../../core/enums/currency.dart';
 import '../../../core/enums/distance_unit.dart';
@@ -17,15 +18,18 @@ abstract class _SettingsControllerBase with Store {
   final ThemeController _themeController;
   final SettingsRepository _settingsRepository;
   final VehicleRepository _vehicleRepository;
+  final BillingController _billingController;
 
   _SettingsControllerBase({
     ThemeController? themeController,
     SettingsRepository? settingsRepository,
     VehicleRepository? vehicleRepository,
+    BillingController? billingController,
     @Deprecated('Use vehicleRepository instead') VehicleRepository? repository,
   })  : _themeController = themeController ?? Locator.themeController,
         _settingsRepository = settingsRepository ?? Locator.settingsRepository,
-        _vehicleRepository = vehicleRepository ?? repository ?? Locator.vehicleRepository;
+        _vehicleRepository = vehicleRepository ?? repository ?? Locator.vehicleRepository,
+        _billingController = billingController ?? Locator.billingController;
 
   @computed
   String get appLanguage => _settingsRepository.appLanguage;
@@ -86,24 +90,31 @@ abstract class _SettingsControllerBase with Store {
     (sum, v) => sum + v.serviceRecords.length,
   );
 
-  /// Encodes all vehicles and their service records into an encrypted sync code.
+  /// Encodes all vehicles, service records, and per-car passes into an encrypted sync code.
   String exportEncryptedVehicles() {
     return VehicleSyncCodec.encode(
       vehicles: _vehicleRepository.vehicles.toList(),
       activeVehicleId: _vehicleRepository.activeVehicleId,
+      unlockedVehicleIds: _billingController.unlockedVehicleIds,
     );
   }
 
-  /// Decodes an encrypted sync code and imports all vehicles into the garage.
+  /// Decodes an encrypted sync code and imports all vehicles and per-car passes.
   Future<int> importEncryptedVehicles(
     String encoded, {
     bool replaceExisting = false,
   }) async {
     final payload = VehicleSyncCodec.decode(encoded);
-    return _vehicleRepository.importVehicles(
+    final count = await _vehicleRepository.importVehicles(
       payload.vehicles,
       preferredActiveVehicleId: payload.activeVehicleId,
       replaceExisting: replaceExisting,
     );
+    if (payload.unlockedVehicleIds.isNotEmpty) {
+      await _billingController.mergeUnlockedVehicleIds(
+        payload.unlockedVehicleIds,
+      );
+    }
+    return count;
   }
 }

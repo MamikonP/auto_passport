@@ -66,6 +66,18 @@ Map<String, dynamic> _$ServiceRecordModelToJson(_ServiceRecordModel instance) =>
       'verificationNotes': instance.verificationNotes,
     };
 
+const _$DistanceUnitEnumMap = {
+  DistanceUnit.km: 'km',
+  DistanceUnit.miles: 'miles',
+};
+
+const _$CurrencyEnumMap = {
+  Currency.amd: 'amd',
+  Currency.usd: 'usd',
+  Currency.eur: 'eur',
+  Currency.rub: 'rub',
+};
+
 const _$ServiceCategoryEnumMap = {
   ServiceCategory.suspension: 'suspension',
   ServiceCategory.brakes: 'brakes',
@@ -77,16 +89,4 @@ const _$ServiceCategoryEnumMap = {
 const _$ProofClassificationEnumMap = {
   ProofClassification.informalMaster: 'informalMaster',
   ProofClassification.formalStoreReceipt: 'formalStoreReceipt',
-};
-
-const _$CurrencyEnumMap = {
-  Currency.amd: 'amd',
-  Currency.usd: 'usd',
-  Currency.eur: 'eur',
-  Currency.rub: 'rub',
-};
-
-const _$DistanceUnitEnumMap = {
-  DistanceUnit.km: 'km',
-  DistanceUnit.miles: 'miles',
 };

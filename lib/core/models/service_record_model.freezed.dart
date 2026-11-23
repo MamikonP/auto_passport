@@ -37,7 +37,7 @@ bool operator ==(Object other) {
 @override
 int get hashCode {
   final _this = this as ServiceRecordModel;
-  return Object.hash(runtimeType,_this.id,_this.title,_this.date,_this.mileageKm,_this.distanceUnit,_this.totalCost,_this.partsCost,_this.laborCost,_this.currency,_this.partsOemNumber,_this.facilityName,_this.facilityType,_this.facilityLocation,_this.category,_this.proofClassification,const DeepCollectionEquality().hash(_this.proofBadges),_this.isVerified,_this.includeInDossier,_this.verificationNotes);
+  return Object.hashAll([runtimeType,_this.id,_this.title,_this.date,_this.mileageKm,_this.distanceUnit,_this.totalCost,_this.partsCost,_this.laborCost,_this.currency,_this.partsOemNumber,_this.facilityName,_this.facilityType,_this.facilityLocation,_this.category,_this.proofClassification,const DeepCollectionEquality().hash(_this.proofBadges),_this.isVerified,_this.includeInDossier,_this.verificationNotes]);
 }
 
 @override
@@ -281,7 +281,7 @@ bool operator ==(Object other) {
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,id,title,date,mileageKm,distanceUnit,totalCost,partsCost,laborCost,currency,partsOemNumber,facilityName,facilityType,facilityLocation,category,proofClassification,const DeepCollectionEquality().hash(_proofBadges),isVerified,includeInDossier,verificationNotes);
+    return Object.hashAll([runtimeType,id,title,date,mileageKm,distanceUnit,totalCost,partsCost,laborCost,currency,partsOemNumber,facilityName,facilityType,facilityLocation,category,proofClassification,const DeepCollectionEquality().hash(_proofBadges),isVerified,includeInDossier,verificationNotes]);
 }
 
 @override

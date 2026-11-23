@@ -288,6 +288,7 @@ proofClassification: ${proofClassification},
 selectedCategory: ${selectedCategory},
 serviceDate: ${serviceDate},
 selectedCurrency: ${selectedCurrency},
+selectedDistanceUnit: ${selectedDistanceUnit},
 proofBadges: ${proofBadges}
     ''';
   }

@@ -869,4 +869,96 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get failedToExportPdfDossierToast =>
       'Could not generate or share the PDF dossier. Please try again.';
+
+  @override
+  String unlockDossierForVehicleTitle(String vehicleName) {
+    return 'Unlock PDF Dossier for $vehicleName';
+  }
+
+  @override
+  String get upgradeToProTitle => 'Upgrade to AutoPassport Pro';
+
+  @override
+  String get multiCarSubscriptionSubtitle =>
+      'Free plan includes 1 vehicle. Subscribe to Pro to manage unlimited vehicles and unlock PDF dossiers for every car.';
+
+  @override
+  String get oneTimeCarPassOptionTitle => 'One-Time Pass — This Car Only';
+
+  @override
+  String oneTimeCarPassOptionSubtitle(String vehicleName) {
+    return 'Unlimited Certified PDF Dossier exports for $vehicleName. Pay once, keep forever.';
+  }
+
+  @override
+  String get proSubscriptionOptionTitle => 'AutoPassport Pro Subscription';
+
+  @override
+  String get proSubscriptionOptionSubtitle =>
+      'Unlimited vehicles in Garage + unlimited Certified PDF Dossiers for all cars.';
+
+  @override
+  String get monthlyBillingLabel => 'Monthly';
+
+  @override
+  String get yearlyBillingLabel => 'Yearly (Save 40%)';
+
+  @override
+  String unlockThisCarButton(String price) {
+    return 'Unlock This Car ($price)';
+  }
+
+  @override
+  String subscribeProButton(String price) {
+    return 'Subscribe to Pro ($price)';
+  }
+
+  @override
+  String get restorePurchasesButton => 'Restore Purchases';
+
+  @override
+  String get purchasesRestoredToast => '✓ Purchases restored';
+
+  @override
+  String vehiclePassUnlockedToast(String vehicleName) {
+    return '✓ Lifetime PDF Dossier unlocked for $vehicleName';
+  }
+
+  @override
+  String get proSubscriptionActivatedToast =>
+      '✓ AutoPassport Pro subscription activated!';
+
+  @override
+  String get purchaseFailedToast =>
+      'Purchase could not be completed. Please try again.';
+
+  @override
+  String get unlockedBadge => 'UNLOCKED';
+
+  @override
+  String unlockAndDownloadPdfButton(String price) {
+    return 'Unlock & Download PDF ($price)';
+  }
+
+  @override
+  String get freePlanMember => 'Free Plan';
+
+  @override
+  String get freePlanDescription =>
+      '1 vehicle included • Upgrade for multi-car & all PDF dossiers';
+
+  @override
+  String get upgradeActionLabel => 'Upgrade';
+
+  @override
+  String get resetLocalDatabaseConsumableWarning =>
+      'Are you sure you want to clear all data? All registered vehicles and service records will be erased.\n\nWarning: You have a one-time per-car PDF pass stored locally. Clearing local storage may remove access to it (export an encrypted backup first to keep it). Pro subscriptions are safely restored from the store.';
+
+  @override
+  String get noPurchasesToRestoreToast =>
+      'No active subscriptions found to restore';
+
+  @override
+  String get restorePurchasesFailedToast =>
+      'Could not restore purchases. Please try again.';
 }

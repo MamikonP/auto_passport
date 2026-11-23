@@ -5,12 +5,15 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 
 import '../../../core/di/locator.dart';
 import '../../../core/models/vehicle_model.dart';
+import '../../../core/services/billing_service/billing_service.dart';
 import '../../../core/services/vehicle_sync_codec.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimensions.dart';
 import '../../../core/widgets/app_confirmation_dialog.dart';
+import '../../../core/widgets/billing_paywall_sheet.dart';
 import '../../../l10n/app_localizations.dart';
 import '../controllers/settings_controller.dart';
+import '../widgets/settings_action_tile.dart';
 import '../widgets/settings_currency_selector.dart';
 import '../widgets/settings_segmented_group.dart';
 
@@ -23,6 +26,7 @@ class SettingsView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final activeController = controller ?? Locator.settingsController;
+    final billingController = Locator.billingController;
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
@@ -57,72 +61,114 @@ class SettingsView extends StatelessWidget {
       ),
       body: Observer(
         builder: (_) {
+          final isProSubscribed = billingController.isProSubscribed;
           return ListView(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 100),
             children: [
-              Container(
-                padding: const EdgeInsets.all(18),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF1E293B), Color(0xFF0F172A)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: AppDimensions.borderRadiusLarge,
-                  border: Border.all(
-                    color: const Color(0xFFF59E0B).withValues(alpha: 0.4),
-                    width: 1.2,
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: const BoxDecoration(
-                        gradient: AppColors.proBadgeGradient,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.workspace_premium_rounded,
-                        color: Colors.black,
-                        size: 22,
-                      ),
+              GestureDetector(
+                onTap: isProSubscribed
+                    ? null
+                    : () => BillingPaywallSheet.show(context),
+                child: Container(
+                  padding: const EdgeInsets.all(18),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF1E293B), Color(0xFF0F172A)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
                     ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            l10n.planStatusHeader,
-                            style: const TextStyle(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: 0.8,
-                              color: Color(0xFFF59E0B),
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            l10n.proLifetimeMember,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w800,
-                              color: Colors.white,
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            l10n.allVehiclesAndExportsUnlocked,
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: AppColors.textSecondary,
-                            ),
-                          ),
-                        ],
-                      ),
+                    borderRadius: AppDimensions.borderRadiusLarge,
+                    border: Border.all(
+                      color: isProSubscribed
+                          ? const Color(0xFFF59E0B).withValues(alpha: 0.5)
+                          : AppColors.darkBorder,
+                      width: 1.2,
                     ),
-                  ],
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          gradient: isProSubscribed
+                              ? AppColors.proBadgeGradient
+                              : null,
+                          color: isProSubscribed
+                              ? null
+                              : AppColors.darkSurfaceVariant,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.workspace_premium_rounded,
+                          color: isProSubscribed
+                              ? Colors.black
+                              : AppColors.textSecondary,
+                          size: 22,
+                        ),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              l10n.planStatusHeader,
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: 0.8,
+                                color: isProSubscribed
+                                    ? const Color(0xFFF59E0B)
+                                    : AppColors.primaryLight,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              isProSubscribed
+                                  ? l10n.proLifetimeMember
+                                  : l10n.freePlanMember,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w800,
+                                color: Colors.white,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              isProSubscribed
+                                  ? l10n.allVehiclesAndExportsUnlocked
+                                  : l10n.freePlanDescription,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      if (!isProSubscribed) ...[
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF59E0B),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Text(
+                            l10n.upgradeActionLabel,
+                            style: const TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
                 ),
               ),
               const SizedBox(height: 22),
@@ -178,155 +224,123 @@ class SettingsView extends StatelessWidget {
                 },
               ),
               const SizedBox(height: 22),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 14,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.darkSurface,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.darkBorder),
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Row(
-                        children: [
-                          const Icon(
-                            Icons.cloud_done_rounded,
-                            color: AppColors.primaryLight,
-                            size: 20,
-                          ),
-                          const SizedBox(width: 12),
-                          Flexible(
-                            child: Text(
-                              l10n.cloudBackupLabel,
-                              style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Row(
-                      children: [
-                        Container(
-                          width: 8,
-                          height: 8,
-                          decoration: const BoxDecoration(
-                            color: AppColors.verified,
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          l10n.syncedStatus,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.verified,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 12),
-              InkWell(
-                borderRadius: BorderRadius.circular(12),
+              // Container(
+              //   padding: const EdgeInsets.symmetric(
+              //     horizontal: 16,
+              //     vertical: 14,
+              //   ),
+              //   decoration: BoxDecoration(
+              //     color: AppColors.darkSurface,
+              //     borderRadius: BorderRadius.circular(12),
+              //     border: Border.all(color: AppColors.darkBorder),
+              //   ),
+              //   child: Row(
+              //     children: [
+              //       Expanded(
+              //         child: Row(
+              //           children: [
+              //             const Icon(
+              //               Icons.cloud_done_rounded,
+              //               color: AppColors.primaryLight,
+              //               size: 20,
+              //             ),
+              //             const SizedBox(width: 12),
+              //             Flexible(
+              //               child: Text(
+              //                 l10n.cloudBackupLabel,
+              //                 style: const TextStyle(
+              //                   fontSize: 14,
+              //                   fontWeight: FontWeight.w600,
+              //                   color: Colors.white,
+              //                 ),
+              //               ),
+              //             ),
+              //           ],
+              //         ),
+              //       ),
+              //       const SizedBox(width: 8),
+              //       Row(
+              //         children: [
+              //           Container(
+              //             width: 8,
+              //             height: 8,
+              //             decoration: const BoxDecoration(
+              //               color: AppColors.verified,
+              //               shape: BoxShape.circle,
+              //             ),
+              //           ),
+              //           const SizedBox(width: 6),
+              //           Text(
+              //             l10n.syncedStatus,
+              //             style: const TextStyle(
+              //               fontSize: 12,
+              //               fontWeight: FontWeight.w700,
+              //               color: AppColors.verified,
+              //             ),
+              //           ),
+              //         ],
+              //       ),
+              //     ],
+              //   ),
+              // ),
+              // const SizedBox(height: 12),
+              SettingsActionTile(
+                icon: Icons.ios_share_rounded,
+                iconColor: AppColors.primaryLight,
+                title: l10n.exportEncryptedBackupLabel,
+                trailingIcon: Icons.lock_outline_rounded,
                 onTap: () => _showExportSyncSheet(context, activeController),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 14,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.darkSurface,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AppColors.darkBorder),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(
-                        Icons.ios_share_rounded,
-                        color: AppColors.primaryLight,
-                        size: 20,
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          l10n.exportEncryptedBackupLabel,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                      const Icon(
-                        Icons.lock_outline_rounded,
-                        color: AppColors.textMuted,
-                        size: 16,
-                      ),
-                    ],
-                  ),
-                ),
               ),
               const SizedBox(height: 12),
-              InkWell(
-                borderRadius: BorderRadius.circular(12),
+              SettingsActionTile(
+                icon: Icons.download_rounded,
+                iconColor: AppColors.verified,
+                title: l10n.importEncryptedBackupLabel,
+                trailingIcon: Icons.sync_rounded,
                 onTap: () => _showImportSyncSheet(context, activeController),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 14,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.darkSurface,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: AppColors.darkBorder),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(
-                        Icons.download_rounded,
-                        color: AppColors.verified,
-                        size: 20,
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          l10n.importEncryptedBackupLabel,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                      const Icon(
-                        Icons.sync_rounded,
-                        color: AppColors.textMuted,
-                        size: 16,
-                      ),
-                    ],
-                  ),
-                ),
               ),
+              if (!isProSubscribed) ...[
+                const SizedBox(height: 12),
+                SettingsActionTile(
+                  icon: Icons.restore_rounded,
+                  iconColor: AppColors.primaryLight,
+                  title: l10n.restorePurchasesButton,
+                  onTap: () async {
+                    final result = await billingController.restorePurchases();
+                    if (!context.mounted) return;
+                    final (message, color) = switch (result) {
+                      RestorePurchasesResult.restored => (
+                        l10n.purchasesRestoredToast,
+                        AppColors.verified,
+                      ),
+                      RestorePurchasesResult.nothingToRestore => (
+                        l10n.noPurchasesToRestoreToast,
+                        AppColors.warning,
+                      ),
+                      RestorePurchasesResult.failed => (
+                        l10n.restorePurchasesFailedToast,
+                        AppColors.error,
+                      ),
+                    };
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(message), backgroundColor: color),
+                    );
+                  },
+                ),
+              ],
               const SizedBox(height: 12),
-              InkWell(
-                borderRadius: BorderRadius.circular(12),
+              SettingsActionTile(
+                icon: Icons.delete_outline_rounded,
+                title: l10n.clearLocalStorageLabel,
+                isDestructive: true,
                 onTap: () async {
+                  final message = billingController.hasOnlyPerCarPasses
+                      ? l10n.resetLocalDatabaseConsumableWarning
+                      : l10n.resetLocalDatabaseMessage;
                   final confirmed = await AppConfirmationDialog.show(
                     context: context,
                     title: l10n.resetLocalDatabaseTitle,
-                    message: l10n.resetLocalDatabaseMessage,
+                    message: message,
                     confirmText: l10n.resetAllConfirmButton,
                     cancelText: l10n.cancel,
                     isDestructive: true,
@@ -343,39 +357,6 @@ class SettingsView extends StatelessWidget {
                     }
                   }
                 },
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 14,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.darkSurface,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: Colors.redAccent.withValues(alpha: 0.3),
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(
-                        Icons.delete_outline_rounded,
-                        color: Colors.redAccent,
-                        size: 20,
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          l10n.clearLocalStorageLabel,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.redAccent,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
               ),
             ],
           );

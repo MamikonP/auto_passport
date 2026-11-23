@@ -1,6 +1,8 @@
 import 'dart:typed_data';
 
 import 'package:mobx/mobx.dart';
+import 'package:printing/printing.dart';
+import '../../../core/controllers/billing_controller.dart';
 import '../../../core/di/locator.dart';
 import '../../../core/models/vehicle_model.dart';
 import '../../../core/repository/settings_repository.dart';
@@ -16,18 +18,31 @@ abstract class _DossierControllerBase with Store {
   final VehicleRepository _repository;
   final SettingsRepository _settingsRepository;
   final DossierPdfService _dossierPdfService;
+  final BillingController _billingController;
 
   _DossierControllerBase({
     VehicleRepository? repository,
     SettingsRepository? settingsRepository,
     DossierPdfService? dossierPdfService,
+    BillingController? billingController,
   })  : _repository = repository ?? Locator.vehicleRepository,
         _settingsRepository = settingsRepository ?? Locator.settingsRepository,
-        _dossierPdfService = dossierPdfService ?? Locator.dossierPdfService;
+        _dossierPdfService = dossierPdfService ?? Locator.dossierPdfService,
+        _billingController = billingController ?? Locator.billingController;
 
   DistanceUnit get distanceUnit => _settingsRepository.distanceUnit;
 
   Currency get displayCurrency => _settingsRepository.displayCurrency;
+
+  bool get isDossierUnlockedForActiveVehicle {
+    final v = activeVehicle;
+    if (v == null) return false;
+    return _billingController.isDossierUnlockedForVehicle(v.id);
+  }
+
+  String get vehiclePassPrice => _billingController.vehiclePassPrice;
+
+  bool get isBusy => isGeneratingPdf || _billingController.isPurchasing;
 
   @observable
   bool includePartBoxPhotos = true;
@@ -105,5 +120,25 @@ abstract class _DossierControllerBase with Store {
     } finally {
       isGeneratingPdf = false;
     }
+  }
+
+  /// Generates and shares the Certified PDF Dossier for the active vehicle.
+  /// Returns `false` if the active vehicle is not unlocked or export fails.
+  Future<bool> downloadDossierPdf({
+    Future<bool> Function(Uint8List bytes, String filename)? shareHandler,
+  }) async {
+    final vehicle = activeVehicle;
+    if (vehicle == null || !isDossierUnlockedForActiveVehicle) {
+      return false;
+    }
+
+    final pdfBytes = await generateDossierPdfBytes();
+    if (pdfBytes == null) return false;
+
+    if (shareHandler != null) {
+      return shareHandler(pdfBytes, pdfFilename);
+    }
+    await Printing.sharePdf(bytes: pdfBytes, filename: pdfFilename);
+    return true;
   }
 }

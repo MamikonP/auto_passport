@@ -871,4 +871,97 @@ class AppLocalizationsRu extends AppLocalizations {
   @override
   String get failedToExportPdfDossierToast =>
       'Не удалось создать или отправить PDF-досье. Попробуйте еще раз.';
+
+  @override
+  String unlockDossierForVehicleTitle(String vehicleName) {
+    return 'Открыть PDF-досье для $vehicleName';
+  }
+
+  @override
+  String get upgradeToProTitle => 'Перейти на AutoPassport Pro';
+
+  @override
+  String get multiCarSubscriptionSubtitle =>
+      'Бесплатный тариф включает 1 авто. Оформите подписку Pro для неограниченного числа авто и PDF-досье для всех машин.';
+
+  @override
+  String get oneTimeCarPassOptionTitle =>
+      'Разовая покупка — только для этого авто';
+
+  @override
+  String oneTimeCarPassOptionSubtitle(String vehicleName) {
+    return 'Неограниченный экспорт PDF-досье для $vehicleName. Оплата один раз навсегда.';
+  }
+
+  @override
+  String get proSubscriptionOptionTitle => 'Подписка AutoPassport Pro';
+
+  @override
+  String get proSubscriptionOptionSubtitle =>
+      'Неограниченно авто в гараже + PDF-досье для всех автомобилей.';
+
+  @override
+  String get monthlyBillingLabel => 'Ежемесячно';
+
+  @override
+  String get yearlyBillingLabel => 'Ежегодно (Скидка 40%)';
+
+  @override
+  String unlockThisCarButton(String price) {
+    return 'Открыть для этого авто ($price)';
+  }
+
+  @override
+  String subscribeProButton(String price) {
+    return 'Оформить Pro ($price)';
+  }
+
+  @override
+  String get restorePurchasesButton => 'Восстановить покупки';
+
+  @override
+  String get purchasesRestoredToast => '✓ Покупки восстановлены';
+
+  @override
+  String vehiclePassUnlockedToast(String vehicleName) {
+    return '✓ PDF-досье открыто для $vehicleName';
+  }
+
+  @override
+  String get proSubscriptionActivatedToast =>
+      '✓ Подписка AutoPassport Pro активирована!';
+
+  @override
+  String get purchaseFailedToast =>
+      'Не удалось завершить покупку. Попробуйте еще раз.';
+
+  @override
+  String get unlockedBadge => 'ОТКРЫТО';
+
+  @override
+  String unlockAndDownloadPdfButton(String price) {
+    return 'Открыть и скачать PDF ($price)';
+  }
+
+  @override
+  String get freePlanMember => 'Бесплатный тариф';
+
+  @override
+  String get freePlanDescription =>
+      '1 авто включено • Перейдите на Pro для нескольких авто';
+
+  @override
+  String get upgradeActionLabel => 'Улучшить';
+
+  @override
+  String get resetLocalDatabaseConsumableWarning =>
+      'Вы уверены, что хотите очистить все данные? Все автомобили и записи обслуживания будут удалены.\n\nВнимание: у вас есть разовая покупка PDF-досье для конкретного авто, сохраненная локально. Очистка хранилища может удалить доступ к ней (сначала сделайте зашифрованный бэкап). Подписка Pro безопасно восстанавливается из магазина.';
+
+  @override
+  String get noPurchasesToRestoreToast =>
+      'Активные подписки для восстановления не найдены';
+
+  @override
+  String get restorePurchasesFailedToast =>
+      'Не удалось восстановить покупки. Попробуйте еще раз.';
 }

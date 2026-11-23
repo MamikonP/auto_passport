@@ -1647,6 +1647,150 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Could not generate or share the PDF dossier. Please try again.'**
   String get failedToExportPdfDossierToast;
+
+  /// No description provided for @unlockDossierForVehicleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock PDF Dossier for {vehicleName}'**
+  String unlockDossierForVehicleTitle(String vehicleName);
+
+  /// No description provided for @upgradeToProTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade to AutoPassport Pro'**
+  String get upgradeToProTitle;
+
+  /// No description provided for @multiCarSubscriptionSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Free plan includes 1 vehicle. Subscribe to Pro to manage unlimited vehicles and unlock PDF dossiers for every car.'**
+  String get multiCarSubscriptionSubtitle;
+
+  /// No description provided for @oneTimeCarPassOptionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'One-Time Pass — This Car Only'**
+  String get oneTimeCarPassOptionTitle;
+
+  /// No description provided for @oneTimeCarPassOptionSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlimited Certified PDF Dossier exports for {vehicleName}. Pay once, keep forever.'**
+  String oneTimeCarPassOptionSubtitle(String vehicleName);
+
+  /// No description provided for @proSubscriptionOptionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'AutoPassport Pro Subscription'**
+  String get proSubscriptionOptionTitle;
+
+  /// No description provided for @proSubscriptionOptionSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlimited vehicles in Garage + unlimited Certified PDF Dossiers for all cars.'**
+  String get proSubscriptionOptionSubtitle;
+
+  /// No description provided for @monthlyBillingLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly'**
+  String get monthlyBillingLabel;
+
+  /// No description provided for @yearlyBillingLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Yearly (Save 40%)'**
+  String get yearlyBillingLabel;
+
+  /// No description provided for @unlockThisCarButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock This Car ({price})'**
+  String unlockThisCarButton(String price);
+
+  /// No description provided for @subscribeProButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscribe to Pro ({price})'**
+  String subscribeProButton(String price);
+
+  /// No description provided for @restorePurchasesButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore Purchases'**
+  String get restorePurchasesButton;
+
+  /// No description provided for @purchasesRestoredToast.
+  ///
+  /// In en, this message translates to:
+  /// **'✓ Purchases restored'**
+  String get purchasesRestoredToast;
+
+  /// No description provided for @vehiclePassUnlockedToast.
+  ///
+  /// In en, this message translates to:
+  /// **'✓ Lifetime PDF Dossier unlocked for {vehicleName}'**
+  String vehiclePassUnlockedToast(String vehicleName);
+
+  /// No description provided for @proSubscriptionActivatedToast.
+  ///
+  /// In en, this message translates to:
+  /// **'✓ AutoPassport Pro subscription activated!'**
+  String get proSubscriptionActivatedToast;
+
+  /// No description provided for @purchaseFailedToast.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchase could not be completed. Please try again.'**
+  String get purchaseFailedToast;
+
+  /// No description provided for @unlockedBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'UNLOCKED'**
+  String get unlockedBadge;
+
+  /// No description provided for @unlockAndDownloadPdfButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock & Download PDF ({price})'**
+  String unlockAndDownloadPdfButton(String price);
+
+  /// No description provided for @freePlanMember.
+  ///
+  /// In en, this message translates to:
+  /// **'Free Plan'**
+  String get freePlanMember;
+
+  /// No description provided for @freePlanDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'1 vehicle included • Upgrade for multi-car & all PDF dossiers'**
+  String get freePlanDescription;
+
+  /// No description provided for @upgradeActionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Upgrade'**
+  String get upgradeActionLabel;
+
+  /// No description provided for @resetLocalDatabaseConsumableWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to clear all data? All registered vehicles and service records will be erased.\n\nWarning: You have a one-time per-car PDF pass stored locally. Clearing local storage may remove access to it (export an encrypted backup first to keep it). Pro subscriptions are safely restored from the store.'**
+  String get resetLocalDatabaseConsumableWarning;
+
+  /// No description provided for @noPurchasesToRestoreToast.
+  ///
+  /// In en, this message translates to:
+  /// **'No active subscriptions found to restore'**
+  String get noPurchasesToRestoreToast;
+
+  /// No description provided for @restorePurchasesFailedToast.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not restore purchases. Please try again.'**
+  String get restorePurchasesFailedToast;
 }
 
 class _AppLocalizationsDelegate

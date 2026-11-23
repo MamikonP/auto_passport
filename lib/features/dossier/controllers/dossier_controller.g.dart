@@ -167,6 +167,7 @@ mixin _$DossierController on _DossierControllerBase, Store {
 includePartBoxPhotos: ${includePartBoxPhotos},
 includeCostTotals: ${includeCostTotals},
 watermarkWithVin: ${watermarkWithVin},
+isGeneratingPdf: ${isGeneratingPdf},
 activeVehicle: ${activeVehicle},
 hasActiveVehicle: ${hasActiveVehicle},
 publicUrl: ${publicUrl}

@@ -1,9 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:auto_passport/core/controllers/billing_controller.dart';
 import 'package:auto_passport/core/di/locator.dart';
 import 'package:auto_passport/core/models/vehicle_model.dart';
 import 'package:auto_passport/core/repository/service_record_repository.dart';
 import 'package:auto_passport/core/repository/settings_repository.dart';
 import 'package:auto_passport/core/repository/vehicle_repository.dart';
+import 'package:auto_passport/core/services/billing_service/billing_service_imp.dart';
 import 'package:auto_passport/core/services/dossier_pdf_service/dossier_pdf_service_imp.dart';
 import 'package:auto_passport/core/services/hive_database/hive_local_database_service.dart';
 import 'package:auto_passport/core/services/local_database_service.dart';
@@ -882,6 +884,89 @@ void main() {
         pdfService.formatPdfCurrency(235.294, Currency.eur),
         'EUR 235.29',
       );
+    });
+  });
+
+  group('BillingController & MobX Dossier PDF Download Tests', () {
+    test('one-time pass unlocks PDF only for the purchased car, Pro unlocks multi-car and all PDFs', () async {
+      final db = HiveLocalDatabaseService();
+      await db.init();
+      final billingService = BillingServiceImp(
+        databaseService: db,
+        enableDevFallback: true,
+      );
+      final billingController = BillingController(
+        billingService: billingService,
+      );
+      await billingController.init();
+      addTearDown(billingController.dispose);
+      addTearDown(billingService.dispose);
+
+      final vehicleRepo = VehicleRepository(databaseService: db);
+      final settingsRepo = SettingsRepository(databaseService: db);
+      final dossierController = DossierController(
+        repository: vehicleRepo,
+        settingsRepository: settingsRepo,
+        dossierPdfService: DossierPdfServiceImp(),
+        billingController: billingController,
+      );
+
+      final car1 = createTestVehicle(id: 'car-1');
+      final car2 = createSecondTestVehicle();
+      vehicleRepo.addVehicle(car1);
+      vehicleRepo.addVehicle(car2);
+      vehicleRepo.setActiveVehicle(car1.id);
+
+      // Free tier: 1 car allowed, 2nd car requires Pro subscription
+      expect(billingController.canAddVehicle(0), isTrue);
+      expect(billingController.canAddVehicle(1), isFalse);
+      expect(billingController.isDossierUnlockedForVehicle(car1.id), isFalse);
+      expect(billingController.isDossierUnlockedForVehicle(car2.id), isFalse);
+      expect(dossierController.isDossierUnlockedForActiveVehicle, isFalse);
+
+      // Downloading PDF before purchasing fails cleanly
+      final blockedDownload = await dossierController.downloadDossierPdf(
+        shareHandler: (_, _) async => true,
+      );
+      expect(blockedDownload, isFalse);
+
+      // Buy one-time Lifetime Pass for car1 ONLY
+      final boughtCar1 = await billingController.purchaseVehiclePass(car1.id);
+      expect(boughtCar1, isTrue);
+      expect(billingController.isDossierUnlockedForVehicle(car1.id), isTrue);
+      expect(billingController.isDossierUnlockedForVehicle(car2.id), isFalse);
+      expect(dossierController.isDossierUnlockedForActiveVehicle, isTrue);
+      // Multi-car still requires Pro subscription
+      expect(billingController.canAddVehicle(1), isFalse);
+
+      // Downloading PDF for car1 now succeeds via MobX DossierController
+      int sharedBytesLength = 0;
+      final car1Download = await dossierController.downloadDossierPdf(
+        shareHandler: (bytes, _) async {
+          sharedBytesLength = bytes.length;
+          return true;
+        },
+      );
+      expect(car1Download, isTrue);
+      expect(sharedBytesLength, greaterThan(1000));
+
+      // Switch active car to car2 -> downloading PDF for car2 is still blocked
+      vehicleRepo.setActiveVehicle(car2.id);
+      expect(dossierController.isDossierUnlockedForActiveVehicle, isFalse);
+      final car2Blocked = await dossierController.downloadDossierPdf(
+        shareHandler: (_, _) async => true,
+      );
+      expect(car2Blocked, isFalse);
+
+      // Subscribe to Pro -> unlocks multi-car garage AND all car dossiers
+      final subscribed = await billingController.purchaseProSubscription(
+        yearly: true,
+      );
+      expect(subscribed, isTrue);
+      expect(billingController.isProSubscribed, isTrue);
+      expect(billingController.canAddVehicle(1), isTrue);
+      expect(billingController.canAddVehicle(5), isTrue);
+      expect(dossierController.isDossierUnlockedForActiveVehicle, isTrue);
     });
   });
 

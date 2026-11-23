@@ -18,12 +18,14 @@ class VehicleSyncPayload {
   final DateTime exportedAt;
   final String? activeVehicleId;
   final List<VehiclePassportModel> vehicles;
+  final Set<String> unlockedVehicleIds;
 
   const VehicleSyncPayload({
     required this.version,
     required this.exportedAt,
     required this.activeVehicleId,
     required this.vehicles,
+    this.unlockedVehicleIds = const <String>{},
   });
 }
 
@@ -51,11 +53,13 @@ class VehicleSyncCodec {
   static String encode({
     required List<VehiclePassportModel> vehicles,
     String? activeVehicleId,
+    Set<String> unlockedVehicleIds = const <String>{},
   }) {
     final jsonMap = <String, dynamic>{
       'version': _formatVersion,
       'exportedAt': DateTime.now().toUtc().toIso8601String(),
       'activeVehicleId': activeVehicleId,
+      'unlockedVehicleIds': unlockedVehicleIds.toList(),
       'vehicles': vehicles.map((v) => v.toJson()).toList(),
     };
 
@@ -155,6 +159,11 @@ class VehicleSyncCodec {
           )
           .toList();
 
+      final rawUnlocked = jsonMap['unlockedVehicleIds'];
+      final unlockedIds = rawUnlocked is List
+          ? rawUnlocked.map((e) => e.toString()).toSet()
+          : <String>{};
+
       return VehicleSyncPayload(
         version: (jsonMap['version'] as num?)?.toInt() ?? _formatVersion,
         exportedAt:
@@ -162,6 +171,7 @@ class VehicleSyncCodec {
             DateTime.now().toUtc(),
         activeVehicleId: jsonMap['activeVehicleId'] as String?,
         vehicles: vehicles,
+        unlockedVehicleIds: unlockedIds,
       );
     } catch (_) {
       throw const VehicleSyncException('Invalid vehicle data inside payload.');

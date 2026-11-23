@@ -1,11 +1,11 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:printing/printing.dart';
 
 import '../../../core/di/locator.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimensions.dart';
+import '../../../core/widgets/billing_paywall_sheet.dart';
 import '../../../l10n/app_localizations.dart';
 import '../controllers/dossier_controller.dart';
 import '../widgets/dossier_customization_card.dart';
@@ -28,6 +28,7 @@ class DossierHubView extends StatelessWidget {
       builder: (context) {
         final vehicle = activeController.activeVehicle;
         final hasVehicle = vehicle != null;
+        final isUnlocked = activeController.isDossierUnlockedForActiveVehicle;
 
         return Scaffold(
           backgroundColor: AppColors.darkBackground,
@@ -99,49 +100,82 @@ class DossierHubView extends StatelessWidget {
                           activeController.toggleWatermarkWithVin,
                     ),
                     const SizedBox(height: 16),
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: AppColors.darkSurface,
-                        borderRadius: AppDimensions.borderRadiusLarge,
-                        border: Border.all(color: AppColors.darkBorder),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  l10n.lifetimeVehiclePass,
+                    GestureDetector(
+                      onTap: isUnlocked
+                          ? null
+                          : () => BillingPaywallSheet.show(
+                                context,
+                                vehicle: vehicle,
+                              ),
+                      child: Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: AppColors.darkSurface,
+                          borderRadius: AppDimensions.borderRadiusLarge,
+                          border: Border.all(
+                            color: isUnlocked
+                                ? AppColors.verified.withValues(alpha: 0.5)
+                                : AppColors.darkBorder,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    l10n.lifetimeVehiclePass,
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w700,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    l10n.unlimitedPdfExports,
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: AppColors.textSecondary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            if (isUnlocked)
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 5,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppColors.verifiedBg,
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(color: AppColors.verified),
+                                ),
+                                child: Text(
+                                  l10n.unlockedBadge,
                                   style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w700,
-                                    color: Colors.white,
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w800,
+                                    color: AppColors.verified,
                                   ),
                                 ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  l10n.unlimitedPdfExports,
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    color: AppColors.textSecondary,
-                                  ),
+                              )
+                            else
+                              Text(
+                                activeController.vehiclePassPrice,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w800,
+                                  color: Colors.white,
                                 ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          const Text(
-                            '\$14.99',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w800,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
+                              ),
+                          ],
+                        ),
                       ),
                     ),
                   ],
@@ -166,7 +200,7 @@ class DossierHubView extends StatelessWidget {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      icon: activeController.isGeneratingPdf
+                      icon: activeController.isBusy
                           ? const SizedBox(
                               width: 18,
                               height: 18,
@@ -175,37 +209,51 @@ class DossierHubView extends StatelessWidget {
                                 color: Colors.white,
                               ),
                             )
-                          : const Icon(Icons.download_rounded, size: 20),
+                          : Icon(
+                              isUnlocked
+                                  ? Icons.download_rounded
+                                  : Icons.lock_open_rounded,
+                              size: 20,
+                            ),
                       label: Text(
-                        l10n.downloadCertifiedPdfDossier,
+                        isUnlocked
+                            ? l10n.downloadCertifiedPdfDossier
+                            : l10n.unlockAndDownloadPdfButton(
+                                activeController.vehiclePassPrice,
+                              ),
                         style: const TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
-                      onPressed: activeController.isGeneratingPdf
+                      onPressed: activeController.isBusy
                           ? null
                           : () async {
                               try {
-                                final pdfBytes = await activeController
-                                    .generateDossierPdfBytes();
-                                if (pdfBytes == null || !context.mounted)
-                                  return;
-
-                                await Printing.sharePdf(
-                                  bytes: pdfBytes,
-                                  filename: activeController.pdfFilename,
-                                );
-                                if (context.mounted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        l10n.certifiedPdfGeneratedToast,
-                                      ),
-                                      backgroundColor: AppColors.verified,
-                                    ),
+                                bool canDownload = isUnlocked;
+                                if (!canDownload) {
+                                  canDownload = await BillingPaywallSheet.show(
+                                    context,
+                                    vehicle: vehicle,
                                   );
                                 }
+                                if (!canDownload || !context.mounted) return;
+
+                                final ok = await activeController
+                                    .downloadDossierPdf();
+                                if (!context.mounted) return;
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      ok
+                                          ? l10n.certifiedPdfGeneratedToast
+                                          : l10n.failedToExportPdfDossierToast,
+                                    ),
+                                    backgroundColor: ok
+                                        ? AppColors.verified
+                                        : AppColors.error,
+                                  ),
+                                );
                               } catch (e, stackTrace) {
                                 debugPrint(
                                   'Failed to export PDF dossier: $e\n$stackTrace',

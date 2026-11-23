@@ -443,5 +443,71 @@
     }
   },
   "invalidSyncCodeError": "Invalid or corrupted encrypted sync code",
-  "failedToExportPdfDossierToast": "Could not generate or share the PDF dossier. Please try again."
+  "failedToExportPdfDossierToast": "Could not generate or share the PDF dossier. Please try again.",
+  "unlockDossierForVehicleTitle": "Unlock PDF Dossier for {vehicleName}",
+  "@unlockDossierForVehicleTitle": {
+    "placeholders": {
+      "vehicleName": {
+        "type": "String"
+      }
+    }
+  },
+  "upgradeToProTitle": "Upgrade to AutoPassport Pro",
+  "multiCarSubscriptionSubtitle": "Free plan includes 1 vehicle. Subscribe to Pro to manage unlimited vehicles and unlock PDF dossiers for every car.",
+  "oneTimeCarPassOptionTitle": "One-Time Pass — This Car Only",
+  "oneTimeCarPassOptionSubtitle": "Unlimited Certified PDF Dossier exports for {vehicleName}. Pay once, keep forever.",
+  "@oneTimeCarPassOptionSubtitle": {
+    "placeholders": {
+      "vehicleName": {
+        "type": "String"
+      }
+    }
+  },
+  "proSubscriptionOptionTitle": "AutoPassport Pro Subscription",
+  "proSubscriptionOptionSubtitle": "Unlimited vehicles in Garage + unlimited Certified PDF Dossiers for all cars.",
+  "monthlyBillingLabel": "Monthly",
+  "yearlyBillingLabel": "Yearly (Save 40%)",
+  "unlockThisCarButton": "Unlock This Car ({price})",
+  "@unlockThisCarButton": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "subscribeProButton": "Subscribe to Pro ({price})",
+  "@subscribeProButton": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "restorePurchasesButton": "Restore Purchases",
+  "purchasesRestoredToast": "✓ Purchases restored",
+  "vehiclePassUnlockedToast": "✓ Lifetime PDF Dossier unlocked for {vehicleName}",
+  "@vehiclePassUnlockedToast": {
+    "placeholders": {
+      "vehicleName": {
+        "type": "String"
+      }
+    }
+  },
+  "proSubscriptionActivatedToast": "✓ AutoPassport Pro subscription activated!",
+  "purchaseFailedToast": "Purchase could not be completed. Please try again.",
+  "unlockedBadge": "UNLOCKED",
+  "unlockAndDownloadPdfButton": "Unlock & Download PDF ({price})",
+  "@unlockAndDownloadPdfButton": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "freePlanMember": "Free Plan",
+  "freePlanDescription": "1 vehicle included • Upgrade for multi-car & all PDF dossiers",
+  "upgradeActionLabel": "Upgrade",
+  "resetLocalDatabaseConsumableWarning": "Are you sure you want to clear all data? All registered vehicles and service records will be erased.\n\nWarning: You have a one-time per-car PDF pass stored locally. Clearing local storage may remove access to it (export an encrypted backup first to keep it). Pro subscriptions are safely restored from the store.",
+  "noPurchasesToRestoreToast": "No active subscriptions found to restore",
+  "restorePurchasesFailedToast": "Could not restore purchases. Please try again."
 }

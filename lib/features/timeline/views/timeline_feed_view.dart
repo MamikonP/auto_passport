@@ -96,25 +96,26 @@ class TimelineFeedView extends StatelessWidget {
                                       ),
                                     ),
                                   ),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 10,
-                                      vertical: 4,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      gradient: AppColors.proBadgeGradient,
-                                      borderRadius: BorderRadius.circular(6),
-                                    ),
-                                    child: Text(
-                                      l10n.proBadge,
-                                      style: const TextStyle(
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.w800,
-                                        color: Colors.black,
-                                        letterSpacing: 0.8,
+                                  if (Locator.billingController.isProSubscribed)
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 10,
+                                        vertical: 4,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        gradient: AppColors.proBadgeGradient,
+                                        borderRadius: BorderRadius.circular(6),
+                                      ),
+                                      child: Text(
+                                        l10n.proBadge,
+                                        style: const TextStyle(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w800,
+                                          color: Colors.black,
+                                          letterSpacing: 0.8,
+                                        ),
                                       ),
                                     ),
-                                  ),
                                 ],
                               ),
                               const SizedBox(height: 12),
